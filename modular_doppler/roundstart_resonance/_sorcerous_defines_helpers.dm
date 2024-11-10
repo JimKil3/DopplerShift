@@ -42,3 +42,6 @@
 #define ROOT_AUGMENTED "root_augmented"
 #define BASIC_AUGMENTED "basic_augmented"
 #define ADVANCED_AUGMENTED "advanced_augmented"
+
+//Special category for taking no Resonant abilities at all
+#define INDOMITABLE "indomitable"
