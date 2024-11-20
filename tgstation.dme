@@ -7137,6 +7137,8 @@
 #include "modular_doppler\religion\code\mind.dm"
 #include "modular_doppler\religion\code\religious_sects.dm"
 #include "modular_doppler\research\designs\limbgrower_designs.dm"
+#include "modular_doppler\sorcerous_augments\core_augments.dm"
+#include "modular_doppler\sorcerous_augments\module_augments.dm"
 #include "modular_doppler\stone\code\ore_veins.dm"
 #include "modular_doppler\stone\code\stone.dm"
 #include "modular_doppler\tableflip\tableflip.dm"
