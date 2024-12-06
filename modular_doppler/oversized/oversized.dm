@@ -33,6 +33,7 @@
 	var/translate_x = translate * ( human_holder.transform.b / 2)
 	var/translate_y = translate * ( human_holder.transform.e / 2)
 	human_holder.transform = human_holder.transform.Translate(translate_x, translate_y)
+	human_holder.maptext_height = 64
 
 /datum/quirk/oversized/remove()
 	var/mob/living/carbon/human/human_holder = quirk_holder
@@ -43,6 +44,7 @@
 	var/translate_x = translate * ( human_holder.transform.b / 2)
 	var/translate_y = translate * ( human_holder.transform.e / 2)
 	human_holder.transform = human_holder.transform.Translate(translate_x, translate_y)
+	human_holder.maptext_height = 32
 
 	var/obj/item/bodypart/arm/left/left_arm = human_holder.get_bodypart(BODY_ZONE_L_ARM)
 	if(left_arm)
