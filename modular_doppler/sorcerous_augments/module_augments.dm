@@ -15,7 +15,3 @@
 
 /obj/item/augment_module/proc/on_remove()
 	return
-
-/obj/item/augment_module/tool
-	name = "tool module"
-	var/tool_type

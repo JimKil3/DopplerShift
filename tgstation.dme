@@ -7140,6 +7140,8 @@
 #include "modular_doppler\sorcerous_augments\augment_surgeries.dm"
 #include "modular_doppler\sorcerous_augments\core_augments.dm"
 #include "modular_doppler\sorcerous_augments\module_augments.dm"
+#include "modular_doppler\sorcerous_augments\arm_augments\arm_core.dm"
+#include "modular_doppler\sorcerous_augments\arm_augments\arm_modules.dm"
 #include "modular_doppler\stone\code\ore_veins.dm"
 #include "modular_doppler\stone\code\stone.dm"
 #include "modular_doppler\tableflip\tableflip.dm"

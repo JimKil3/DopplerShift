@@ -47,17 +47,3 @@
 /obj/item/organ/cyberimp/core/proc/remove_module(obj/item/augment_module/removed_augment, mob/living/carbon/remover)
 	removed_augment.on_remove()
 	remover.put_in_hands(removed_augment)
-
-/obj/item/organ/cyberimp/core/arm
-	name = "arm endoskeletal mount"
-	desc = "A mounting point for various modules which extend from or make changes to the arms."
-	icon_state = "toolkit_generic"
-
-	zone = BODY_ZONE_L_ARM
-	slot = ORGAN_SLOT_LEFT_ARM_AUG
-	accepted_types = list(/obj/item/augment_module/tool)
-
-	/// Which arm this module is configured to mount to
-	var/current_arm = "left"
-	/// All the tool modules that this augment contains
-	var/all_tools = list()
