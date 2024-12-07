@@ -9,11 +9,11 @@
 	zone = BODY_ZONE_L_ARM
 	slot = ORGAN_SLOT_LEFT_ARM_AUG
 	accepted_types = list(/obj/item/augment_module/tool)
-	actions_types = list(/datum/action/item_action/organ_action/toggle)
+	actions_types = list(/datum/action/item_action/organ_action/toggle/toolkit)
 
 	/// Which arm this module is configured to mount to
 	var/current_arm = "left"
-	/// All the tools that this augment contains
+	/// A list of all the modules we have (because contents changes order).
 	var/all_tools = list()
 	/// Complexity is how much space a tool takes up in the arm.
 	var/max_complexity = 10
@@ -31,6 +31,15 @@
 	return ..()
 
 /obj/item/organ/cyberimp/core/arm/proc/refresh_modules()
-	QDEL_LIST(all_tools)
+	all_tools = list()
 	for(var/obj/item/augment_module/tool/module in contents)
-		all_tools += new module.tool_path(src)
+		all_tools += module
+
+/obj/item/organ/cyberimp/core/arm/ui_action_click()
+	if((organ_flags & ORGAN_FAILING) ||  !length(contents))
+		to_chat(owner, span_warning("The implant doesn't respond. It seems to be broken..."))
+		return
+
+	if(length(all_tools) == 1)
+		var/obj/item/augment_module/tool/active_tool = all_tools[1]
+		active_tool.deploy()

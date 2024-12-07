@@ -36,14 +36,27 @@
 	remove_module(choice, user)
 	to_chat(user, span_notice("You remove [choice] from [src]."))
 
+/obj/item/organ/cyberimp/core/Insert(mob/living/carbon/receiver, special, movement_flags)
+	. = ..()
+	for(var/obj/item/augment_module/module in contents)
+		module.owner = receiver
+
+/obj/item/organ/cyberimp/core/Remove(mob/living/carbon/organ_owner, special, movement_flags)
+	. = ..()
+	for(var/obj/item/augment_module/module in contents)
+		module.owner = null
+
 /obj/item/organ/cyberimp/core/proc/can_install(obj/item/augment_module/potential_augment)
 	return is_type_in_list(potential_augment, accepted_types)
 
 /obj/item/organ/cyberimp/core/proc/install_module(obj/item/augment_module/new_augment)
 	new_augment.forceMove(src)
 	new_augment.frame = src
+	new_augment.owner = owner
 	new_augment.on_install()
 
 /obj/item/organ/cyberimp/core/proc/remove_module(obj/item/augment_module/removed_augment, mob/living/carbon/remover)
 	removed_augment.on_remove()
+	removed_augment.frame = null
+	removed_augment.owner = null
 	remover.put_in_hands(removed_augment)
