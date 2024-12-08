@@ -35,6 +35,8 @@
 	human_holder.transform = human_holder.transform.Translate(translate_x, translate_y)
 	human_holder.maptext_height = 64
 
+	human_holder.AddComponent(/datum/component/seethrough_mob)
+
 /datum/quirk/oversized/remove()
 	var/mob/living/carbon/human/human_holder = quirk_holder
 	human_holder.mob_size = MOB_SIZE_HUMAN
@@ -82,6 +84,9 @@
 			possibly_a_brain.brainmob = current_brain.brainmob
 
 		organ_to_restore.replace_into(quirk_holder)
+
+	var/datum/component/seethrough_mob/component = human_holder.GetComponent(/datum/component/seethrough_mob)
+	qdel(component)
 
 /datum/quirk/oversized/proc/on_gain_limb(datum/source, obj/item/bodypart/gained, special)
 	SIGNAL_HANDLER
