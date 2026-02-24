@@ -7,7 +7,7 @@
 	base_icon_state = "toggle"
 	mouse_over_pointer = MOUSE_HAND_POINTER
 
-/atom/movable/screen/human/toggle/Click()
+/atom/movable/screen/human/toggle/Click(location, control, params) // DOPPLER EDIT ADDITION - Original: /atom/movable/screen/human/toggle/Click()
 
 	var/mob/targetmob = usr
 
@@ -15,6 +15,13 @@
 		if(ishuman(usr.client.eye) && (usr.client.eye != usr))
 			var/mob/M = usr.client.eye
 			targetmob = M
+
+	// DOPPLER EDIT ADDITION START - Right click functionality for mutant part toggling
+	if(LAZYACCESS(params2list(params), RIGHT_CLICK))
+		var/mob/living/carbon/human/H = targetmob
+		H.mutant_part_visibility(re_do = TRUE)
+		return
+	// DOPPLER EDIT ADDITION END
 
 	if(usr.hud_used.inventory_shown && targetmob.hud_used)
 		usr.hud_used.inventory_shown = FALSE
@@ -256,6 +263,10 @@
 	rest_icon.update_appearance()
 	static_inventory += rest_icon
 
+	sleep_icon = new /atom/movable/screen/sleep(null, src)
+	sleep_icon.icon = ui_style
+	sleep_icon.screen_loc = ui_above_throw
+
 	spacesuit = new /atom/movable/screen/spacesuit(null, src)
 	infodisplay += spacesuit
 
@@ -282,9 +293,6 @@
 	zone_select.update_appearance()
 	static_inventory += zone_select
 
-	combo_display = new /atom/movable/screen/combo(null, src)
-	infodisplay += combo_display
-
 	for(var/atom/movable/screen/inventory/inv in (static_inventory + toggleable_inventory))
 		if(inv.slot_id)
 			inv_slots[TOBITSHIFT(inv.slot_id) + 1] = inv
@@ -300,7 +308,7 @@
 	var/mob/living/carbon/human/human_mob = mymob
 	if(istype(human_mob))
 		blocked_slots |= human_mob.dna?.species?.no_equip_flags
-		if(isnull(human_mob.w_uniform) && !HAS_TRAIT(human_mob, TRAIT_NO_JUMPSUIT))
+		if((isnull(human_mob.w_uniform) || !(human_mob.w_uniform.item_flags & IN_INVENTORY)) && !HAS_TRAIT(human_mob, TRAIT_NO_JUMPSUIT))
 			var/obj/item/bodypart/chest = human_mob.get_bodypart(BODY_ZONE_CHEST)
 			if(isnull(chest) || IS_ORGANIC_LIMB(chest))
 				blocked_slots |= ITEM_SLOT_ID|ITEM_SLOT_BELT
@@ -310,7 +318,7 @@
 			var/obj/item/bodypart/right_leg = human_mob.get_bodypart(BODY_ZONE_R_LEG)
 			if(isnull(right_leg) || IS_ORGANIC_LIMB(right_leg))
 				blocked_slots |= ITEM_SLOT_RPOCKET
-		if(isnull(human_mob.wear_suit))
+		if(isnull(human_mob.wear_suit) || !(human_mob.wear_suit.item_flags & IN_INVENTORY))
 			blocked_slots |= ITEM_SLOT_SUITSTORE
 		if(human_mob.num_hands <= 0)
 			blocked_slots |= ITEM_SLOT_GLOVES

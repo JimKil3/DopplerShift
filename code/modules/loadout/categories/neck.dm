@@ -21,6 +21,8 @@
 		outfit.neck = item_path
 // DOPPLER EDIT END
 
+/* // DOPPLER EDIT REMOVAL START - Custom Loadout Organization
+
 /datum/loadout_item/neck/scarf_greyscale
 	name = "Scarf (Colorable)"
 	item_path = /obj/item/clothing/neck/scarf
@@ -44,3 +46,9 @@
 /datum/loadout_item/neck/necktie_loose
 	name = "Necktie (Loose)"
 	item_path = /obj/item/clothing/neck/tie/detective
+
+/datum/loadout_item/neck/bowtie
+	name = "Bowtie"
+	item_path = /obj/item/clothing/neck/bowtie
+
+*/ // DOPPLER EDIT REMOVAL END

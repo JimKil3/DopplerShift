@@ -5,12 +5,10 @@
 	icon = 'modular_doppler/deforest_medical_items/icons/storage.dmi'
 	icon_state = "painkiller_bottle"
 	custom_price = PAYCHECK_CREW * 1.5
+	spawn_type = /obj/item/reagent_containers/applicator/pill/amollin
+	spawn_count = 7
 
-/obj/item/storage/pill_bottle/painkiller/PopulateContents()
-	for(var/i in 1 to 7)
-		new /obj/item/reagent_containers/pill/amollin(src)
-
-/obj/item/reagent_containers/pill/amollin
+/obj/item/reagent_containers/applicator/pill/amollin
 	name = "amollin pill"
 	desc = "Neutralizes many common pains and ailments. A blend of Miner's Salve and Lidocaine."
 	icon_state = "pill9"
@@ -21,26 +19,7 @@
 	)
 
 // Narcolepsy quirk medicines
-/obj/item/storage/pill_bottle/prescription_stimulant
-	name = "alifil pill bottle"
-	desc = "A special miniaturized pill bottle with an insert resembling a revolver cylinder, fitted for the inside of a 'civil defense'-class shell medkit. Holds five alifil pills, and is designed only to accept their proprietary DeForest(tm) shape. A big, bold yellow warning label on the side reads: 'FOLLOW DOSAGE DIRECTIONS'."
-	icon = 'modular_doppler/deforest_medical_items/icons/storage.dmi'
-	icon_state = "painkiller_bottle"
-	w_class = WEIGHT_CLASS_TINY // this is fine because we hard limit what can go in this thing
-
-/obj/item/storage/pill_bottle/prescription_stimulant/Initialize(mapload)
-	. = ..()
-	// Make sure we can only hold alifil pills since this is nested inside a symptom support kit
-	atom_storage.max_slots = 5
-	atom_storage.set_holdable(list(
-		/obj/item/reagent_containers/pill/prescription_stimulant,
-	))
-
-/obj/item/storage/pill_bottle/prescription_stimulant/PopulateContents()
-	for(var/i in 1 to 5)
-		new /obj/item/reagent_containers/pill/prescription_stimulant(src)
-
-/obj/item/reagent_containers/pill/prescription_stimulant
+/obj/item/reagent_containers/applicator/pill/prescription_stimulant
 	name = "alifil pill"
 	desc = "Used to treat symptoms of drowsiness and sudden loss of consciousness. Contains a mix of sugar, synaptizine and modafinil. A warning label reads: <b>Take in moderation</b>."
 	icon_state = "pill15"
@@ -49,6 +28,23 @@
 		/datum/reagent/medicine/synaptizine = 5,
 		/datum/reagent/medicine/modafinil = 3
 	)
+
+/obj/item/storage/pill_bottle/prescription_stimulant
+	name = "alifil pill bottle"
+	desc = "A special miniaturized pill bottle with an insert resembling a revolver cylinder, fitted for the inside of a 'civil defense'-class shell medkit. Holds five alifil pills, and is designed only to accept their proprietary DeForest(tm) shape. A big, bold yellow warning label on the side reads: 'FOLLOW DOSAGE DIRECTIONS'."
+	icon = 'modular_doppler/deforest_medical_items/icons/storage.dmi'
+	icon_state = "painkiller_bottle"
+	w_class = WEIGHT_CLASS_TINY // this is fine because we hard limit what can go in this thing
+	spawn_type = /obj/item/reagent_containers/applicator/pill/prescription_stimulant
+	spawn_count = 5
+
+/obj/item/storage/pill_bottle/prescription_stimulant/Initialize(mapload)
+	. = ..()
+	// Make sure we can only hold alifil pills since this is nested inside a symptom support kit
+	atom_storage.max_slots = 5
+	atom_storage.set_holdable(list(
+		/obj/item/reagent_containers/applicator/pill/prescription_stimulant,
+	))
 
 // Pre-packed civil defense medkit, with items to heal low damages inside
 /obj/item/storage/medkit/civil_defense
@@ -280,7 +276,7 @@
 		/obj/item/reagent_containers/cup/tube,
 		/obj/item/reagent_containers/hypospray,
 		/obj/item/reagent_containers/medigel,
-		/obj/item/reagent_containers/pill,
+		/obj/item/reagent_containers/applicator/pill,
 		/obj/item/reagent_containers/spray,
 		/obj/item/reagent_containers/syringe,
 		/obj/item/stack/medical,
@@ -380,7 +376,7 @@
 		/obj/item/reagent_containers/cup/tube,
 		/obj/item/reagent_containers/hypospray,
 		/obj/item/reagent_containers/medigel,
-		/obj/item/reagent_containers/pill,
+		/obj/item/reagent_containers/applicator/pill,
 		/obj/item/reagent_containers/spray,
 		/obj/item/reagent_containers/syringe,
 		/obj/item/retractor,

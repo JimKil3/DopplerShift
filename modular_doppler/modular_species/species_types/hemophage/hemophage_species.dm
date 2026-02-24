@@ -16,7 +16,7 @@
 		TRAIT_MUTANT_COLORS,
 	)
 	inherent_biotypes = MOB_HUMANOID | MOB_ORGANIC
-	exotic_bloodtype = "U"
+	exotic_bloodtype = BLOOD_TYPE_HEMOPHAGE
 	mutantheart = /obj/item/organ/heart/hemophage
 	mutantliver = /obj/item/organ/liver/hemophage
 	mutantstomach = /obj/item/organ/stomach/hemophage
@@ -99,12 +99,12 @@
 	uniform = /obj/item/clothing/under/suit/black_really/skirt
 
 /datum/species/human/genemod/hemophage/prepare_human_for_preview(mob/living/carbon/human/human)
-	human.dna.features["mcolor"] = skintone2hex("albino")
-	human.dna.features["horns"] = "Lifted"
-	human.dna.features["horns_color_1"] = "#52435e"
+	human.dna.features[FEATURE_MUTANT_COLOR] = skintone2hex("albino")
+	human.dna.features[FEATURE_HORNS] = "Lifted"
+	human.dna.features[FEATURE_HORNS_COLORS][1] = "#52435e"
 	human.dna.ear_type = HUMANOID
-	human.dna.features["ears"] = "Elf (wide)"
-	human.dna.features["ears_color_1"] = "#F7D1C3"
+	human.dna.features[FEATURE_EARS] = "Elf (wide)"
+	human.dna.features[FEATURE_EARS_COLORS][1] = "#F7D1C3"
 	human.hair_color = "#f1cc9c"
 	human.lip_style = "lipstick"
 	human.lip_color = COLOR_BLACK
@@ -179,5 +179,12 @@
 /datum/species/human/genemod/hemophage/create_pref_biotypes_perks()
 	return
 
+/datum/blood_type/hemophage
+	name = BLOOD_TYPE_HEMOPHAGE
+	color = BLOOD_COLOR_BLACK
+	compatible_types = list()
+
+/datum/blood_type/hemophage/type_key()
+	return subtypesof(/datum/blood_type)
 
 #undef HEMOPHAGE_SPAWN_TEXT

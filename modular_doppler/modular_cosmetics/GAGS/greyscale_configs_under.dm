@@ -140,6 +140,24 @@
 	name = "Giant Scarf (Worn)"
 	icon_file = 'modular_doppler/modular_cosmetics/GAGS/icons/mob/under.dmi'
 
+/datum/greyscale_config/halter_dress
+	name = "Halter Dress"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/obj/under/dresses.dmi'
+	json_config = 'modular_doppler/modular_cosmetics/GAGS/json_configs/under/halter_dress.json'
+
+/datum/greyscale_config/halter_dress/worn
+	name = "Halter Dress (Worn)"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/dresses.dmi'
+
+/datum/greyscale_config/sweaterdress
+	name = "Keyhole Sweater Dress"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/obj/under/dresses.dmi'
+	json_config = 'modular_doppler/modular_cosmetics/GAGS/json_configs/under/sweaterdress.json'
+
+/datum/greyscale_config/sweaterdress/worn
+	name = "Keyhole Sweater Dress (Worn)"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/dresses.dmi'
+
 
 /// LUNAR JAPANESE SECTION
 
@@ -212,25 +230,30 @@
 //PANTS//
 /////////
 
-/datum/greyscale_config/slacks
-	icon_file = 'modular_doppler/modular_cosmetics/icons/obj/under/pants.dmi'
-
-/datum/greyscale_config/slacks/worn
-	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/pants.dmi'
-
 /datum/greyscale_config/slacks/worn/digi
 	name = "Slacks (Worn, Digi)"
 	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/pants_digi.dmi'
 
-/datum/greyscale_config/shorts
-	icon_file = 'modular_doppler/modular_cosmetics/icons/obj/under/pants.dmi'
-
-/datum/greyscale_config/shorts/worn
-	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/pants.dmi'
-
 /datum/greyscale_config/shorts/worn/digi
 	name = "Shorts (Worn, Digi)"
 	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/pants_digi.dmi'
+
+/datum/greyscale_config/shortalls
+	name = "Shortalls"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/obj/under/pants.dmi'
+	json_config = 'modular_doppler/modular_cosmetics/GAGS/json_configs/under/shortalls.json'
+
+/datum/greyscale_config/shortalls/worn
+	name = "Shortalls (Worn)"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/pants.dmi'
+
+/datum/greyscale_config/shortalls/worn/digi
+	name = "Shortalls (Worn, Digi)"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/pants_digi.dmi'
+
+
+//these two jeans configs are loadbearing. they are overrides of existing tg configs, and if you remove them absolutely nothing will change in the game
+// itself, but the antag screenshot unit test will fail consistently.
 
 /datum/greyscale_config/jeans
 	icon_file = 'modular_doppler/modular_cosmetics/icons/obj/under/pants.dmi'
@@ -242,14 +265,21 @@
 	name = "Jeans (Worn, Digi)"
 	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/pants_digi.dmi'
 
-/datum/greyscale_config/jeanshorts
-	icon_file = 'modular_doppler/modular_cosmetics/icons/obj/under/pants.dmi'
-
-/datum/greyscale_config/jeanshorts/worn
-	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/pants.dmi'
-
 /datum/greyscale_config/jeanshorts/worn/digi
 	name = "Jeans Shorts (Worn, Digi)"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/pants_digi.dmi'
+
+/datum/greyscale_config/ripped_jeans
+	name = "Ripped Jeans"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/obj/under/pants.dmi'
+	json_config = 'modular_doppler/modular_cosmetics/GAGS/json_configs/under/ripped_jeans.json'
+
+/datum/greyscale_config/ripped_jeans/worn
+	name = "Ripped Jeans (Worn)"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/pants.dmi'
+
+/datum/greyscale_config/ripped_jeans/worn/digi
+	name = "Ripped Jeans (Worn, Digi)"
 	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/pants_digi.dmi'
 
 /// CUSTOM PANTS GAGSIFICATIONS
@@ -265,6 +295,19 @@
 
 /datum/greyscale_config/camo_pants/worn/digi
 	name = "Camo Pants (Worn, Digi)"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/pants_digi.dmi'
+
+/datum/greyscale_config/moto_leggings
+	name = "Moto Leggings"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/obj/under/miscellania.dmi'
+	json_config = 'modular_doppler/modular_cosmetics/GAGS/json_configs/under/moto_leggings.json'
+
+/datum/greyscale_config/moto_leggings/worn
+	name = "Moto Leggings (Worn)"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/miscellania.dmi'
+
+/datum/greyscale_config/moto_leggings/worn/digi
+	name = "Moto Leggings (Worn, Digi)"
 	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/pants_digi.dmi'
 
 /datum/greyscale_config/track_pants
@@ -309,6 +352,24 @@
 
 /datum/greyscale_config/long_skirt/worn
 	name = "Long Skirt (Worn)"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/miscellania.dmi'
+
+/datum/greyscale_config/highwaisted_skirt
+	name = "High-Waisted Skirt"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/obj/under/miscellania.dmi'
+	json_config = 'modular_doppler/modular_cosmetics/GAGS/json_configs/under/highwaisted_skirt.json'
+
+/datum/greyscale_config/highwaisted_skirt/worn
+	name = "High-Waisted Skirt (Worn)"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/miscellania.dmi'
+
+/datum/greyscale_config/miniskirt
+	name = "Miniskirt"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/obj/under/miscellania.dmi'
+	json_config = 'modular_doppler/modular_cosmetics/GAGS/json_configs/under/miniskirt.json'
+
+/datum/greyscale_config/miniskirt/worn
+	name = "Miniskirt (Worn)"
 	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/miscellania.dmi'
 
 /datum/greyscale_config/pencilskirt
@@ -365,4 +426,13 @@
 
 /datum/greyscale_config/athletas_bodysuit/worn
 	name = "ATHLETAS bodysuit (Worn)"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/miscellania.dmi'
+
+/datum/greyscale_config/gear_harness_visible
+	name = "Gear Harness, Visible"
+	icon_file = 'modular_doppler/modular_cosmetics/icons/obj/under/miscellania.dmi'
+	json_config = 'modular_doppler/modular_cosmetics/GAGS/json_configs/under/gear_harness_visible.json'
+
+/datum/greyscale_config/gear_harness_visible/worn
+	name = "Gear Harness, Visible (Worn)"
 	icon_file = 'modular_doppler/modular_cosmetics/icons/mob/under/miscellania.dmi'

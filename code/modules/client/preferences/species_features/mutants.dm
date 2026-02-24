@@ -16,13 +16,14 @@
 	return sanitize_hexcolor("[pick("7F", "FF")][pick("7F", "FF")][pick("7F", "FF")]")
 
 /datum/preference/color/mutant_color/apply_to_human(mob/living/carbon/human/target, value)
-	target.dna.features["mcolor"] = value
+	target.dna.features[FEATURE_MUTANT_COLOR] = value
 
 /datum/preference/color/mutant_color/is_valid(value)
 	if (!..(value))
 		return FALSE
 
+	/* DOPPLER REMOVAL BEGIN - Allows pretty dark characters. Update from a previous 2 year old update that removed the whole proc instead.
 	if (is_color_dark(value, 15))
 		return FALSE
-
+	*/ // DOPPLER REMOVAL END
 	return TRUE

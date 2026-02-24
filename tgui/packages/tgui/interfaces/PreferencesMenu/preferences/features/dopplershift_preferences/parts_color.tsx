@@ -187,3 +187,22 @@ export const has_fluff: FeatureToggle = {
   `,
   component: CheckboxInput,
 };
+
+export const has_taur: FeatureToggle = {
+  name: 'Add Part: Taur',
+  category: 'GAMEPLAY',
+  description: `
+    When toggled adds taur parts to your character.
+   `,
+  component: CheckboxInput,
+};
+
+export const taur_color: Feature<string[]> = {
+  name: 'Taur Color',
+  component: FeatureTriColorInput,
+};
+
+export const pod_hair_color: Feature<string[]> = {
+  name: 'Viridian Hair Color',
+  component: FeatureTriColorInput,
+};

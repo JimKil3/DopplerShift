@@ -1,3 +1,8 @@
+/datum/asset/spritesheet_batched/chat/create_spritesheets()
+	. = ..()
+
+	insert_all_icons("nif", 'modular_doppler/soulcatcher/icons/chat.dmi')
+
 /datum/component/soulcatcher/ui_interact(mob/user, datum/tgui/ui)
 	ui = SStgui.try_update_ui(user, src, ui)
 
@@ -119,6 +124,7 @@
 
 		if("toggle_joinable")
 			ghost_joinable = !ghost_joinable
+			update_joinability()
 			return TRUE
 
 		if("toggle_approval")
@@ -246,6 +252,9 @@
 
 			remove_self()
 			return TRUE
+
+/datum/component/soulcatcher/proc/update_joinability()
+	SEND_GLOBAL_SIGNAL(COMSIG_SOULCATCHER_UPDATE_JOINABILITY)
 
 /datum/component/soulcatcher_user/New()
 	. = ..()

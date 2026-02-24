@@ -3,7 +3,7 @@
 	category_name = "Recreative"
 	category_ui_icon = FA_ICON_GUITAR
 	type_to_generate = /datum/loadout_item/toy
-	tab_order = /datum/loadout_category/inhands::tab_order + 1
+	tab_order = /datum/loadout_category/inhands::tab_order + 2
 
 /datum/loadout_item/toy
 	abstract_type = /datum/loadout_item/toy
@@ -19,6 +19,10 @@
 /datum/loadout_item/toy/toy_sword
 	name = "Fake Energy-Sword"
 	item_path = /obj/item/toy/sword
+
+/datum/loadout_item/toy/tiziran_boffa
+	name = "\improper Tiziran training sword"
+	item_path = /obj/item/melee/tizirian_sword/boffa
 
 /datum/loadout_item/toy/toy_gun
 	name = "Fake .357 Revolver"
@@ -39,6 +43,10 @@
 /datum/loadout_item/toy/donk_rifle
 	name = "DONK CO. C-20r"
 	item_path = /obj/item/gun/ballistic/automatic/c20r/toy/unrestricted
+
+/datum/loadout_item/toy/karim
+	name = "\improper RealToy™ Karim Pulse Rifle"
+	item_path = /obj/item/gun/ballistic/automatic/karim/toy
 
 /datum/loadout_item/toy/synth
 	name = "Keyboard"
@@ -76,3 +84,74 @@
 	name = "Harmonica"
 	item_path = /obj/item/instrument/harmonica
 	restricted_roles =  list(JOB_PRISONER)
+
+/// Plushie blast
+
+/datum/loadout_item/toy/plush
+	group = "Plushies"
+	abstract_type = /datum/loadout_item/toy/plush
+
+/datum/loadout_item/toy/plush/carp
+	name = "Space Carp plushie"
+	item_path = /obj/item/toy/plush/carpplushie
+
+/datum/loadout_item/toy/plush/lizard
+	name = "Lizard plushie"
+	item_path = /obj/item/toy/plush/lizard_plushie/greyscale
+
+/datum/loadout_item/toy/plush/space
+	name = "Space Lizard plushie"
+	item_path = /obj/item/toy/plush/lizard_plushie/space
+
+/datum/loadout_item/toy/plush/snake
+	name = "Snake plushie"
+	item_path = /obj/item/toy/plush/snakeplushie
+
+/datum/loadout_item/toy/plush/plasmaperson
+	name = "Plasmaperson plushie"
+	item_path = /obj/item/toy/plush/plasmamanplushie
+
+/datum/loadout_item/toy/plush/slime
+	name = "Slime plushie"
+	item_path = /obj/item/toy/plush/slimeplushie
+
+/datum/loadout_item/toy/plush/bee
+	name = "Bee plushie"
+	item_path = /obj/item/toy/plush/beeplushie
+
+/datum/loadout_item/toy/plush/moth
+	name = "Moth plushie"
+	item_path = /obj/item/toy/plush/moth
+
+/datum/loadout_item/toy/plush/peacekeeper
+	name = "Peacekeeper plushie"
+	item_path = /obj/item/toy/plush/pkplush
+
+/datum/loadout_item/toy/plush/runner
+	name = "Runner plushie"
+	item_path = /obj/item/toy/plush/rouny
+
+/datum/loadout_item/toy/plush/shark
+	name = "Shark plushie"
+	item_path = /obj/item/toy/plush/shark
+
+/datum/loadout_item/toy/plush/donkpocket
+	name = "Donk pocket plushie"
+	item_path = /obj/item/toy/plush/donkpocket
+
+/datum/loadout_item/toy/plush/horse
+	name = "Horse plushie"
+	item_path = /obj/item/toy/plush/horse
+
+/datum/loadout_item/toy/plush/unicorn
+	name = "Unicorn plushie"
+	item_path = /obj/item/toy/plush/unicorn
+
+/datum/loadout_item/toy/plush/monkey
+	name = "Monkey plushie"
+	item_path = /obj/item/toy/plush/monkey
+
+/datum/loadout_item/toy/plush/deer
+	name = "Deer plushie"
+	item_path = /obj/item/toy/plush/modular/deer
+

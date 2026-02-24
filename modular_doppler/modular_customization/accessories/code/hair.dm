@@ -683,10 +683,6 @@
 	name = "Halfcut Rough"
 	icon_state = "hair_halfcut_rough"
 
-/datum/sprite_accessory/hair/modular/glossy
-	name = "Glossy"
-	icon_state = "hair_glossy"
-
 /datum/sprite_accessory/hair/modular/mia
 	name = "Mia"
 	icon_state = "hair_mia"
@@ -695,14 +691,14 @@
 	name = "Braided Sidetail"
 	icon_state = "hair_braided_sidetail"
 
-/datum/sprite_accessory/hair/modular/glamour
-	name = "Glamour"
-	icon_state = "hair_glamour"
-
 /datum/sprite_accessory/hair/modular/hugeafro_eyescovered
 	name = "Huge Afro (Eyes Covered)"
 	y_offset = 6
 	icon_state = "hair_hugeafro_eyescovered"
+
+/datum/sprite_accessory/hair/modular/frills_big
+	name = "Reptile Frills"
+	icon_state = "hair_frillsbig"
 
 // Facial hair
 
@@ -744,3 +740,4 @@
 /datum/sprite_accessory/facial_hair/modular/selleckreceeded
 	name = "Moustache (Selleck - Alt)"
 	icon_state = "facial_selleckreceeded"
+

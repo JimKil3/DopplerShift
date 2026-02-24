@@ -124,6 +124,8 @@
 	if(new_w == pixel_w && new_x == pixel_x && new_y == pixel_y && new_z == pixel_z)
 		return FALSE
 
+	SEND_SIGNAL(src, COMSIG_LIVING_UPDATE_OFFSETS, new_x, new_y, new_w, new_z, animate)
+
 	if(!animate)
 		pixel_w = new_w
 		pixel_x = new_x
@@ -141,7 +143,6 @@
 		pixel_x = new_x,
 		pixel_y = new_y,
 		pixel_z = new_z,
-		easing = (EASE_IN|EASE_OUT),
 		flags = ANIMATION_PARALLEL,
 		time = UPDATE_TRANSFORM_ANIMATION_TIME,
 	)
@@ -151,17 +152,31 @@
  * Checks if we are offset by the passed source for the passed pixel.
  *
  * * source: The source of the offset
+ * If not supplied, it will report the total offset of the passed pixel.
  * * pixel: Optional, The pixel to check.
  * If not supplied, just reports if it's offset by the source at all (returning the first offset found).
  *
  * Returns the offset if we are, 0 otherwise.
  */
 /mob/living/proc/has_offset(source, pixel)
+	if(isnull(source) && isnull(pixel))
+		stack_trace("has_offset() requires at least one argument.")
+		return 0
+
+	if(isnull(source))
+		if(!length(offsets?[pixel]))
+			return 0
+
+		var/total_found_offset = 0
+		for(var/found_offset in offsets[pixel])
+			total_found_offset += has_offset(found_offset, pixel)
+		return total_found_offset
+
 	if(isnull(pixel))
 		for(var/found_pixel in offsets)
-			var/pixel_source = has_offset(source, found_pixel)
-			if(pixel_source)
-				return pixel_source
+			var/found_offset = has_offset(source, found_pixel)
+			if(found_offset)
+				return found_offset
 
 		return 0
 

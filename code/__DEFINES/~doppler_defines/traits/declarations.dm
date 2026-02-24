@@ -10,8 +10,15 @@
 //// The trait for undersized quirk
 #define TRAIT_UNDERSIZED "undersized"
 
+//// The trait for Holosynths
+#define TRAIT_HOLOSYNTH "holosynthetic"
+
 /// Carp infusion: allows preferential metabolism & production of carpotoxin
 #define TRAIT_CARP_GOODTOX "carp_goodtox"
 
 /// chamskin toggle - lets yo ufucking toggle shit shut up
 #define TRAIT_CHAMELEON_SKIN "chameleon_skin"
+
+// makes it so held items float by their head
+#define TRAIT_FLOATING_HELD "held_items_float"
+

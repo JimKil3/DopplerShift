@@ -16,10 +16,10 @@
 	breasts_list = init_sprite_accessory_subtypes(/datum/sprite_accessory/breasts)["default_sprites"] // FLAKY DEFINE: this should be using DEFAULT_SPRITE_LIST
 
 
-/datum/species/regenerate_organs(mob/living/carbon/target, datum/species/old_species, replace_current = TRUE, list/excluded_zones, visual_only = FALSE)
+/datum/species/regenerate_organs(mob/living/carbon/target, datum/species/old_species, replace_current = TRUE, list/excluded_zones, visual_only = FALSE, replace_missing = TRUE)
 	. = ..()
-	if(target.dna.features["breasts"])
-		if(target.dna.features["breasts"] != "Bare")
+	if(target.dna.features[FEATURE_BREASTS])
+		if(target.dna.features[FEATURE_BREASTS] != "Bare")
 			var/obj/item/organ/replacement = SSwardrobe.provide_type(/obj/item/organ/breasts)
 			//replacement.build_from_dna(target.dna, "breasts") //TODO: do we need to add this
 			replacement.Insert(target, special = TRUE, movement_flags = DELETE_IF_REPLACED)
@@ -41,7 +41,7 @@
 /datum/preference/toggle/breasts/apply_to_human(mob/living/carbon/human/target, value)
 	if(value == FALSE)
 		//to_chat(world, "Begone, boobs.")
-		target.dna.features["breasts"] = "Bare"
+		target.dna.features[FEATURE_BREASTS] = "Bare"
 
 /datum/preference/toggle/breasts/create_default_value()
 	return FALSE
@@ -60,10 +60,10 @@
 	return assoc_to_keys_features(SSaccessories.breasts_list)
 
 /datum/preference/choiced/breasts/icon_for(value)
-	return generate_breasts_shot(SSaccessories.breasts_list[value], "breasts")
+	return generate_breasts_shot(SSaccessories.breasts_list[value])
 
 /datum/preference/choiced/breasts/apply_to_human(mob/living/carbon/human/target, value)
-	target.dna.features["breasts"] = value
+	target.dna.features[FEATURE_BREASTS] = value
 
 /datum/preference/choiced/breasts/create_default_value()
 	return /datum/sprite_accessory/breasts/bare::name
@@ -76,21 +76,21 @@
 	return FALSE
 
 
-/proc/generate_breasts_shot(datum/sprite_accessory/sprite_accessory, key)
-	var/icon/final_icon = icon('icons/mob/human/bodyparts_greyscale.dmi', "human_chest_f", SOUTH)
+/proc/generate_breasts_shot(datum/sprite_accessory/sprite_accessory)
+	var/static/datum/universal_icon/final_icon
+	final_icon = uni_icon('icons/mob/human/bodyparts_greyscale.dmi', "human_chest_f", SOUTH)
 
 	if (!isnull(sprite_accessory))
-		var/icon/accessory_icon = icon(sprite_accessory.icon, "m_[key]_[sprite_accessory.icon_state]_ADJ", SOUTH)
-		var/icon/accessory_icon_2 = icon(sprite_accessory.icon, "m_[key]_[sprite_accessory.icon_state]_ADJ_2", SOUTH)
-		accessory_icon_2.Blend(COLOR_RED, ICON_MULTIPLY)
-		var/icon/accessory_icon_3 = icon(sprite_accessory.icon, "m_[key]_[sprite_accessory.icon_state]_ADJ_3", SOUTH)
-		accessory_icon_3.Blend(COLOR_VIBRANT_LIME, ICON_MULTIPLY)
-		final_icon.Blend(accessory_icon, ICON_OVERLAY)
-		final_icon.Blend(accessory_icon_2, ICON_OVERLAY)
-		final_icon.Blend(accessory_icon_3, ICON_OVERLAY)
+		if(icon_exists(sprite_accessory.icon, "m_breasts_[sprite_accessory.icon_state]_ADJ"))
+			var/datum/universal_icon/accessory_icon = uni_icon(sprite_accessory.icon, "m_breasts_[sprite_accessory.icon_state]_ADJ", SOUTH)
+			final_icon.blend_icon(accessory_icon, ICON_OVERLAY)
+		if(icon_exists(sprite_accessory.icon, "m_breasts_[sprite_accessory.icon_state]_ADJ_2"))
+			var/datum/universal_icon/accessory_icon_2 = uni_icon(sprite_accessory.icon, "m_breasts_[sprite_accessory.icon_state]_ADJ_2", SOUTH)
+			accessory_icon_2.blend_color(COLOR_LIGHT_GRAYISH_RED, ICON_MULTIPLY)
+			final_icon.blend_icon(accessory_icon_2, ICON_OVERLAY)
 
-	final_icon.Crop(10, 8, 22, 23)
-	final_icon.Scale(26, 32)
-	final_icon.Crop(-2, 1, 29, 32)
+	final_icon.crop(10, 8, 22, 23)
+	final_icon.scale(26, 32)
+	final_icon.crop(-2, 1, 29, 32)
 
 	return final_icon

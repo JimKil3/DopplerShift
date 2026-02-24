@@ -1,6 +1,8 @@
 //Gun crafting parts til they can be moved elsewhere
 
 // PARTS //
+/obj/item/weaponcrafting
+	abstract_type = /obj/item/weaponcrafting
 
 /obj/item/weaponcrafting/Initialize(mapload)
 	. = ..()
@@ -70,6 +72,7 @@
 /obj/item/weaponcrafting/gunkit/tesla
 	name = "tesla cannon parts kit (lethal)"
 	desc = "A suitcase containing the necessary gun parts to construct a tesla cannon around a stabilized flux anomaly. Handle with care."
+	icon_state = "weaponskit_tesla"
 
 /obj/item/weaponcrafting/gunkit/xray
 	name = "x-ray laser gun parts kit (lethal)"
@@ -98,3 +101,7 @@
 /obj/item/weaponcrafting/gunkit/photon
 	name = "photon cannon parts kit (nonlethal)"
 	desc = "A suitcase containing the necessary gun parts to construct a photon cannon around a stabilized flux anomaly. Harness the power of the sun, in the palms of your hands."
+
+/obj/item/weaponcrafting/gunkit/sks
+	name = "\improper Sakhno SKS semi-automatic rifle parts kit (lethal)"
+	desc = "A suitcase containing the necessary gun parts to construct a Sakhno SKS semi-automatic rifle. These things are all over the frontier worlds."

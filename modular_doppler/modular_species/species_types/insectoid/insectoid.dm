@@ -15,8 +15,7 @@
 	inherent_biotypes = MOB_ORGANIC|MOB_HUMANOID|MOB_BUG
 	payday_modifier = 1.0
 	changesource_flags = MIRROR_BADMIN | WABBAJACK | MIRROR_PRIDE | MIRROR_MAGIC | RACE_SWAP | ERT_SPAWN | SLIME_EXTRACT
-	exotic_blood = /datum/reagent/bug_blood
-	exotic_bloodtype = "I*"
+	exotic_bloodtype = BLOOD_TYPE_INSECTOID
 
 	digitigrade_customization = DIGITIGRADE_OPTIONAL
 	bodypart_overrides = list(
@@ -42,15 +41,15 @@
 	uniform = /obj/item/clothing/under/rank/cargo/miner/lavaland
 
 /datum/species/insectoid/prepare_human_for_preview(mob/living/carbon/human/human_for_preview)
-	human_for_preview.dna.features["lizard_markings"] = "Insectoid Pattern"
-	human_for_preview.dna.features["body_markings_color_1"] = "#46c346"
-	human_for_preview.dna.features["body_markings_color_2"] = "#1c1c1c"
-	human_for_preview.dna.features["mcolor"] = "#383942"
-	human_for_preview.dna.features["fluff"] = "Insect Fluff"
-	human_for_preview.dna.features["fluff_color_1"] = "#dae7f7"
+	human_for_preview.dna.features[FEATURE_LIZARD_MARKINGS] = "Insectoid Pattern"
+	human_for_preview.dna.features[FEATURE_MARKINGS_COLORS][1] = "#46c346"
+	human_for_preview.dna.features[FEATURE_MARKINGS_COLORS][2] = "#1c1c1c"
+	human_for_preview.dna.features[FEATURE_MUTANT_COLOR] = "#383942"
+	human_for_preview.dna.features[FEATURE_FLUFF] = "Insect Fluff"
+	human_for_preview.dna.features[FEATURE_FLUFF_COLORS][1] = "#dae7f7"
 	human_for_preview.dna.ear_type = BUG
-	human_for_preview.dna.features["ears"] = "Straight"
-	human_for_preview.dna.features["ears_color_1"] = "#ffffff"
+	human_for_preview.dna.features[FEATURE_EARS] = "Straight"
+	human_for_preview.dna.features[FEATURE_EARS_COLORS][1] = "#ffffff"
 	human_for_preview.eye_color_left = "#46C346"
 	human_for_preview.eye_color_right = "#46C346"
 	regenerate_organs(human_for_preview)

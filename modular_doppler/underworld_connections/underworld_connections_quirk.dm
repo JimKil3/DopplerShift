@@ -32,11 +32,11 @@
 		give_item_to_holder(
 			roundstart_uplink,
 			list(
-				LOCATION_LPOCKET = ITEM_SLOT_LPOCKET,
-				LOCATION_RPOCKET = ITEM_SLOT_RPOCKET,
-				LOCATION_BACKPACK = ITEM_SLOT_BACKPACK,
-				LOCATION_HANDS = ITEM_SLOT_HANDS,
-			)
+				LOCATION_LPOCKET,
+				LOCATION_RPOCKET,
+				LOCATION_BACKPACK,
+				LOCATION_HANDS,
+			),
 		)
 
 /datum/quirk/item_quirk/underworld_connections/post_add()
@@ -58,6 +58,8 @@
 	if (ishuman(quirk_holder))
 		var/mob/living/carbon/human/human_holder = quirk_holder
 		var/datum/record/crew/our_record = find_record(human_holder.name)
+		if (isnull(our_record))
+			return
 		if (our_record.security_note)
 			our_record.security_note = replacetext(our_record.security_note, "DO NOT ISSUE WEAPON PERMITS. Subject has suspected links to covert criminal elements, and has been indicated as a priority smuggling suspect.", "")
 		if (!length(our_record.security_note)) // that was the only thing in the notes

@@ -3,6 +3,22 @@
 	greyscale_colors = CIRCUIT_COLOR_SUPPLY
 	build_path = /obj/machinery/computer/personal_shuttle_order
 
+/datum/design/board/personal_shuttle_order
+	name = "Personal Shuttle Order Console"
+	desc = "A console giving you access to only the sleaziest of shuttle sales services."
+	id = "personal_shuttle_console"
+	build_path = /obj/item/circuitboard/computer/personal_shuttle_order
+	category = list(
+		RND_CATEGORY_COMPUTER + RND_SUBCATEGORY_COMPUTER_CARGO
+	)
+	departmental_flags = DEPARTMENT_BITFLAG_CARGO
+
+/datum/techweb_node/mining/New()
+	design_ids += list(
+		"personal_shuttle_console",
+	)
+	return ..()
+
 /obj/machinery/computer/personal_shuttle_order
 	name = "personal shuttle order console"
 	desc = "A console giving you access to only the sleaziest of shuttle sales services. \
@@ -193,3 +209,18 @@
 /obj/item/circuitboard/computer/personal_shuttle_order/station
 	name = "Station-Linked Personal Shuttle Order Console"
 	build_path = /obj/machinery/computer/personal_shuttle_order/station
+
+// For the cantina
+
+/obj/machinery/computer/personal_shuttle_order/cantina
+	docking_port_id = "cantina"
+	circuit = /obj/item/circuitboard/computer/personal_shuttle_order/cantina
+	valid_shuttle_templates = list(
+		/datum/map_template/shuttle/personal_buyable/ferries,
+		/datum/map_template/shuttle/personal_buyable/mining,
+		/datum/map_template/shuttle/personal_buyable/incomplete,
+	)
+
+/obj/item/circuitboard/computer/personal_shuttle_order/cantina
+	name = "Cantina-Linked Personal Shuttle Order Console"
+	build_path = /obj/machinery/computer/personal_shuttle_order/cantina

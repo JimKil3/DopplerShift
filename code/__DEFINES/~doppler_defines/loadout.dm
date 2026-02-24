@@ -1,8 +1,14 @@
 /// Used to set custom descriptions.
 #define INFO_DESCRIBED "description"
+/// Used to set custom labels on MODlink devices.
+#define INFO_MODLINK_LABEL "modlink_label"
+/// Used to set special examine text for ear tags
+#define INFO_TAG_TEXT "tag_text"
 
 /// Max amonut of misc / backpack items that are allowed.
 #define MAX_ALLOWED_MISC_ITEMS 3
+/// Max amount of pickable clothes for any category that lets you choose more than one
+#define MAX_ALLOWED_EXTRA_CLOTHES 2
 
 /// Defines for extra info blurbs, for loadout items.
 #define TOOLTIP_NO_ARMOR "Armorless"

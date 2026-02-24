@@ -18,6 +18,8 @@
 	alert_type = null
 	/// The level of drunkness we are currently at.
 	var/drunk_value = 0
+	/// If TRUE, drunk_value will be capped at 51, preventing serious damage 
+	var/iron_liver = FALSE 
 
 /datum/status_effect/inebriated/on_creation(mob/living/new_owner, drunk_value = 0)
 	. = ..()
@@ -31,9 +33,7 @@
 	// Having your face covered conceals your drunkness
 	if(iscarbon(owner))
 		var/mob/living/carbon/carbon_owner = owner
-		if(carbon_owner.wear_mask?.flags_inv & HIDEFACE)
-			return null
-		if(carbon_owner.head?.flags_inv & HIDEFACE)
+		if(carbon_owner.obscured_slots & HIDEFACE)
 			return null
 
 	// .01s are used in case the drunk value ends up to be a small decimal.
@@ -57,7 +57,8 @@
 /datum/status_effect/inebriated/proc/set_drunk_value(set_to)
 	if(!isnum(set_to))
 		CRASH("[type] - invalid value passed to set_drunk_value. (Got: [set_to])")
-
+	if(iron_liver)
+		set_to = min(51, set_to)
 	drunk_value = set_to
 	if(drunk_value <= 0)
 		qdel(src)
@@ -106,7 +107,7 @@
 /datum/status_effect/inebriated/drunk/on_apply()
 	. = ..()
 	owner.sound_environment_override = SOUND_ENVIRONMENT_PSYCHOTIC
-	owner.add_mood_event(id, /datum/mood_event/drunk)
+	owner.add_mood_event(id, /datum/mood_event/drunk, drunk_value)
 	RegisterSignal(owner, COMSIG_MOB_FIRED_GUN, PROC_REF(drunk_gun_fired))
 
 /datum/status_effect/inebriated/drunk/on_remove()
@@ -126,6 +127,7 @@
 		owner.sound_environment_override = SOUND_ENVIRONMENT_NONE
 
 	UnregisterSignal(owner, COMSIG_MOB_FIRED_GUN)
+	REMOVE_TRAIT(owner, TRAIT_FEARLESS, TRAIT_STATUS_EFFECT(id))
 
 /datum/status_effect/inebriated/drunk/proc/drunk_gun_fired(datum/source, obj/item/gun/gun, atom/firing_at, params, zone, bonus_spread_values)
 	SIGNAL_HANDLER
@@ -142,12 +144,17 @@
 	. = ..()
 	if(QDELETED(src))
 		return
-
 	// Return to "tipsyness" when we're below 6.
 	if(drunk_value < TIPSY_THRESHOLD)
 		owner.apply_status_effect(/datum/status_effect/inebriated/tipsy, drunk_value)
+		return
+
+	var/datum/mood_event/drunk/moodlet = owner.mob_mood.mood_events[id]
+	if(istype(moodlet))
+		moodlet.update_change(drunk_value)
 
 /datum/status_effect/inebriated/drunk/on_tick_effects()
+	/* //DOPPLER EDIT REMOVAL START - Removes Ballmer Peak
 	// Handle the Ballmer Peak.
 	// If our owner is a scientist (has the trait "TRAIT_BALLMER_SCIENTIST"), there's a 5% chance
 	// that they'll say one of the special "ballmer message" lines, depending their drunk-ness level.
@@ -158,6 +165,7 @@
 
 		if(drunk_value > BALLMER_PEAK_WINDOWS_ME) // by this point you're into windows ME territory
 			owner.say(pick_list_replacements(VISTA_FILE, "ballmer_windows_me_msg"), forced = "ballmer")
+	*/ //DOPPLER EDIT REMOVAL END
 
 	// Drunk slurring scales in intensity based on how drunk we are -at 16 you will likely not even notice it,
 	// but when we start to scale up you definitely will
@@ -182,6 +190,9 @@
 			if(iscarbon(owner))
 				var/mob/living/carbon/carbon_owner = owner
 				carbon_owner.vomit(VOMIT_CATEGORY_DEFAULT) // Vomiting clears toxloss - consider this a blessing
+		ADD_TRAIT(owner, TRAIT_FEARLESS, TRAIT_STATUS_EFFECT(id))
+	else
+		REMOVE_TRAIT(owner, TRAIT_FEARLESS, TRAIT_STATUS_EFFECT(id))
 
 	// Over 71, we will constantly have blurry eyes
 	if(drunk_value >= 71)

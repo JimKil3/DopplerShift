@@ -313,6 +313,12 @@
 	tick_interval = 0.4 SECONDS
 	alert_type = /atom/movable/screen/alert/status_effect/his_wrath
 
+/datum/status_effect/his_wrath/on_creation(mob/living/new_owner, His, Him)
+	. = ..()
+	linked_alert.name = "[His] Wrath"
+	linked_alert.desc = "You fled from [His] Grace instead of feeding [Him], and now you suffer."
+	linked_alert.icon_state = "[LOWER_TEXT(His)]_grace"
+
 /atom/movable/screen/alert/status_effect/his_wrath
 	name = "His Wrath"
 	desc = "You fled from His Grace instead of feeding Him, and now you suffer."
@@ -354,29 +360,26 @@
 	var/boosted = FALSE
 	/// How long before the mark is ready to be detonated. Used for both the visual overlay and to determine when it's ready
 	var/ready_delay = 0.8 SECONDS
-	/// Tracks world.time when the mark was applied
-	var/mark_applied
 
 /datum/status_effect/crusher_mark/on_creation(mob/living/new_owner, was_boosted)
 	. = ..()
 	boosted = was_boosted
-	mark_applied = world.time
 
 /datum/status_effect/crusher_mark/on_apply()
-	if(owner.mob_size >= MOB_SIZE_LARGE)
-		marked_underlay = new()
-		marked_underlay.pixel_x = -owner.pixel_x
-		marked_underlay.pixel_y = -owner.pixel_y
+	if(owner.mob_size < MOB_SIZE_LARGE)
+		return FALSE
 
-		var/list/new_color = list(
-			0, 1, 0,
-			0, 1, 0,
-			0, 1, 0
-		)
-		owner.vis_contents += marked_underlay
-		animate(marked_underlay, color = new_color, time = ready_delay, loop = 1)
-		return TRUE
-	return FALSE
+	marked_underlay = new()
+	marked_underlay.pixel_w = -owner.pixel_x
+	marked_underlay.pixel_z = -owner.pixel_y
+	marked_underlay.transform *= 0.5
+	owner.vis_contents += marked_underlay
+	animate(marked_underlay, ready_delay, transform = matrix() * 1.2, flags = CIRCULAR_EASING | EASE_IN)
+	addtimer(CALLBACK(src, PROC_REF(scale_back)), ready_delay) // Animate chains do not function with vis_contents
+	return TRUE
+
+/datum/status_effect/crusher_mark/proc/scale_back()
+	animate(marked_underlay, time = 0.1 SECONDS, transform = matrix(), flags = CUBIC_EASING | EASE_OUT)
 
 /datum/status_effect/crusher_mark/Destroy()
 	if(owner)
@@ -389,14 +392,9 @@
 	name = "Crusher mark underlay"
 	icon = 'icons/effects/effects.dmi'
 	icon_state = "shield"
-	appearance_flags = TILE_BOUND|LONG_GLIDE|RESET_COLOR
+	appearance_flags = TILE_BOUND|LONG_GLIDE|RESET_COLOR|PIXEL_SCALE|KEEP_APART
 	vis_flags = VIS_UNDERLAY
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
-	color = list(
-		1, 0, 0,
-		1, 0, 0,
-		1, 0, 0
-	)
 
 /datum/status_effect/stacking/saw_bleed
 	id = "saw_bleed"
@@ -405,9 +403,7 @@
 	stack_threshold = 10
 	max_stacks = 10
 	overlay_file = 'icons/effects/bleed.dmi'
-	underlay_file = 'icons/effects/bleed.dmi'
 	overlay_state = "bleed"
-	underlay_state = "bleed"
 	var/bleed_damage = 200
 
 /datum/status_effect/stacking/saw_bleed/fadeout_effect()
@@ -582,7 +578,7 @@
 		return FALSE
 	RegisterSignal(owner, COMSIG_MOVABLE_HEAR, PROC_REF(hypnotize))
 	ADD_TRAIT(owner, TRAIT_MUTE, TRAIT_STATUS_EFFECT(id))
-	owner.add_client_colour(/datum/client_colour/monochrome/trance)
+	owner.add_client_colour(/datum/client_colour/monochrome, REF(src))
 	owner.visible_message("[stun ? span_warning("[owner] stands still as [owner.p_their()] eyes seem to focus on a distant point.") : ""]", \
 	span_warning(pick("You feel your thoughts slow down...", "You suddenly feel extremely dizzy...", "You feel like you're in the middle of a dream...","You feel incredibly relaxed...")))
 	return TRUE
@@ -596,7 +592,7 @@
 	UnregisterSignal(owner, COMSIG_MOVABLE_HEAR)
 	REMOVE_TRAIT(owner, TRAIT_MUTE, TRAIT_STATUS_EFFECT(id))
 	owner.remove_status_effect(/datum/status_effect/dizziness)
-	owner.remove_client_colour(/datum/client_colour/monochrome/trance)
+	owner.remove_client_colour(REF(src))
 	to_chat(owner, span_warning("You snap out of your trance!"))
 
 /datum/status_effect/trance/get_examine_text()
@@ -733,22 +729,36 @@
 	. = ..()
 	direction = pick(NORTH, SOUTH, EAST, WEST)
 	new_owner.setDir(direction)
+	owner.add_traits(list(TRAIT_NO_FLOATING_ANIM, TRAIT_MOVE_FLYING), TRAIT_STATUS_EFFECT(id)) //I believe I can fly!
 
 /datum/status_effect/go_away/tick(seconds_between_ticks)
 	owner.AdjustStun(1, ignore_canstun = TRUE)
-	var/turf/T = get_step(owner, direction)
-	owner.forceMove(T)
+	var/turf/turf = get_step(owner, direction)
+	if(!turf)
+		qdel(src)
+		return
+	owner.forceMove(turf)
 
+/datum/status_effect/go_away/on_remove()
+	. = ..()
+	owner.remove_traits(list(TRAIT_NO_FLOATING_ANIM, TRAIT_MOVE_FLYING), TRAIT_STATUS_EFFECT(id))
+
+///Subtype of the go away effect (phases the mob in one direction) that deletes the owner on z-level change or when the time's up.
 /datum/status_effect/go_away/deletes_mob
 	id = "go_away_deletes_mob"
-	duration = INFINITY
+	duration = 30 SECONDS
 
-/datum/status_effect/go_away/deluxe/on_creation(mob/living/new_owner, set_duration)
+/datum/status_effect/go_away/deletes_mob/on_creation(mob/living/new_owner, set_duration)
 	. = ..()
 	RegisterSignal(new_owner, COMSIG_MOVABLE_Z_CHANGED, PROC_REF(wipe_bozo))
 
-/datum/status_effect/go_away/deluxe/proc/wipe_bozo()
-	qdel(owner)
+/datum/status_effect/go_away/deletes_mob/proc/wipe_bozo()
+	qdel(src)
+
+/datum/status_effect/go_away/deletes_mob/on_remove()
+	. = ..()
+	if(!QDELETED(owner))
+		qdel(owner)
 
 /atom/movable/screen/alert/status_effect/go_away
 	name = "TO THE STARS AND BEYOND!"
@@ -859,8 +869,11 @@
 
 /datum/status_effect/ants/proc/ants_washed()
 	SIGNAL_HANDLER
-	owner.remove_status_effect(/datum/status_effect/ants)
-	return COMPONENT_CLEANED
+
+	. = NONE
+
+	if(owner.remove_status_effect(/datum/status_effect/ants))
+		return COMPONENT_CLEANED|COMPONENT_CLEANED_GAIN_XP
 
 /datum/status_effect/ants/get_examine_text()
 	return span_warning("[owner.p_They()] [owner.p_are()] covered in ants!")
@@ -929,12 +942,14 @@
 	duration = 30 SECONDS
 	tick_interval = 1 SECONDS
 	alert_type = null
+	/// By how much we should increase the attack cooldown
+	var/cd_increase = 2.5
 
 /datum/status_effect/rebuked/on_apply()
 	owner.next_move_modifier *= 2
 	if(ishostile(owner))
 		var/mob/living/simple_animal/hostile/simple_owner = owner
-		simple_owner.ranged_cooldown_time *= 2.5
+		simple_owner.ranged_cooldown_time *= cd_increase
 	return TRUE
 
 /datum/status_effect/rebuked/on_remove()
@@ -944,7 +959,7 @@
 	owner.next_move_modifier *= 0.5
 	if(ishostile(owner))
 		var/mob/living/simple_animal/hostile/simple_owner = owner
-		simple_owner.ranged_cooldown_time /= 2.5
+		simple_owner.ranged_cooldown_time /= cd_increase
 
 /datum/status_effect/freezing_blast
 	id = "freezing_blast"
@@ -1083,6 +1098,38 @@
 	owner.remove_actionspeed_modifier(ACTIONSPEED_ID_MIDAS_BLIGHT, update = TRUE)
 	UnregisterSignal(owner, COMSIG_ATOM_UPDATE_OVERLAYS)
 	owner.update_icon()
+
+// Desginated Target - Applied typically by Flare lasers
+
+/atom/movable/screen/alert/status_effect/designated_target
+	name = "Designated Target"
+	desc = "You've been lit up by some kind of bright energy! Wash it off to get rid of it, or you'll be a lot easier to hit!"
+	icon_state = "designated_target"
+
+/datum/status_effect/designated_target
+	id = "designated_target"
+	duration = 2 MINUTES
+	alert_type = /atom/movable/screen/alert/status_effect/designated_target
+	status_type = STATUS_EFFECT_REFRESH
+	/// Dummy lighting object for our flare attached to our mob
+	var/obj/effect/dummy/lighting_obj/moblight/mob_flare
+
+/datum/status_effect/designated_target/on_apply()
+	mob_flare = owner.mob_light(3, 15, LIGHT_COLOR_FLARE)
+	ADD_TRAIT(owner, TRAIT_DESIGNATED_TARGET, id)
+	owner.add_filter("designated_target", 3, list("type" = "outline", "color" = COLOR_RED, "size" = 1))
+	return TRUE
+
+/datum/status_effect/designated_target/tick(seconds_between_ticks)
+	// If we are ever wet, remove our flare status effect
+	var/datum/status_effect/fire_handler/wet_stacks/splashed_with_water = locate() in owner.status_effects
+	if(istype(splashed_with_water))
+		qdel(src)
+
+/datum/status_effect/designated_target/on_remove()
+	QDEL_NULL(mob_flare)
+	owner.remove_filter("designated_target")
+	REMOVE_TRAIT(owner, TRAIT_DESIGNATED_TARGET, id)
 
 #undef HEALING_SLEEP_DEFAULT
 #undef HEALING_SLEEP_ORGAN_MULTIPLIER

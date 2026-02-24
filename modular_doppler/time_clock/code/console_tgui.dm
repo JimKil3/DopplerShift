@@ -16,7 +16,7 @@
 	/obj/item/door_remote/head_of_security, \
 	/obj/item/door_remote/quartermaster, \
 	/obj/item/door_remote/chief_medical_officer, \
-	/obj/item/door_remote/civilian, \
+	/obj/item/door_remote/head_of_personnel, \
 	/obj/item/circuitboard/machine/techfab/department/engineering, \
 	/obj/item/circuitboard/machine/techfab/department/service, \
 	/obj/item/circuitboard/machine/techfab/department/security, \
@@ -32,7 +32,10 @@
 	/obj/item/gun/energy/e_gun/hos, \
 	/obj/item/pinpointer/nuke, \
 	/obj/item/gun/energy/e_gun, \
-	/obj/item/storage/belt/sabre, \
+	/obj/item/storage/belt/sheath/sabre, \
+	/obj/item/storage/belt/sheath/modular/alternate, \
+	/obj/item/storage/belt/sheath/modular/cane, \
+	/obj/item/storage/belt/sheath/modular/golden, \
 	/obj/item/mod/control/pre_equipped/magnate, \
 	/obj/item/clothing/suit/armor/vest/warden, \
 	/obj/item/clothing/glasses/hud/security/sunglasses, \

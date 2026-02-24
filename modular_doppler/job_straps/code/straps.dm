@@ -10,7 +10,7 @@
 	force = 10
 	demolition_mod = 1.5
 	wound_bonus = 0
-	bare_wound_bonus = 10
+	exposed_wound_bonus = 10
 	attack_verb_continuous = list("flogs", "whips", "lashes", "disciplines")
 	attack_verb_simple = list("flog", "whip", "lash", "discipline")
 	hitsound = 'sound/items/weapons/whipgrab.ogg'
@@ -45,7 +45,10 @@
 		return ITEM_INTERACT_BLOCKING
 
 	var/obj/item/clothing/suit/targeted_suit = interacting_with
-	targeted_suit.allowed |= things_to_allow
+	var/list/new_suit_allowed_list = list()
+	new_suit_allowed_list = targeted_suit.allowed.Copy()
+	new_suit_allowed_list |= things_to_allow
+	targeted_suit.allowed = new_suit_allowed_list
 	playsound(src, 'sound/items/equip/toolbelt_equip.ogg', 50, TRUE)
 	qdel(src)
 	return ITEM_INTERACT_SUCCESS
@@ -108,7 +111,7 @@
 		/obj/item/reagent_containers/cup/bottle,
 		/obj/item/reagent_containers/cup/tube,
 		/obj/item/reagent_containers/hypospray,
-		/obj/item/reagent_containers/pill,
+		/obj/item/reagent_containers/applicator/pill,
 		/obj/item/reagent_containers/syringe,
 		/obj/item/sensor_device,
 		/obj/item/storage/pill_bottle,
@@ -146,7 +149,7 @@
 		/obj/item/reagent_containers/cup/bottle,
 		/obj/item/reagent_containers/cup/tube,
 		/obj/item/reagent_containers/hypospray,
-		/obj/item/reagent_containers/pill,
+		/obj/item/reagent_containers/applicator/pill,
 		/obj/item/reagent_containers/syringe,
 		/obj/item/storage/bag/xeno,
 		/obj/item/storage/pill_bottle,

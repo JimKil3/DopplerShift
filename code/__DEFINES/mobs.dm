@@ -32,6 +32,57 @@
 /// Temperature at which blood loss and regen stops. [/mob/living/carbon/human/proc/handle_blood]
 #define BLOOD_STOP_TEMP 225
 
+// Bloodtype defines
+#define BLOOD_TYPE_A_MINUS "A-"
+#define BLOOD_TYPE_A_PLUS "A+"
+#define BLOOD_TYPE_B_MINUS "B-"
+#define BLOOD_TYPE_B_PLUS "B+"
+#define BLOOD_TYPE_AB_MINUS "AB-"
+#define BLOOD_TYPE_AB_PLUS "AB+"
+#define BLOOD_TYPE_O_MINUS "O-"
+#define BLOOD_TYPE_O_PLUS "O+"
+#define BLOOD_TYPE_UNIVERSAL "U"
+#define BLOOD_TYPE_LIZARD "L"
+#define BLOOD_TYPE_VAMPIRE "V"
+#define BLOOD_TYPE_ANIMAL "Y-"
+#define BLOOD_TYPE_ETHEREAL "LE"
+#define BLOOD_TYPE_TOX "TOX"
+#define BLOOD_TYPE_OIL "Oil"
+#define BLOOD_TYPE_MEAT "MT-"
+#define BLOOD_TYPE_CLOWN "C"
+#define BLOOD_TYPE_XENO "X*"
+#define BLOOD_TYPE_H2O "H2O"
+#define BLOOD_TYPE_SNAIL "S"
+// DOPPLER ADDITIONS:
+#define BLOOD_TYPE_INSECTOID "HMT"
+#define BLOOD_TYPE_SYNTHETIC "CL"
+#define BLOOD_TYPE_HEMOPHAGE "COR"
+#define BLOOD_TYPE_HOLOGEL "HOLO"
+#define BLOOD_TYPE_SAP "SAP"
+
+// Blood exposure behavior flag defines
+/// Add our DNA to turfs/mobs/items, does not correlate with adding decals/overlays
+/// mob/turf/item flags will add DNA when triggered even if this flag is false
+#define BLOOD_ADD_DNA (1<<0)
+/// Cover the entire mob in *visible* blood
+#define BLOOD_COVER_MOBS (1<<1)
+/// Create blood splashes and trails on floors, does not affect gibs creation
+#define BLOOD_COVER_TURFS (1<<2)
+/// Cover items in ourselves
+#define BLOOD_COVER_ITEMS (1<<3)
+/// Usually you want all COVER flags together or none at all
+#define BLOOD_COVER_ALL (BLOOD_COVER_MOBS | BLOOD_COVER_TURFS | BLOOD_COVER_ITEMS)
+/// Transfer blood immunities and viruses to exposed mobs
+#define BLOOD_TRANSFER_VIRAL_DATA (1<<4)
+
+// Bleed check results
+/// We cannot bleed (here, or in general) at all
+#define BLEED_NONE 0
+/// We cannot make a splatter, but we can add our DNA
+#define BLEED_ADD_DNA 1
+/// We can bleed just fine
+#define BLEED_SPLATTER 2
+
 //Sizes of mobs, used by mob/living/var/mob_size
 #define MOB_SIZE_TINY 0
 #define MOB_SIZE_SMALL 1
@@ -73,8 +124,12 @@
 #define MOB_PLANT (1 << 10)
 ///The mob is a goopy creature, probably coming from xenobiology.
 #define MOB_SLIME (1 << 11)
-/// Mob is fish or water-related.
+///The mob is fish or water-related.
 #define MOB_AQUATIC (1 << 12)
+///The mob is a mining-related mob. It's the plasma, you see. Gets in ya bones.
+#define MOB_MINING (1 << 13)
+///The mob is a crustacean. Like crabs. Or lobsters.
+#define MOB_CRUSTACEAN (1 << 14)
 
 //Lung respiration type flags
 #define RESPIRATION_OXYGEN (1 << 0)
@@ -95,6 +150,12 @@
 #define BODYTYPE_GOLEM (1<<4)
 //The limb is a peg limb
 #define BODYTYPE_PEG (1<<5)
+//The limb is plantly (and will regen if photosynthesis is active)
+#define BODYTYPE_PLANT (1<<6)
+//This limb is shadowy and will regen if shadowheal is active
+#define BODYTYPE_SHADOW (1<<7)
+//This limb is a ghost limb and can phase through walls.
+#define BODYTYPE_GHOST (1<<8)
 
 // Bodyshape defines for how things can be worn, i.e., what "shape" the mob sprite is
 ///The limb fits the human mold. This is not meant to be literal, if the sprite "fits" on a human, it is "humanoid", regardless of origin.
@@ -108,12 +169,27 @@
 
 /// DOPPLER SHIFT ADDITION BEGIN
 // This is where our custom bodyshapes are going to go.  Keeping these in one place is critical for readability.
+
+///The limb fits a taur body
+/// This one is abstract; merely a indicator of a taur body
+#define BODYSHAPE_TAUR (1<<7)
+// Specific taur types
+#define BODYSHAPE_TAUR_SNAKE (1<<8)
+#define BODYSHAPE_TAUR_HOOF (1<<9)
+#define BODYSHAPE_TAUR_PAW (1<<10)
+#define BODYSHAPE_TAUR_ALL (BODYSHAPE_TAUR_SNAKE|BODYSHAPE_TAUR_HOOF|BODYSHAPE_TAUR_PAW)
+/// A bit nasty, but I can't think of another way to do this. Owners of this limb will not render shoes.
+#define BODYSHAPE_HIDE_SHOES (1<<11)
+
 /// BREAKER: Numeric -> text for use in defines
 #define BODYSHAPE_HUMANOID_T "1"
 #define BODYSHAPE_MONKEY_T "2"
 #define BODYSHAPE_DIGITIGRADE_T "4"
 #define BODYSHAPE_SNOUTED_T "8"
-/// DOPPLER SHIFT ADDITIO NEND
+#define BODYSHAPE_TAUR_SNAKE_T "256"
+#define BODYSHAPE_TAUR_HOOF_T "512"
+#define BODYSHAPE_TAUR_PAW_T "1024"
+/// DOPPLER SHIFT ADDITION END
 
 #define BODYTYPE_BIOSCRAMBLE_INCOMPATIBLE (BODYTYPE_ROBOTIC | BODYTYPE_LARVA_PLACEHOLDER | BODYTYPE_GOLEM | BODYTYPE_PEG)
 #define BODYTYPE_CAN_BE_BIOSCRAMBLED(bodytype) (!(bodytype & BODYTYPE_BIOSCRAMBLE_INCOMPATIBLE))
@@ -124,6 +200,8 @@
 #define SPECIES_DULLAHAN "dullahan"
 #define SPECIES_ETHEREAL "ethereal"
 #define SPECIES_ETHEREAL_LUSTROUS "lustrous"
+#define SPECIES_GHOST "ghost"
+#define SPECIES_GOLEM "golem"
 #define SPECIES_FELINE "felinid"
 #define SPECIES_FLYPERSON "fly"
 #define SPECIES_HUMAN "human"
@@ -174,7 +252,7 @@
 #define DIGITIGRADE_LEGS "Digitigrade Legs"
 
 // Health/damage defines
-#define MAX_LIVING_HEALTH 100
+#define MAX_LIVING_HEALTH 150 //DOPPLER EDIT CHANGE - ORIGINAL: MAX_LIVING_HEALTH 100
 
 //for determining which type of heartbeat sound is playing
 ///Heartbeat is beating fast for hard crit
@@ -186,6 +264,9 @@
 
 #define HUMAN_MAX_OXYLOSS 3
 #define HUMAN_CRIT_MAX_OXYLOSS (SSMOBS_DT/3)
+
+/// Combined brute and burn damage states on a human's head after which they become disfigured
+#define HUMAN_DISFIGURATION_HEAD_DAMAGE_STATES 3
 
 #define HEAT_DAMAGE_LEVEL_1 1 //Amount of damage applied when your body temperature just passes the 360.15k safety point
 #define HEAT_DAMAGE_LEVEL_2 1.5 //Amount of damage applied when your body temperature passes the 400K point
@@ -206,6 +287,7 @@
 
 //Brain Damage defines
 #define BRAIN_DAMAGE_MILD 20
+#define BRAIN_DAMAGE_ASYNC_BLINKING 60
 #define BRAIN_DAMAGE_SEVERE 100
 #define BRAIN_DAMAGE_DEATH 200
 
@@ -219,7 +301,8 @@
 #define TRAUMA_RESILIENCE_LOBOTOMY 3 //Curable with lobotomy
 #define TRAUMA_RESILIENCE_WOUND 4 //Curable by healing the head wound
 #define TRAUMA_RESILIENCE_MAGIC 5 //Curable only with magic
-#define TRAUMA_RESILIENCE_ABSOLUTE 6 //This is here to stay
+#define TRAUMA_RESILIENCE_ETHEREAL 6 //DOPPLER ADDITION FOR ETHEREAL REWORK
+#define TRAUMA_RESILIENCE_ABSOLUTE 7 //DOPPLER EDIT: 6 -> 7
 
 //Limit of traumas for each resilience tier
 #define TRAUMA_LIMIT_BASIC 3
@@ -237,60 +320,13 @@
 #define SCREWYHUD_DEAD 2
 #define SCREWYHUD_HEALTHY 3
 
-//Threshold levels for beauty for humans
-#define BEAUTY_LEVEL_HORRID -66
-#define BEAUTY_LEVEL_BAD -33
-#define BEAUTY_LEVEL_DECENT 33
-#define BEAUTY_LEVEL_GOOD 66
-#define BEAUTY_LEVEL_GREAT 100
-
-//Moods levels for humans
-#define MOOD_HAPPY4 15
-#define MOOD_HAPPY3 10
-#define MOOD_HAPPY2 6
-#define MOOD_HAPPY1 2
-#define MOOD_NEUTRAL 0
-#define MOOD_SAD1 -3
-#define MOOD_SAD2 -7
-#define MOOD_SAD3 -15
-#define MOOD_SAD4 -20
-
-//Moods levels for humans
-#define MOOD_LEVEL_HAPPY4 9
-#define MOOD_LEVEL_HAPPY3 8
-#define MOOD_LEVEL_HAPPY2 7
-#define MOOD_LEVEL_HAPPY1 6
-#define MOOD_LEVEL_NEUTRAL 5
-#define MOOD_LEVEL_SAD1 4
-#define MOOD_LEVEL_SAD2 3
-#define MOOD_LEVEL_SAD3 2
-#define MOOD_LEVEL_SAD4 1
-
-//Sanity values for humans
-#define SANITY_MAXIMUM 150
-#define SANITY_GREAT 125
-#define SANITY_NEUTRAL 100
-#define SANITY_DISTURBED 75
-#define SANITY_UNSTABLE 50
-#define SANITY_CRAZY 25
-#define SANITY_INSANE 0
-
-//Sanity levels for humans
-#define SANITY_LEVEL_GREAT 1
-#define SANITY_LEVEL_NEUTRAL 2
-#define SANITY_LEVEL_DISTURBED 3
-#define SANITY_LEVEL_UNSTABLE 4
-#define SANITY_LEVEL_CRAZY 5
-#define SANITY_LEVEL_INSANE 6
-/// Equal to the highest sanity level
-#define SANITY_LEVEL_MAX SANITY_LEVEL_INSANE
-
 //Nutrition levels for humans
 #define NUTRITION_LEVEL_FAT 600
 #define NUTRITION_LEVEL_FULL 550
 #define NUTRITION_LEVEL_WELL_FED 450
 #define NUTRITION_LEVEL_FED 350
 #define NUTRITION_LEVEL_HUNGRY 250
+#define NUTRITION_LEVEL_VERY_HUNGRY 200
 #define NUTRITION_LEVEL_STARVING 150
 
 #define NUTRITION_LEVEL_START_MIN 250
@@ -316,7 +352,6 @@
 #define ETHEREAL_CHARGE_FULL (2 * STANDARD_ETHEREAL_CHARGE)
 #define ETHEREAL_CHARGE_OVERLOAD (2.5 * STANDARD_ETHEREAL_CHARGE)
 #define ETHEREAL_CHARGE_DANGEROUS (3 * STANDARD_ETHEREAL_CHARGE)
-
 
 #define CRYSTALIZE_COOLDOWN_LENGTH (120 SECONDS)
 #define CRYSTALIZE_PRE_WAIT_TIME (40 SECONDS)
@@ -356,6 +391,7 @@
 #define SENTIENCE_HUMANOID 3
 #define SENTIENCE_MINEBOT 4
 #define SENTIENCE_BOSS 5
+#define SENTIENCE_PONY 6
 
 //Mob AI Status
 #define POWER_RESTORATION_OFF 0
@@ -456,17 +492,17 @@
 #define OFFSET_HELD "held"
 
 //MINOR TWEAKS/MISC
-#define AGE_MIN 18 //youngest a character can be //DOPPLER EDIT was 17
+#define AGE_MIN 18 //youngest a character can be
 #define AGE_MAX 250 //oldest a character can be //DOPPLER EDIT was 85
 #define AGE_MINOR 21 //legal age of space drinking and smoking //DOPPLER EDIT was 20
 #define WIZARD_AGE_MIN 30 //youngest a wizard can be
 #define APPRENTICE_AGE_MIN 29 //youngest an apprentice can be
 #define SHOES_SLOWDOWN 0 //How much shoes slow you down by default. Negative values speed you up
 #define POCKET_STRIP_DELAY (4 SECONDS) //time taken to search somebody's pockets
-#define DOOR_CRUSH_DAMAGE 15 //the amount of damage that airlocks deal when they crush you
+#define DOOR_CRUSH_DAMAGE 20 //the amount of damage that airlocks deal when they crush you
 
 #define HUNGER_FACTOR 0.05 //factor at which mob nutrition decreases
-#define ETHEREAL_DISCHARGE_RATE (1e-3 * STANDARD_ETHEREAL_CHARGE) // Rate at which ethereal stomach charge decreases
+#define ETHEREAL_DISCHARGE_RATE (1e-3 * STANDARD_ETHEREAL_CHARGE * 0.75) // Rate at which ethereal stomach charge decreases. DOPPLER EDIT ORIGINAL: ETHEREAL_DISCHARGE_RATE (1e-3 * STANDARD_ETHEREAL_CHARGE)
 /// How much nutrition eating clothes as moth gives and drains
 #define CLOTHING_NUTRITION_GAIN 15
 #define REAGENTS_METABOLISM 0.2 //How many units of reagent are consumed per second, by default.
@@ -669,11 +705,6 @@
 #define GRADIENT_APPLIES_TO_HAIR (1<<0)
 #define GRADIENT_APPLIES_TO_FACIAL_HAIR (1<<1)
 
-// Hair masks
-#define HAIR_MASK_HIDE_ABOVE_45_DEG_MEDIUM "hide_above_45deg_medium"
-#define HAIR_MASK_HIDE_ABOVE_45_DEG_LOW "hide_above_45deg_low"
-#define HAIR_MASK_HIDE_WINTERHOOD "hide_winterhood"
-
 // Height defines
 // - They are numbers so you can compare height values (x height < y height)
 // - They do not start at 0 for futureproofing
@@ -709,80 +740,85 @@ GLOBAL_LIST_INIT(human_heights_to_offsets, list(
 /// Total number of layers for mob overlays
 /// KEEP THIS UP-TO-DATE OR SHIT WILL BREAK
 /// Also consider updating layers_to_offset
-#define TOTAL_LAYERS 35
+#define TOTAL_LAYERS 39
 /// Mutations layer - Tk headglows, cold resistance glow, etc
-#define MUTATIONS_LAYER 35
+#define MUTATIONS_LAYER 38
 /// Mutantrace features (tail when looking south) that must appear behind the body parts
-#define BODY_BEHIND_LAYER 34
-/// DOPPLER SHIFT ADDITION BEGIN
-#define BODY_BEHIND_LAYER_2 33.99
-#define BODY_BEHIND_LAYER_3 33.98
-/// DOPPLER SHIFT ADDITION END
+#define BODY_BEHIND_LAYER 37
 /// Layer for bodyparts that should appear behind every other bodypart - Mostly, legs when facing WEST or EAST
-#define BODYPARTS_LOW_LAYER 33
+#define BODYPARTS_LOW_LAYER 36
 /// Layer for most bodyparts, appears above BODYPARTS_LOW_LAYER and below BODYPARTS_HIGH_LAYER
-#define BODYPARTS_LAYER 32
+#define BODYPARTS_LAYER 35
 /// Mutantrace features (snout, body markings) that must appear above the body parts
-#define BODY_ADJ_LAYER 31
+#define BODY_ADJ_LAYER 34
 /// DOPPLER SHIFT ADDITION BEGIN
-#define BODY_ADJ_LAYER_2 30.99
-#define BODY_ADJ_LAYER_3 30.98
+#define BODY_ADJ_LAYER_2 33.75
+#define BODY_ADJ_LAYER_3 33.5
 /// DOPPLER SHIFT ADDITION END
-/// Underwear, undershirts, socks, eyes, lips(makeup)
-#define BODY_LAYER 30
+/// Underwear, undershirts, socks
+#define BODY_LAYER 33
+/// Eyes and eyelids
+#define EYES_LAYER 32
 /// Mutations that should appear above body, body_adj and bodyparts layer (e.g. laser eyes)
-#define FRONT_MUTATIONS_LAYER 29
+#define FRONT_MUTATIONS_LAYER 31
 /// Damage indicators (cuts and burns)
-#define DAMAGE_LAYER 28
+#define DAMAGE_LAYER 30
 /// DOPPLER SHIFT ADDITION BEGIN
 /// Just below clothing layer
-#define UNDER_UNIFORM_LAYER 27.5
+#define UNDER_UNIFORM_LAYER 29.75
 /// Bra and socks
-#define BRA_SOCKS_LAYER 27.02
+#define BRA_SOCKS_LAYER 29.5
 /// Underwear and undershirt
-#define UNDERWEAR_UNDERSHIRT 27.01
+#define UNDERWEAR_UNDERSHIRT 29.25
 /// DOPPLER SHIFT ADDITION END
 /// Jumpsuit clothing layer
-#define UNIFORM_LAYER 27
+#define UNIFORM_LAYER 29
 /// DOPPLER SHIFT ADDITION BEGIN
-#define BANDAGE_LAYER 26.5
+#define BANDAGE_LAYER 28.5
+/// This layer is used for things that shouldn't be over clothes, but should be over mutations
+#define BODY_FRONT_UNDER_CLOTHES_LAYER 28.25
 /// DOPPLER SHIFT ADDITION END
 /// ID card layer
-#define ID_LAYER 26
+#define ID_LAYER 28
 /// ID card layer (might be deprecated)
-#define ID_CARD_LAYER 25
+#define ID_CARD_LAYER 27
 /// Layer for bodyparts that should appear above every other bodypart - Currently only used for hands
-#define BODYPARTS_HIGH_LAYER 24
-// For hand markings :3c - DOPPLER ADDITION
-#define BODY_HAND_LAYER 23.99
+#define BODYPARTS_HIGH_LAYER 26
+/// DOPPLER SHIFT ADDITION BEGIN - For hand markings :3c
+#define BODY_HAND_LAYER 25.5
+/// DOPPLER SHIFT ADDITION END
 /// Gloves layer
-#define GLOVES_LAYER 23
+#define GLOVES_LAYER 25
 /// Shoes layer
-#define SHOES_LAYER 22
+#define SHOES_LAYER 24
 /// Layer for masks that are worn below ears and eyes (like Balaclavas) (layers below hair, use flagsinv=HIDEHAIR as needed)
-#define LOW_FACEMASK_LAYER 21
+#define LOW_FACEMASK_LAYER 23
 /// Ears layer (Spessmen have ears? Wow)
-#define EARS_LAYER 20
+#define EARS_LAYER 22
 /// Layer for neck apperal that should appear below the suit slot (like neckties)
-#define LOW_NECK_LAYER 19
+#define LOW_NECK_LAYER 21
 /// Suit layer (armor, coats, etc.)
-#define SUIT_LAYER 18
+#define SUIT_LAYER 20
 /// Glasses layer
-#define GLASSES_LAYER 17
+#define GLASSES_LAYER 19
 /// Belt layer
-#define BELT_LAYER 16 //Possible make this an overlay of something required to wear a belt?
+#define BELT_LAYER 18 //Possible make this an overlay of something required to wear a belt?
 /// Suit storage layer (tucking a gun or baton underneath your armor)
-#define SUIT_STORE_LAYER 15
+#define SUIT_STORE_LAYER 17
 /// Neck layer (for wearing capes and bedsheets)
-#define NECK_LAYER 14
+#define NECK_LAYER 16
 /// Back layer (for backpacks and equipment on your back)
-#define BACK_LAYER 13
+#define BACK_LAYER 15
+/// Special layer for rendering beneath hair, for special facemasks
+#define BENEATH_HAIR_LAYER 14
 /// Hair layer (mess with the fro and you got to go!)
-#define HAIR_LAYER 12 //TODO: make part of head layer?
+#define HAIR_LAYER 13 //TODO: make part of head layer?
 /// Facemask layer (gas masks, breath masks, etc.)
-#define FACEMASK_LAYER 11
+#define FACEMASK_LAYER 12
 /// Head layer (hats, helmets, etc.)
-#define HEAD_LAYER 10
+#define HEAD_LAYER 11
+/// Hair that layers out above clothing, including hats (high ponytails and such)
+#define OUTER_HAIR_LAYER 10
 /// Handcuff layer (when your hands are cuffed)
 #define HANDCUFF_LAYER 9
 /// Legcuff layer (when your feet are cuffed)
@@ -791,10 +827,6 @@ GLOBAL_LIST_INIT(human_heights_to_offsets, list(
 #define HANDS_LAYER 7
 /// Body front layer. Usually used for mutant bodyparts that need to be in front of stuff (e.g. cat ears)
 #define BODY_FRONT_LAYER 6
-/// DOPPLER SHIFT ADDITION BEGIN
-#define BODY_FRONT_LAYER_2 5.99
-#define BODY_FRONT_LAYER_3 5.98
-/// DOPPLER SHIFT ADDITION END
 /// Special body layer that actually require to be above the hair (e.g. lifted welding goggles)
 #define ABOVE_BODY_FRONT_GLASSES_LAYER 5
 /// Special body layer for the rare cases where something on the head needs to be above everything else (e.g. flowers)
@@ -820,6 +852,7 @@ GLOBAL_LIST_INIT(layers_to_offset, list(
 	"[HEAD_LAYER]" = UPPER_BODY,
 	// Hair will get cut off by filter
 	"[HAIR_LAYER]" = UPPER_BODY,
+	"[BENEATH_HAIR_LAYER]" = UPPER_BODY,
 	// Long belts (sabre sheathe) will get cut off by filter
 	"[BELT_LAYER]" = LOWER_BODY,
 	// Everything below looks fine with or without a filter, so we can skip it and just offset
@@ -843,7 +876,8 @@ GLOBAL_LIST_INIT(layers_to_offset, list(
 	// to show how many filters are added at a glance
 	// BACK_LAYER (backpacks are big)
 	// BODYPARTS_HIGH_LAYER (arms)
-	// BODY_LAYER (body markings (full body), underwear (full body), eyes)
+	// BODY_LAYER (body markings (full body), underwear (full body))
+	// EYES_LAYER,
 	// BODY_ADJ_LAYER (external organs like wings)
 	// BODY_BEHIND_LAYER (external organs like wings)
 	// BODY_FRONT_LAYER (external organs like wings)
@@ -856,26 +890,19 @@ GLOBAL_LIST_INIT(layers_to_offset, list(
 //Bitflags for the layers a bodypart overlay can draw on (can be drawn on multiple layers)
 /// Draws overlay on the BODY_FRONT_LAYER
 #define EXTERNAL_FRONT (1 << 0)
-/// DOPPLER SHIFT REMOVAL BEGIN
-/*/// Draws overlay on the BODY_ADJ_LAYER
+/// Draws overlay on the BODY_ADJ_LAYER
 #define EXTERNAL_ADJACENT (1 << 1)
-/// Draws overlay on the BODY_BEHIND_LAYER
-#define EXTERNAL_BEHIND (1 << 2) */
-/// DOPPLER SHIFT REMOVAL END
 /// DOPPLER SHIFT ADDITION BEGIN
-//Front extra-color layers.
-#define EXTERNAL_FRONT_2 (1 << 1)
-#define EXTERNAL_FRONT_3 (1 << 2)
-//Updated adjacent & extra-color layers.
-#define EXTERNAL_ADJACENT (1 << 3)
-#define EXTERNAL_ADJACENT_2 (1 << 4)
-#define EXTERNAL_ADJACENT_3 (1 << 5)
-//Updated behind & extra-color layers.
-#define EXTERNAL_BEHIND (1 << 6)
-#define EXTERNAL_BEHIND_2 (1 << 7)
-#define EXTERNAL_BEHIND_3 (1 << 8)
+#define EXTERNAL_ADJACENT_2 (1 << 2)
+#define EXTERNAL_ADJACENT_3 (1 << 3)
+/// DOPPLER SHIFT ADDITION END
+/// Draws overlay on the BODY_BEHIND_LAYER
+#define EXTERNAL_BEHIND (1 << 4)
+/// DOPPLER SHIFT ADDITION BEGIN
 //Hand markings
-#define EXTERNAL_HAND (1 << 9)
+#define EXTERNAL_HAND (1 << 5)
+//Misc
+#define EXTERNAL_BODY_FRONT_UNDER_CLOTHES (1 << 6)
 /// DOPPLER SHIFT ADDITION END
 /// Draws organ on all EXTERNAL layers
 #define ALL_EXTERNAL_OVERLAYS EXTERNAL_FRONT | EXTERNAL_ADJACENT | EXTERNAL_BEHIND
@@ -958,6 +985,8 @@ GLOBAL_LIST_INIT(layers_to_offset, list(
 #define VOMIT_CATEGORY_DEFAULT (MOB_VOMIT_MESSAGE | MOB_VOMIT_HARM | MOB_VOMIT_STUN)
 /// The vomit you've all come to know and love, but with a little extra "spice" (blood)
 #define VOMIT_CATEGORY_BLOOD (VOMIT_CATEGORY_DEFAULT | MOB_VOMIT_BLOOD)
+/// The bloody vomit, but without the stunning
+#define VOMIT_CATEGORY_BLOOD_STUNLESS (VOMIT_CATEGORY_BLOOD & ~MOB_VOMIT_STUN)
 /// Another vomit variant that causes you to get knocked down instead of just only getting a stun. Standard otherwise.
 #define VOMIT_CATEGORY_KNOCKDOWN (MOB_VOMIT_MESSAGE | MOB_VOMIT_HARM | MOB_VOMIT_KNOCKDOWN)
 
@@ -985,7 +1014,7 @@ GLOBAL_LIST_INIT(layers_to_offset, list(
 #define HEAL_LIMBS (1<<6)
 /// Heals all organs from failing.
 #define HEAL_ORGANS (1<<7)
-/// A "super" heal organs, this refreshes all organs entirely, deleting old and replacing them with new.
+/// replaces any organ with ORGAN_HAZARDOUS in organ_flags with species defaults
 #define HEAL_REFRESH_ORGANS (1<<8)
 /// Removes all wounds.
 #define HEAL_WOUNDS (1<<9)
@@ -1081,3 +1110,11 @@ GLOBAL_LIST_INIT(layers_to_offset, list(
 /// Distance which you can see someone's ID card
 /// Short enough that you can inspect over tables (bartender checking age)
 #define ID_EXAMINE_DISTANCE 3
+
+GLOBAL_LIST_INIT(regal_rat_minion_commands, list(
+	/datum/pet_command/idle,
+	/datum/pet_command/free,
+	/datum/pet_command/protect_owner,
+	/datum/pet_command/follow,
+	/datum/pet_command/attack/mouse
+))

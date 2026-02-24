@@ -13,22 +13,22 @@
 /datum/quirk/item_quirk/fluoride_stare/add_unique(client/client_source)
 	var/obj/item/reagent_containers/cup/bottle/salglu_solution/saline = new(get_turf(quirk_holder))
 	give_item_to_holder(saline, list(
-		LOCATION_LPOCKET = ITEM_SLOT_LPOCKET,
-		LOCATION_RPOCKET = ITEM_SLOT_RPOCKET,
-		LOCATION_BACKPACK = ITEM_SLOT_BACKPACK,
-		LOCATION_HANDS = ITEM_SLOT_HANDS,
+		LOCATION_LPOCKET,
+		LOCATION_RPOCKET,
+		LOCATION_BACKPACK,
+		LOCATION_HANDS,
 	))
 	var/obj/item/reagent_containers/dropper/dropper = new(get_turf(quirk_holder))
 	give_item_to_holder(dropper, list(
-		LOCATION_LPOCKET = ITEM_SLOT_LPOCKET,
-		LOCATION_RPOCKET = ITEM_SLOT_RPOCKET,
-		LOCATION_BACKPACK = ITEM_SLOT_BACKPACK,
-		LOCATION_HANDS = ITEM_SLOT_HANDS,
+		LOCATION_LPOCKET,
+		LOCATION_RPOCKET,
+		LOCATION_BACKPACK,
+		LOCATION_HANDS,
 	))
 
 /datum/quirk/item_quirk/fluoride_stare/add(client/client_source)
 	ADD_TRAIT(quirk_holder, TRAIT_NO_EYELIDS, QUIRK_TRAIT)
-	quirk_holder.AddComponent(/datum/component/manual_blinking, 0.5, 1800 SECONDS, 60 SECONDS, FALSE) // DOPPLER EDIT - half dmg, 30s to 30m inbetween, 10s to 60s grace
+	quirk_holder.AddComponent(/datum/component/manual_blinking, 0.5, 15 MINUTES, 30 SECONDS, FALSE) //DOPPLER EDIT - ORIGINAL 3 MINUTES, 30 SECONDS,
 
 /datum/quirk/item_quirk/fluoride_stare/remove()
 	REMOVE_TRAIT(quirk_holder, TRAIT_NO_EYELIDS, QUIRK_TRAIT)

@@ -6,6 +6,7 @@
 	langs += /datum/language/carptongue
 	langs += /datum/language/slime
 	langs += /datum/language/primitive_genemod
+	langs += /datum/language/nambuni
 	return langs
 
 /// ACTUAL LANGUAGES BEGIN HERE
@@ -90,3 +91,32 @@
 	)
 	icon_state = "solcommon"
 	icon = 'modular_doppler/languages/icons/language.dmi'
+
+/datum/language/nambuni
+	name = "Nambūni"
+	desc = "Nambūni is the language spoken by most Nambūlites and by extension Deep Spacers. It has no known origin, though it superficially resembles some Austronesian and Khoisan languages in grammatical and phonetic structure despite predating human spaceflight. There are countless dialects, pidgins, and creoles spread throughout the thousands of micronations that compose the greater Nambūni Assembly, making the language a difficult one to master. As it is the official language of the Assembly, it is mandated that all prayer, diplomacy, and trade must be conducted in Nambūni, thus learning the language is one of the greatest hurdles outsider merchants face."
+	key = "N"
+	flags = TONGUELESS_SPEECH
+	space_chance = 30
+	syllables = list (
+		"se", "tiap", "ora", "nga", "nge", "ngi", "ngo", "ngū", "ang", "eng", "ing", "ong", "ung", "ach",
+		"ech", "ich", "och", "uch", "ych", "basei", "gehi", "nam", "nem", "nim", "nom", "nūm", "da", "de", "di",
+		"do", "du", "harū", "heru", "horo", "lua", "lūi", "luo", "ikan", "iken", "ikun", "lah", "luh", "leh",
+		"lih", "loh", "pan", "pen", "pon", "pun", "panam", "penam", "pinam", "ponam", "pūnam", "bang", "beng",
+		"yang", "yeng", "yong", "yung", "apat", "apet", "apot", "pat", "pet", "pot", "gaan", "geen", "giin", "goon",
+		"guun", "yai", "yei", "yūi", "hara", "hera", "hira", "hora", "hura", "hak", "hek", "hik", "hok", "huk",
+		"sai", "sei", "sui", "basei", "gehinnam", "mbūn", "mben", "mbon", "mbin", "mbem", "pakan", "pekan", "pak",
+		"pek", "puk"
+	)
+	special_characters = list("'", "-")
+	icon_state = "nambu"
+	icon = 'modular_doppler/languages/icons/language.dmi'
+	additional_syllable_low = 1
+	additional_syllable_high = 3
+	default_priority = 67
+	default_name_syllable_min = 2
+	default_name_syllable_max = 3
+
+/datum/language/draconic
+	name = "Khaishhs"
+	desc = "Often mispronounced as \"Heesh\" by offworlders and non-lizardfolk, The language can date its origins to Tiziran Pre-History where its abundant use of hisses, rattles, glottal sounds and other harsh consonants made it easily understood at greater distances and the extensive cave systems below the surface of Tizira. Though there are as many dialects as there are Clans, the more common \"Imperial Khaishhs\" was created by Clan Talunan as an effort to unite the people under their rule, and is what used in any and all official dealings with their government. The language itself has gained a bit of infamy in how uncomfortable it is to speak after any extended period for those whom do not use it on a daily basis, or whose biology is non-conducive to the vocals required to properly speak it. "
