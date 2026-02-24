@@ -23,7 +23,7 @@
 	def_zone,
 	blocked,
 	wound_bonus,
-	bare_wound_bonus,
+	exposed_wound_bonus,
 	sharpness,
 	attack_direction,
 	attacking_item,
@@ -31,7 +31,7 @@
 	SIGNAL_HANDLER
 
 	if(istype(attacking_item, /obj/item/kinetic_crusher))
-		total_damage += (-1 * damage_dealt)
+		total_damage += damage_dealt
 
 /datum/status_effect/syphon_mark
 	id = "syphon_mark"
@@ -101,15 +101,30 @@
 
 /datum/status_effect/throat_soothed/on_apply()
 	. = ..()
-	ADD_TRAIT(owner, TRAIT_SOOTHED_THROAT, "[STATUS_EFFECT_TRAIT]_[id]")
+	ADD_TRAIT(owner, TRAIT_SOOTHED_THROAT, TRAIT_STATUS_EFFECT(id))
 
 /datum/status_effect/throat_soothed/on_remove()
 	. = ..()
-	REMOVE_TRAIT(owner, TRAIT_SOOTHED_THROAT, "[STATUS_EFFECT_TRAIT]_[id]")
+	REMOVE_TRAIT(owner, TRAIT_SOOTHED_THROAT, TRAIT_STATUS_EFFECT(id))
+
+/datum/status_effect/headache_soothed
+	id = "headache_soothed"
+	duration = 60 SECONDS
+	status_type = STATUS_EFFECT_REFRESH
+	alert_type = null
+
+/datum/status_effect/headache_soothed/on_apply()
+	. = ..()
+	ADD_TRAIT(owner, TRAIT_SOOTHED_HEADACHE, TRAIT_STATUS_EFFECT(id))
+
+/datum/status_effect/headache_soothed/on_remove()
+	. = ..()
+	REMOVE_TRAIT(owner, TRAIT_SOOTHED_HEADACHE, TRAIT_STATUS_EFFECT(id))
 
 /datum/status_effect/bounty
 	id = "bounty"
 	status_type = STATUS_EFFECT_UNIQUE
+	alert_type = null
 	var/mob/living/rewarded
 
 /datum/status_effect/bounty/on_creation(mob/living/new_owner, mob/living/caster)
@@ -176,6 +191,7 @@
 	name = "Holding Up"
 	desc = "You're currently pointing a gun at someone. Click to cancel."
 	icon_state = "aimed"
+	clickable_glow = TRUE
 
 /atom/movable/screen/alert/status_effect/holdup/Click(location, control, params)
 	. = ..()
@@ -198,7 +214,7 @@
 	/// The type of alert given to people when offered, in case you need to override some behavior (like for high-fives)
 	var/give_alert_type = /atom/movable/screen/alert/give
 
-/datum/status_effect/offering/on_creation(mob/living/new_owner, obj/item/offer, give_alert_override, mob/living/carbon/offered)
+/datum/status_effect/offering/on_creation(mob/living/new_owner, obj/item/offer, give_alert_override, mob/living/offered)
 	. = ..()
 	if(!.)
 		return
@@ -209,7 +225,7 @@
 	if(offered && is_taker_elligible(offered))
 		register_candidate(offered)
 	else
-		for(var/mob/living/carbon/possible_taker in orange(1, owner))
+		for(var/mob/living/possible_taker in orange(1, owner))
 			if(!is_taker_elligible(possible_taker))
 				continue
 
@@ -223,14 +239,14 @@
 	RegisterSignals(offered_item, list(COMSIG_QDELETING, COMSIG_ITEM_DROPPED), PROC_REF(dropped_item))
 
 /datum/status_effect/offering/Destroy()
-	for(var/mob/living/carbon/removed_taker as anything in possible_takers)
+	for(var/mob/living/removed_taker as anything in possible_takers)
 		remove_candidate(removed_taker)
 	LAZYCLEARLIST(possible_takers)
 	offered_item = null
 	return ..()
 
-/// Hook up the specified carbon mob to be offered the item in question, give them the alert and signals and all
-/datum/status_effect/offering/proc/register_candidate(mob/living/carbon/possible_candidate)
+/// Hook up the specified living mob to be offered the item in question, give them the alert and signals and all
+/datum/status_effect/offering/proc/register_candidate(mob/living/possible_candidate)
 	var/atom/movable/screen/alert/give/G = possible_candidate.throw_alert("[owner]", give_alert_type)
 	if(!G)
 		return
@@ -238,8 +254,8 @@
 	RegisterSignal(possible_candidate, COMSIG_MOVABLE_MOVED, PROC_REF(check_taker_in_range))
 	G.setup(possible_candidate, src)
 
-/// Remove the alert and signals for the specified carbon mob. Automatically removes the status effect when we lost the last taker
-/datum/status_effect/offering/proc/remove_candidate(mob/living/carbon/removed_candidate)
+/// Remove the alert and signals for the specified living mob. Automatically removes the status effect when we lost the last taker
+/datum/status_effect/offering/proc/remove_candidate(mob/living/removed_candidate)
 	removed_candidate.clear_alert("[owner]")
 	LAZYREMOVE(possible_takers, removed_candidate)
 	UnregisterSignal(removed_candidate, COMSIG_MOVABLE_MOVED)
@@ -247,7 +263,7 @@
 		qdel(src)
 
 /// One of our possible takers moved, see if they left us hanging
-/datum/status_effect/offering/proc/check_taker_in_range(mob/living/carbon/taker)
+/datum/status_effect/offering/proc/check_taker_in_range(mob/living/taker)
 	SIGNAL_HANDLER
 	if(owner.CanReach(taker) && !IS_DEAD_OR_INCAP(taker))
 		return
@@ -256,10 +272,10 @@
 	remove_candidate(taker)
 
 /// The offerer moved, see if anyone is out of range now
-/datum/status_effect/offering/proc/check_owner_in_range(mob/living/carbon/source)
+/datum/status_effect/offering/proc/check_owner_in_range(mob/living/source)
 	SIGNAL_HANDLER
 
-	for(var/mob/living/carbon/checking_taker as anything in possible_takers)
+	for(var/mob/living/checking_taker as anything in possible_takers)
 		if(!istype(checking_taker) || !owner.CanReach(checking_taker) || IS_DEAD_OR_INCAP(checking_taker))
 			remove_candidate(checking_taker)
 
@@ -274,7 +290,7 @@
  *
  * Returns `TRUE` if the taker is valid as a target for the offering.
  */
-/datum/status_effect/offering/proc/is_taker_elligible(mob/living/carbon/taker)
+/datum/status_effect/offering/proc/is_taker_elligible(mob/living/taker)
 	return owner.CanReach(taker) && !IS_DEAD_OR_INCAP(taker) && additional_taker_check(taker)
 
 /**
@@ -285,7 +301,7 @@
  * Returns `TRUE` if the taker is valid as a target for the offering based on these
  * additional checks.
  */
-/datum/status_effect/offering/proc/additional_taker_check(mob/living/carbon/taker)
+/datum/status_effect/offering/proc/additional_taker_check(mob/living/taker)
 	return taker.can_hold_items()
 
 /**
@@ -294,7 +310,7 @@
  */
 /datum/status_effect/offering/no_item_received
 
-/datum/status_effect/offering/no_item_received/additional_taker_check(mob/living/carbon/taker)
+/datum/status_effect/offering/no_item_received/additional_taker_check(mob/living/taker)
 	return taker.usable_hands > 0
 
 /**
@@ -305,23 +321,23 @@
  */
 /datum/status_effect/offering/no_item_received/needs_resting
 
-/datum/status_effect/offering/no_item_received/needs_resting/additional_taker_check(mob/living/carbon/taker)
+/datum/status_effect/offering/no_item_received/needs_resting/additional_taker_check(mob/living/taker)
 	return taker.body_position == LYING_DOWN
 
-/datum/status_effect/offering/no_item_received/needs_resting/on_creation(mob/living/new_owner, obj/item/offer, give_alert_override, mob/living/carbon/offered)
+/datum/status_effect/offering/no_item_received/needs_resting/on_creation(mob/living/new_owner, obj/item/offer, give_alert_override, mob/living/offered)
 	. = ..()
 	RegisterSignal(owner, COMSIG_LIVING_SET_BODY_POSITION, PROC_REF(check_owner_standing))
 
-/datum/status_effect/offering/no_item_received/needs_resting/register_candidate(mob/living/carbon/possible_candidate)
+/datum/status_effect/offering/no_item_received/needs_resting/register_candidate(mob/living/possible_candidate)
 	. = ..()
 	RegisterSignal(possible_candidate, COMSIG_LIVING_SET_BODY_POSITION, PROC_REF(check_candidate_resting))
 
-/datum/status_effect/offering/no_item_received/needs_resting/remove_candidate(mob/living/carbon/removed_candidate)
+/datum/status_effect/offering/no_item_received/needs_resting/remove_candidate(mob/living/removed_candidate)
 	UnregisterSignal(removed_candidate, COMSIG_LIVING_SET_BODY_POSITION)
 	return ..()
 
 /// Simple signal handler that ensures that, if the owner stops standing, the offer no longer stands either!
-/datum/status_effect/offering/no_item_received/needs_resting/proc/check_owner_standing(mob/living/carbon/owner)
+/datum/status_effect/offering/no_item_received/needs_resting/proc/check_owner_standing(mob/living/owner)
 	if(src.owner.body_position == STANDING_UP)
 		return
 
@@ -329,7 +345,7 @@
 	qdel(src)
 
 /// Simple signal handler that ensures that, should a candidate now be standing up, the offer won't be standing for them anymore!
-/datum/status_effect/offering/no_item_received/needs_resting/proc/check_candidate_resting(mob/living/carbon/candidate)
+/datum/status_effect/offering/no_item_received/needs_resting/proc/check_candidate_resting(mob/living/candidate)
 	SIGNAL_HANDLER
 
 	if(candidate.body_position == LYING_DOWN)
@@ -358,6 +374,7 @@
 	name = "Surrender"
 	desc = "Looks like you're in trouble now, bud. Click here to surrender. (Warning: You will be incapacitated.)"
 	icon_state = "surrender"
+	clickable_glow = TRUE
 
 /atom/movable/screen/alert/status_effect/surrender/Click(location, control, params)
 	. = ..()
@@ -579,6 +596,7 @@
 	id = "tinea_luxor_light"
 	processing_speed = STATUS_EFFECT_NORMAL_PROCESS
 	remove_on_fullheal = TRUE
+	alert_type = null
 	var/obj/effect/dummy/lighting_obj/moblight/mob_light_obj
 
 /datum/status_effect/tinlux_light/on_creation(mob/living/new_owner, duration)
@@ -615,40 +633,67 @@
 	duration = STATUS_EFFECT_PERMANENT
 	status_type = STATUS_EFFECT_UNIQUE
 	alert_type = /atom/movable/screen/alert/status_effect/washing_regen
-	///The screen alert shown if you hate water
-	var/hater_alert = /atom/movable/screen/alert/status_effect/washing_regen/hater
 	/// How much stamina we regain from washing
 	var/stamina_heal_per_tick = -4
 	/// How much brute, tox and fie damage we heal from this
 	var/heal_per_tick = 0
+	/// The main reagent used for the shower (if no reagent is at least 70% of volume then it's null)
+	var/datum/reagent/shower_reagent
+
+/datum/status_effect/washing_regen/on_creation(mob/living/new_owner, shower_reagent)
+	if(!src.shower_reagent)
+		src.shower_reagent = shower_reagent
+	return ..()
 
 /datum/status_effect/washing_regen/on_apply()
 	. = ..()
-	if(HAS_TRAIT(owner, TRAIT_WATER_HATER) && !HAS_TRAIT(owner, TRAIT_WATER_ADAPTATION))
-		alert_type = hater_alert
+	if(istype(shower_reagent, /datum/reagent/blood))
+		if(HAS_TRAIT(owner, TRAIT_MORBID) || HAS_TRAIT(owner, TRAIT_EVIL) || (owner.mob_biotypes & MOB_UNDEAD))
+			alert_type = /atom/movable/screen/alert/status_effect/washing_regen/bloody_like
+		else
+			alert_type  = /atom/movable/screen/alert/status_effect/washing_regen/bloody_dislike
+	else if(istype(shower_reagent, /datum/reagent/water))
+		if(HAS_TRAIT(owner, TRAIT_WATER_HATER) && !HAS_TRAIT(owner, TRAIT_WATER_ADAPTATION))
+			alert_type = /atom/movable/screen/alert/status_effect/washing_regen/hater
+		else
+			alert_type = /atom/movable/screen/alert/status_effect/washing_regen
+	else if(!shower_reagent) // dirty shower
+		alert_type  = /atom/movable/screen/alert/status_effect/washing_regen/dislike
 
 /datum/status_effect/washing_regen/tick(seconds_between_ticks)
 	. = ..()
-	var/water_adaptation = HAS_TRAIT(owner, TRAIT_WATER_ADAPTATION)
-	var/water_hater = HAS_TRAIT(owner, TRAIT_WATER_HATER)
-	var/stam_recovery = (water_hater && !water_adaptation ? -stamina_heal_per_tick : stamina_heal_per_tick) * seconds_between_ticks
-	var/recovery = heal_per_tick
-	if(water_adaptation)
-		recovery -= 1
-		stam_recovery *= 1.5
-	else if(water_hater)
-		recovery *= 0
-	recovery *= seconds_between_ticks
 
-	var/healed = 0
-	if(recovery) //very mild healing for those with the water adaptation trait (fish infusion)
-		healed += owner.adjustOxyLoss(recovery * (water_adaptation ? 1.5 : 1), updating_health = FALSE, required_biotype = MOB_ORGANIC)
-		healed += owner.adjustFireLoss(recovery, updating_health = FALSE, required_bodytype = BODYTYPE_ORGANIC)
-		healed += owner.adjustToxLoss(recovery, updating_health = FALSE, required_biotype = MOB_ORGANIC)
-		healed += owner.adjustBruteLoss(recovery, updating_health = FALSE, required_bodytype = BODYTYPE_ORGANIC)
-	healed += owner.adjustStaminaLoss(stam_recovery, updating_stamina = FALSE)
-	if(healed)
-		owner.updatehealth()
+	var/is_disgusted = FALSE
+
+	if(istype(shower_reagent, /datum/reagent/water))
+		var/water_adaptation = HAS_TRAIT(owner, TRAIT_WATER_ADAPTATION)
+		var/water_hater = HAS_TRAIT(owner, TRAIT_WATER_HATER)
+		var/stam_recovery = (water_hater && !water_adaptation ? -stamina_heal_per_tick : stamina_heal_per_tick) * seconds_between_ticks
+		var/recovery = heal_per_tick
+		if(water_adaptation)
+			recovery -= 1
+			stam_recovery *= 1.5
+		else if(water_hater)
+			recovery *= 0
+		recovery *= seconds_between_ticks
+
+		var/healed = 0
+		if(recovery) //very mild healing for those with the water adaptation trait (fish infusion)
+			healed += owner.adjustOxyLoss(recovery * (water_adaptation ? 1.5 : 1), updating_health = FALSE, required_biotype = MOB_ORGANIC)
+			healed += owner.adjustFireLoss(recovery, updating_health = FALSE, required_bodytype = BODYTYPE_ORGANIC)
+			healed += owner.adjustToxLoss(recovery, updating_health = FALSE, required_biotype = MOB_ORGANIC)
+			healed += owner.adjustBruteLoss(recovery, updating_health = FALSE, required_bodytype = BODYTYPE_ORGANIC)
+		healed += owner.adjustStaminaLoss(stam_recovery, updating_stamina = FALSE)
+		if(healed)
+			owner.updatehealth()
+	else if(istype(shower_reagent, /datum/reagent/blood))
+		var/enjoy_bloody_showers = HAS_TRAIT(owner, TRAIT_MORBID) || HAS_TRAIT(owner, TRAIT_EVIL) || (owner.mob_biotypes & MOB_UNDEAD)
+		is_disgusted = !enjoy_bloody_showers
+	else if(!shower_reagent) // dirty shower
+		is_disgusted = TRUE
+
+	if(is_disgusted)
+		owner.adjust_disgust(2)
 
 /atom/movable/screen/alert/status_effect/washing_regen
 	name = "Washing"
@@ -659,11 +704,28 @@
 	desc = "Waaater... Fuck this WATER!!"
 	icon_state = "shower_regen_catgirl"
 
+/atom/movable/screen/alert/status_effect/washing_regen/dislike
+	desc = "This water feels dirty..."
+	icon_state = "shower_regen_dirty"
+
+/atom/movable/screen/alert/status_effect/washing_regen/bloody_like
+	desc = "Mhhhmmmm... the crimson red drops of life. How delightful."
+	icon_state = "shower_regen_blood_happy"
+
+/atom/movable/screen/alert/status_effect/washing_regen/bloody_dislike
+	desc = "Is that... blood? What the fuck!"
+	icon_state = "shower_regen_blood_bad"
+
 /datum/status_effect/washing_regen/hot_spring
 	alert_type = /atom/movable/screen/alert/status_effect/washing_regen/hotspring
-	hater_alert = /atom/movable/screen/alert/status_effect/washing_regen/hotspring/hater
 	stamina_heal_per_tick = -4.5
 	heal_per_tick = -0.4
+	shower_reagent = /datum/reagent/water
+
+/datum/status_effect/washing_regen/hot_spring/on_apply()
+	. = ..()
+	if(HAS_TRAIT(owner, TRAIT_WATER_HATER) && !HAS_TRAIT(owner, TRAIT_WATER_ADAPTATION))
+		alert_type = /atom/movable/screen/alert/status_effect/washing_regen/hotspring/hater
 
 /datum/status_effect/washing_regen/hot_spring/tick(seconds_between_ticks)
 	. = ..()
@@ -678,3 +740,64 @@
 	name = "Hotspring"
 	desc = "Waaater... FUCK THIS HOT WATER!!"
 	icon_state = "hotspring_regen_catgirl"
+
+#define BEAM_ALPHA 62
+
+///Makes the mob luminescent for the duration of the effect, and project a large spotlight overtop them.
+/datum/status_effect/spotlight_light
+	id = "spotlight_light"
+	processing_speed = STATUS_EFFECT_NORMAL_PROCESS
+	alert_type = null
+	/// Color of the light
+	var/spotlight_color = "#e2e2ca"
+	/// Dummy lighting object to simulate the spotlight highlighting the mob.
+	var/obj/effect/dummy/lighting_obj/moblight/mob_light_obj
+	/// First visual overlay, this one sits on the back of the mob.
+	var/obj/effect/overlay/spotlight/beam_from_above_a
+	/// Second visual overlay, this one sits on the front of the mob.
+	var/obj/effect/overlay/spotlight/beam_from_above_b
+	/// An additional overlay to supply with the spotlight
+	var/image/additional_overlay
+
+/datum/status_effect/spotlight_light/on_creation(mob/living/new_owner, duration, additional_overlay)
+	if(duration)
+		src.duration = duration
+	if(additional_overlay)
+		src.additional_overlay = additional_overlay
+	return ..()
+
+/datum/status_effect/spotlight_light/on_apply()
+	mob_light_obj = owner.mob_light(2, 1.5, spotlight_color)
+
+	beam_from_above_a = new /obj/effect/overlay/spotlight
+	beam_from_above_a.color = spotlight_color
+	beam_from_above_a.alpha = BEAM_ALPHA
+	owner.vis_contents += beam_from_above_a
+	beam_from_above_a.layer = BELOW_MOB_LAYER
+
+	beam_from_above_b = new /obj/effect/overlay/spotlight
+	beam_from_above_b.color = spotlight_color
+	beam_from_above_b.alpha = BEAM_ALPHA
+	beam_from_above_b.layer = ABOVE_MOB_LAYER
+	beam_from_above_b.pixel_y = -2 //Slight vertical offset for an illusion of volume
+	owner.vis_contents += beam_from_above_b
+
+	if(additional_overlay)
+		owner.add_overlay(additional_overlay)
+
+	return TRUE
+
+/datum/status_effect/spotlight_light/on_remove()
+	owner.vis_contents -= beam_from_above_a
+	owner.vis_contents -= beam_from_above_b
+	QDEL_NULL(beam_from_above_a)
+	QDEL_NULL(beam_from_above_b)
+	QDEL_NULL(mob_light_obj)
+
+	if(additional_overlay)
+		owner.cut_overlay(additional_overlay)
+
+/datum/status_effect/spotlight_light/divine
+	id = "divine_spotlight"
+
+#undef BEAM_ALPHA

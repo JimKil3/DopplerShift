@@ -37,10 +37,8 @@
 	jobtype = /datum/job/janitor
 
 	id_trim = /datum/id_trim/job/janitor
-	uniform = /obj/item/clothing/under/rank/civilian/janitor/doppler
-	suit = /obj/item/clothing/suit/apron/janitor_cloak
+	uniform = /obj/item/clothing/under/rank/civilian/janitor
 	belt = /obj/item/modular_computer/pda/janitor
-	gloves = /obj/item/clothing/gloves/botanic_leather/janitor
 	ears = /obj/item/radio/headset/headset_srv
 	skillchips = list(/obj/item/skillchip/job/janitor)
 	backpack_contents = list(/obj/item/access_key)
@@ -49,10 +47,10 @@
 	. = ..()
 	if(check_holidays(GARBAGEDAY))
 		backpack_contents += list(/obj/item/gun/ballistic/revolver)
-		r_pocket = /obj/item/ammo_box/a357
+		r_pocket = /obj/item/ammo_box/speedloader/c357
 
 /datum/outfit/job/janitor/get_types_to_preload()
 	. = ..()
 	if(check_holidays(GARBAGEDAY))
 		. += /obj/item/gun/ballistic/revolver
-		. += /obj/item/ammo_box/a357
+		. += /obj/item/ammo_box/speedloader/c357

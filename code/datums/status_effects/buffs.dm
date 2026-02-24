@@ -6,6 +6,21 @@
 	tick_interval = 0.4 SECONDS
 	alert_type = /atom/movable/screen/alert/status_effect/his_grace
 	var/bloodlust = 0
+	var/gender = MALE
+	var/word
+	var/word2
+
+/datum/status_effect/his_grace/on_creation(mob/living/new_owner, inputgender)
+	. = ..()
+	gender = inputgender
+	if(gender == MALE)
+		word = "His"
+		word2 = "Him"
+		linked_alert.icon_state = "his_grace"
+	else
+		word = "Her"
+		word2 = "Her"
+		linked_alert.icon_state = "her_grace"
 
 /atom/movable/screen/alert/status_effect/his_grace
 	name = "His Grace"
@@ -16,6 +31,11 @@
 /atom/movable/screen/alert/status_effect/his_grace/MouseEntered(location,control,params)
 	desc = initial(desc)
 	var/datum/status_effect/his_grace/HG = attached_effect
+	var/His = HG.word
+	var/Him = HG.word2
+	name = "[His] Grace"
+	desc = "[His] Grace hungers, and you must feed [Him]."
+	icon_state = "[LOWER_TEXT(His)]_grace"
 	desc += "<br><font size=3><b>Current Bloodthirst: [HG.bloodlust]</b></font>\
 	<br>Becomes undroppable at <b>[HIS_GRACE_FAMISHED]</b>\
 	<br>Will consume you at <b>[HIS_GRACE_CONSUME_OWNER]</b>"
@@ -25,7 +45,7 @@
 	owner.add_stun_absorption(
 		source = id,
 		priority = 3,
-		self_message = span_boldwarning("His Grace protects you from the stun!"),
+		self_message = span_boldwarning("[word] Grace protects you from the stun!"),
 	)
 	return ..()
 
@@ -41,7 +61,7 @@
 		if(HG.awakened)
 			graces++
 	if(!graces)
-		owner.apply_status_effect(/datum/status_effect/his_wrath)
+		owner.apply_status_effect(/datum/status_effect/his_wrath, word, word2)
 		qdel(src)
 		return
 	var/grace_heal = bloodlust * 0.02
@@ -213,14 +233,14 @@
 		if(new_owner.reagents.has_reagent(workout_reagent))
 			food_boost += supplementary_reagents_bonus[workout_reagent]
 
-	var/skill_level_boost = (new_owner.mind.get_skill_level(/datum/skill/athletics) - 1) * 2 SECONDS
+	var/skill_level_boost = (new_owner.mind?.get_skill_level(/datum/skill/athletics) - 1) * 2 SECONDS
 	bonus_time = (bonus_time + food_boost + skill_level_boost) * modifier
 
-	var/exhaustion_limit = new_owner.mind.get_skill_modifier(/datum/skill/athletics, SKILL_VALUE_MODIFIER) + world.time
+	var/exhaustion_limit = new_owner.mind?.get_skill_modifier(/datum/skill/athletics, SKILL_VALUE_MODIFIER) + world.time
 	if(duration + bonus_time >= exhaustion_limit)
 		duration = exhaustion_limit
 		to_chat(new_owner, span_userdanger("Your muscles are exhausted! Might be a good idea to sleep..."))
-		new_owner.emote("scream")
+		new_owner.painful_scream() // DOPPLER EDIT: check for painkilling before screaming
 		return // exhaustion_limit
 
 	return bonus_time
@@ -235,8 +255,10 @@
 	new_owner.add_mood_event("exercise", /datum/mood_event/exercise, new_owner.mind.get_skill_level(/datum/skill/athletics))
 
 /datum/status_effect/exercised/on_apply()
+	if(!owner.mind)
+		return FALSE
 	owner.add_mood_event("exercise", /datum/mood_event/exercise, owner.mind.get_skill_level(/datum/skill/athletics))
-	return ..()
+	return TRUE
 
 /datum/status_effect/exercised/on_remove()
 	owner.clear_mood_event("exercise")
@@ -306,7 +328,7 @@
 				newRod.activated()
 				if(!itemUser.has_hand_for_held_index(hand))
 					//If user does not have the corresponding hand anymore, give them one and return the rod to their hand
-					var/zone = (hand % 2) ? BODY_ZONE_L_ARM : BODY_ZONE_R_ARM
+					var/zone = IS_LEFT_INDEX(hand) ? BODY_ZONE_L_ARM : BODY_ZONE_R_ARM
 					if(itemUser.regenerate_limb(zone, FALSE))
 						itemUser.put_in_hand(newRod, hand, forced = TRUE)
 					else
@@ -390,12 +412,12 @@
 
 /datum/status_effect/lightningorb/on_apply()
 	. = ..()
-	owner.add_movespeed_modifier(/datum/movespeed_modifier/yellow_orb)
+	owner.add_movespeed_modifier(/datum/movespeed_modifier/status_effect/yellow_orb)
 	to_chat(owner, span_notice("You feel fast!"))
 
 /datum/status_effect/lightningorb/on_remove()
 	. = ..()
-	owner.remove_movespeed_modifier(/datum/movespeed_modifier/yellow_orb)
+	owner.remove_movespeed_modifier(/datum/movespeed_modifier/status_effect/yellow_orb)
 	to_chat(owner, span_notice("You slow down."))
 
 /atom/movable/screen/alert/status_effect/lightningorb
@@ -406,6 +428,7 @@
 /datum/status_effect/mayhem
 	id = "Mayhem"
 	duration = 2 MINUTES
+	alert_type = null
 	/// The chainsaw spawned by the status effect
 	var/obj/item/chainsaw/doomslayer/chainsaw
 
@@ -427,7 +450,7 @@
 
 	if(iscarbon(owner))
 		chainsaw = new(get_turf(owner))
-		ADD_TRAIT(chainsaw, TRAIT_NODROP, CHAINSAW_FRENZY_TRAIT)
+		ADD_TRAIT(chainsaw, TRAIT_NODROP, TRAIT_STATUS_EFFECT(id))
 		owner.put_in_hands(chainsaw, forced = TRUE)
 		chainsaw.attack_self(owner)
 		owner.reagents.add_reagent(/datum/reagent/medicine/adminordrazine, 25)
@@ -435,7 +458,7 @@
 	owner.log_message("entered a blood frenzy", LOG_ATTACK)
 	to_chat(owner, span_narsiesmall("KILL, KILL, KILL! YOU HAVE NO ALLIES ANYMORE, NO TEAM MATES OR ALLEGIANCES! KILL THEM ALL!"))
 
-	var/datum/client_colour/colour = owner.add_client_colour(/datum/client_colour/bloodlust)
+	var/datum/client_colour/colour = owner.add_client_colour(/datum/client_colour/bloodlust, REF(src))
 	QDEL_IN(colour, 1.1 SECONDS)
 	return TRUE
 
@@ -450,18 +473,30 @@
 	duration = 2 SECONDS
 	status_type = STATUS_EFFECT_REPLACE
 	show_duration = TRUE
+	alert_type = null
+	///What speed datum do we apply?
+	var/move_datum = /datum/movespeed_modifier/status_speed_boost
+	var/action_datum = null
 
 /datum/status_effect/speed_boost/on_creation(mob/living/new_owner, set_duration)
 	if(isnum(set_duration))
 		duration = set_duration
+	new_owner.do_alert_animation()
+	playsound(new_owner, 'sound/machines/chime.ogg', 50, FALSE, -5)
 	. = ..()
 
 /datum/status_effect/speed_boost/on_apply()
-	owner.add_movespeed_modifier(/datum/movespeed_modifier/status_speed_boost, update = TRUE)
+	if(move_datum)
+		owner.add_movespeed_modifier(move_datum, update = TRUE)
+	if(action_datum)
+		owner.add_actionspeed_modifier(action_datum, update = TRUE)
 	return ..()
 
 /datum/status_effect/speed_boost/on_remove()
-	owner.remove_movespeed_modifier(/datum/movespeed_modifier/status_speed_boost, update = TRUE)
+	if(move_datum)
+		owner.remove_movespeed_modifier(move_datum, update = TRUE)
+	if(action_datum)
+		owner.remove_actionspeed_modifier(action_datum, update = TRUE)
 
 /datum/movespeed_modifier/status_speed_boost
 	multiplicative_slowdown = -1
@@ -557,7 +592,7 @@
 	owner.AddElement(/datum/element/simple_flying)
 	owner.add_stun_absorption(source = id, priority = 4)
 	owner.add_movespeed_mod_immunities(id, /datum/movespeed_modifier/damage_slowdown)
-	ADD_TRAIT(owner, TRAIT_FREE_HYPERSPACE_MOVEMENT, id)
+	ADD_TRAIT(owner, TRAIT_FREE_HYPERSPACE_MOVEMENT, TRAIT_STATUS_EFFECT(id))
 	owner.playsound_local(get_turf(owner), 'sound/effects/chemistry/ahaha.ogg', vol = 100, vary = TRUE, use_reverb = TRUE)
 	return TRUE
 
@@ -575,7 +610,7 @@
 	owner.RemoveElement(/datum/element/simple_flying)
 	owner.remove_stun_absorption(id)
 	owner.remove_movespeed_mod_immunities(id, /datum/movespeed_modifier/damage_slowdown)
-	REMOVE_TRAIT(owner, TRAIT_FREE_HYPERSPACE_MOVEMENT, id)
+	REMOVE_TRAIT(owner, TRAIT_FREE_HYPERSPACE_MOVEMENT, TRAIT_STATUS_EFFECT(id))
 
 /// Gives you a brief period of anti-gravity
 /datum/status_effect/jump_jet
@@ -595,13 +630,14 @@
 	id = "radiation_immunity"
 	duration = 1 MINUTES
 	show_duration = TRUE
+	alert_type = null
 
 /datum/status_effect/radiation_immunity/on_apply()
-	ADD_TRAIT(owner, TRAIT_RADIMMUNE, type)
+	ADD_TRAIT(owner, TRAIT_RADIMMUNE, TRAIT_STATUS_EFFECT(id))
 	return TRUE
 
 /datum/status_effect/radiation_immunity/on_remove()
-	REMOVE_TRAIT(owner, TRAIT_RADIMMUNE, type)
+	REMOVE_TRAIT(owner, TRAIT_RADIMMUNE, TRAIT_STATUS_EFFECT(id))
 
 /datum/status_effect/radiation_immunity/radnebula
 	alert_type = /atom/movable/screen/alert/status_effect/radiation_immunity
@@ -611,29 +647,33 @@
 	desc = "You're immune to radiation, get settled quick!"
 	icon_state = "radiation_shield"
 
-/// Heal in darkness and potentially trigger other effects, persists for a short duration after leaving
-/datum/status_effect/shadow_regeneration
-	id = "shadow_regeneration"
+/// Throw an alert we're in darkness!! Nightvision can make it hard to tell so this is useful
+/datum/status_effect/shadow
+	id = "shadow"
 	duration = 2 SECONDS
 	status_type = STATUS_EFFECT_REFRESH
 	alert_type = /atom/movable/screen/alert/status_effect/shadow_regeneration
 
-/datum/status_effect/shadow_regeneration/on_apply()
+/// Same as above, but also heal in darkness!! Mostly superseded but some simple mobs use this
+/datum/status_effect/shadow/regeneration
+	id = "shadow_regeneration"
+
+/datum/status_effect/shadow/regeneration/on_apply()
 	. = ..()
 	if (!.)
 		return FALSE
 	heal_owner()
 	return TRUE
 
-/datum/status_effect/shadow_regeneration/refresh(effect)
+/datum/status_effect/shadow/regeneration/refresh(effect)
 	. = ..()
 	heal_owner()
 
 /// Regenerate health whenever this status effect is applied or reapplied
-/datum/status_effect/shadow_regeneration/proc/heal_owner()
+/datum/status_effect/shadow/regeneration/proc/heal_owner()
 	owner.heal_overall_damage(brute = 1, burn = 1, required_bodytype = BODYTYPE_ORGANIC)
 
 /atom/movable/screen/alert/status_effect/shadow_regeneration
 	name = "Shadow Regeneration"
-	desc = "Bathed in soothing darkness, you will slowly heal yourself."
+	desc = "Bathed in soothing darkness, you will slowly heal yourself"
 	icon_state = "lightless"

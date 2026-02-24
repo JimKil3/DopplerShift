@@ -1,9 +1,10 @@
-/proc/getviewsize(view)
-	if(!view) // Just to avoid any runtimes that could otherwise cause constant disconnect loops.
-		stack_trace("Missing value for 'view' in getviewsize(), defaulting to world.view!")
-		view = world.view
+/proc/getviewsize(view = world.view)
+	SHOULD_BE_PURE(TRUE)
 
 	if(isnum(view))
+		//resetting back to 0- this is the same as just checking !view but we want to be clear the point of the check.
+		if(view == 0)
+			return list(0, 0)
 		var/totalviewrange = (view < 0 ? -1 : 1) + 2 * view
 		return list(totalviewrange, totalviewrange)
 	else
@@ -28,7 +29,7 @@
 */
 
 /// The default tile-distance between two atoms for one to consider the other as visible.
-#define DEFAULT_SIGHT_DISTANCE 7
+#define DEFAULT_SIGHT_DISTANCE 9 // Doppler edit - widescreen autofire - #define DEFAULT_SIGHT_DISTANCE 7
 
 /// Basic check to see if the src object can see the target object.
 #define CAN_I_SEE(target) ((src in viewers(DEFAULT_SIGHT_DISTANCE, target)) || in_range(target, src))

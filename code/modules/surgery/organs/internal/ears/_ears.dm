@@ -24,7 +24,7 @@
 	/// Resistance against loud noises
 	var/bang_protect = 0
 	/// Multiplier for both long term and short term ear damage
-	var/damage_multiplier = 1
+	var/damage_multiplier = 0.125 // DOPPLER EDIT, makes deafness last less long - old code: var/damage_multiplier = 1
 
 /obj/item/organ/ears/on_life(seconds_per_tick, times_fired)
 	// only inform when things got worse, needs to happen before we heal
@@ -52,7 +52,7 @@
 	. = ..()
 	update_temp_deafness()
 
-/obj/item/organ/ears/on_mob_remove(mob/living/carbon/organ_owner, special)
+/obj/item/organ/ears/on_mob_remove(mob/living/carbon/organ_owner, special, movement_flags)
 	. = ..()
 	UnregisterSignal(organ_owner, COMSIG_MOB_SAY)
 	REMOVE_TRAIT(organ_owner, TRAIT_DEAF, EAR_DAMAGE)
@@ -141,6 +141,10 @@
 	speech_args[SPEECH_MESSAGE] = message
 	return COMPONENT_UPPERCASE_SPEECH
 
+/obj/item/organ/ears/feel_for_damage(self_aware)
+	// Ear damage has audible effects, so we don't really need to "feel" it when self-examining
+	return ""
+
 /obj/item/organ/ears/invincible
 	damage_multiplier = 0
 
@@ -151,11 +155,12 @@
 	worn_icon = 'icons/mob/clothing/head/costume.dmi'
 	icon_state = "kitty"
 	visual = TRUE
-	damage_multiplier = 2
+	damage_multiplier = parent_type::damage_multiplier // DOPPLER EDIT, old code: damage_multiplier = 2
 
 	preference = "feature_human_ears"
+	restyle_flags = EXTERNAL_RESTYLE_FLESH
 
-	dna_block = DNA_EARS_BLOCK
+	dna_block = /datum/dna_block/feature/ears
 
 	bodypart_overlay = /datum/bodypart_overlay/mutant/cat_ears
 
@@ -163,7 +168,7 @@
 /datum/bodypart_overlay/mutant/cat_ears
 	layers = EXTERNAL_FRONT | EXTERNAL_BEHIND
 	color_source = ORGAN_COLOR_HAIR
-	feature_key = "ears"
+	feature_key = FEATURE_EARS
 	dyable = TRUE
 
 	/// Layer upon which we add the inner ears overlay
@@ -172,13 +177,12 @@
 /datum/bodypart_overlay/mutant/cat_ears/get_global_feature_list()
 	return SSaccessories.ears_list
 
-/datum/bodypart_overlay/mutant/cat_ears/can_draw_on_bodypart(mob/living/carbon/human/human)
-	if((human.head?.flags_inv & HIDEHAIR) || (human.wear_mask?.flags_inv & HIDEHAIR))
-		return FALSE
-	return TRUE
+/datum/bodypart_overlay/mutant/cat_ears/can_draw_on_bodypart(obj/item/bodypart/bodypart_owner)
+	return !(bodypart_owner.owner?.obscured_slots & HIDEHAIR)
 
 /datum/bodypart_overlay/mutant/cat_ears/get_image(image_layer, obj/item/bodypart/limb)
 	var/mutable_appearance/base_ears = ..()
+	base_ears.color = (dye_color || draw_color)
 
 	// Only add inner ears on the inner layer
 	if(image_layer != bitflag_to_layer(inner_layer))
@@ -187,11 +191,21 @@
 	// Construct image of inner ears, apply to base ears as an overlay
 	feature_key += "inner"
 	var/mutable_appearance/inner_ears = ..()
-	inner_ears.appearance_flags = RESET_COLOR
 	feature_key = initial(feature_key)
+	var/mutable_appearance/ear_holder = mutable_appearance(layer = image_layer)
+	ear_holder.overlays += base_ears
+	ear_holder.overlays += inner_ears
+	return ear_holder
 
-	base_ears.overlays += inner_ears
-	return base_ears
+/datum/bodypart_overlay/mutant/cat_ears/color_image(image/overlay, layer, obj/item/bodypart/limb)
+	return // We color base ears manually above in get_image
+
+/obj/item/organ/ears/ghost
+	name = "ghost ears"
+	desc = "All the more to hear you... though it can't hear through walls."
+	icon_state = "ears-ghost"
+	movement_type = PHASING
+	organ_flags = parent_type::organ_flags | ORGAN_GHOST
 
 /obj/item/organ/ears/penguin
 	name = "penguin ears"
@@ -211,7 +225,7 @@
 	name = "basic cybernetic ears"
 	icon_state = "ears-c"
 	desc = "A basic cybernetic organ designed to mimic the operation of ears."
-	damage_multiplier = 0.9
+	damage_multiplier = parent_type::damage_multiplier // DOPPLER EDIT, old code: damage_multiplier = 0.9
 	organ_flags = ORGAN_ROBOTIC
 	failing_desc = "seems to be broken."
 
@@ -219,14 +233,14 @@
 	name = "cybernetic ears"
 	icon_state = "ears-c-u"
 	desc =  "An advanced cybernetic ear, surpassing the performance of organic ears."
-	damage_multiplier = 0.5
+	damage_multiplier = 0.085 // DOPPLER EDIT, old code: damage_multiplier = 0.5
 
 /obj/item/organ/ears/cybernetic/whisper
 	name = "whisper-sensitive cybernetic ears"
 	icon_state = "ears-c-u"
 	desc = "Allows the user to more easily hear whispers. The user becomes extra vulnerable to loud noises, however"
 	// Same sensitivity as felinid ears
-	damage_multiplier = 2
+	damage_multiplier = 0.35 // DOPPLER EDIT, old code: damage_multiplier = 2
 
 // The original idea was to use signals to do this not traits. Unfortunately, the star effect used for whispers applies before any relevant signals
 // This seems like the least invasive solution
@@ -244,7 +258,7 @@
 	icon_state = "ears-c-u"
 	desc = "Through the power of modern engineering, allows the user to hear speech through walls. The user becomes extra vulnerable to loud noises, however"
 	// Same sensitivity as felinid ears
-	damage_multiplier = 2
+	damage_multiplier = 0.35 // DOPPLER EDIT, old code: damage_multiplier = 2
 
 /obj/item/organ/ears/cybernetic/xray/on_mob_insert(mob/living/carbon/ear_owner)
 	. = ..()
@@ -259,3 +273,9 @@
 	if(. & EMP_PROTECT_SELF)
 		return
 	apply_organ_damage(20 / severity)
+
+/obj/item/organ/ears/pod
+	name = "pod ears"
+	desc = "Strangest salad you've ever seen."
+	foodtype_flags = PODPERSON_ORGAN_FOODTYPES
+	color = COLOR_LIME

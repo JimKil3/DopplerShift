@@ -90,6 +90,25 @@
 	name = "Shirt - Turtleneck Leotard Sleeveless"
 	icon_state = "leotard_turtleneck_sleeveless"
 
+/datum/sprite_accessory/undershirt/leotard/athletic
+	name = "Shirt - Athletic Leotard"
+	icon_state = "leotard_athletic"
+
+/datum/sprite_accessory/undershirt/blouse
+	name = "Shirt - Blouse"
+	icon_state = "blouse"
+	use_static = FALSE
+
+/datum/sprite_accessory/undershirt/keyhole_sweater
+	name = "Sweater - Keyhole Sweater"
+	icon_state = "keyhole_sweater"
+	use_static = FALSE
+
+/datum/sprite_accessory/undershirt/sweetheart
+	name = "Shirt - Sweetheart Neckline"
+	icon_state = "sweetheart"
+	use_static = FALSE
+
 //Presets
 /datum/sprite_accessory/undershirt/bulletclub //4 life
 	name = "Shirt - Black Skull"
@@ -120,6 +139,11 @@
 /datum/sprite_accessory/undershirt/tank_top_sun
 	name = "Tank Top - Sun"
 	icon_state = "tank_sun"
+
+/datum/sprite_accessory/undershirt/cropped_tee
+	name = "Cropped T-shirt"
+	icon_state = "cropped_t_shirt"
+	use_static = FALSE
 
 //Not really qualifying as shirts but having nowhere better to go, these get shoved to the bottom of the list
 /datum/sprite_accessory/undershirt/corset

@@ -34,6 +34,7 @@
 		"mod_longfall",
 		"mod_thermal_regulator",
 		"mod_sign_radio",
+		"mod_mister_janitor",
 	)
 	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = TECHWEB_TIER_1_POINTS)
 	announce_channels = list(RADIO_CHANNEL_SCIENCE)
@@ -89,7 +90,6 @@
 	prereq_ids = list(TECHWEB_NODE_MOD_EQUIP)
 	design_ids = list(
 		"mod_mirage_grenade",
-		"mod_plating_security",
 		"mod_stealth",
 		"mod_mag_harness",
 		"mod_pathfinder",

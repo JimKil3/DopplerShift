@@ -48,8 +48,8 @@
 	if(atom_integrity < 90)
 		Die()
 
-/obj/item/clothing/mask/facehugger/attackby(obj/item/O, mob/user, params)
-	return O.attack_atom(src, user, params)
+/obj/item/clothing/mask/facehugger/attackby(obj/item/attacked_item, mob/user, list/modifiers, list/attack_modifiers)
+	return attacked_item.attack_atom(src, user, modifiers)
 
 /obj/item/clothing/mask/facehugger/proc/react_to_mob(datum/source, mob/user)
 	SIGNAL_HANDLER
@@ -75,11 +75,11 @@
 		return
 	switch(stat)
 		if(DEAD,UNCONSCIOUS)
-			. += span_boldannounce("[src] is not moving.")
+			. += span_bolddanger("[src] is not moving.")
 		if(CONSCIOUS)
-			. += span_boldannounce("[src] seems to be active!")
+			. += span_bolddanger("[src] seems to be active!")
 	if (sterile)
-		. += span_boldannounce("It looks like the proboscis has been removed.")
+		. += span_bolddanger("It looks like the proboscis has been removed.")
 
 /obj/item/clothing/mask/facehugger/should_atmos_process(datum/gas_mixture/air, exposed_temperature)
 	return (exposed_temperature > 300)
@@ -103,7 +103,7 @@
 	if(CanHug(AM) && Adjacent(AM))
 		return Leap(AM)
 
-/obj/item/clothing/mask/facehugger/throw_at(atom/target, range, speed, mob/thrower, spin=1, diagonals_first = 0, datum/callback/callback, gentle, quickstart = TRUE)
+/obj/item/clothing/mask/facehugger/throw_at(atom/target, range, speed, mob/thrower, spin=1, diagonals_first = 0, datum/callback/callback, gentle, quickstart = TRUE, throw_type_path = /datum/thrownthing)
 	. = ..()
 	if(!.)
 		return
@@ -168,6 +168,7 @@
 								span_userdanger("[src] tears [worn_mask] off of your face!"))
 
 	if(!target.equip_to_slot_if_possible(src, ITEM_SLOT_MASK, 0, 1, 1))
+		log_combat(target, src, "failed facehugged by")
 		return FALSE
 	log_combat(target, src, "was facehugged by")
 	return TRUE // time for a smoke

@@ -49,7 +49,7 @@
 /obj/structure/void_conduit/proc/build_view_turfs()
 	for(var/turf/affected_turf as anything in overlayed_turfs)
 		affected_turf.cut_overlay(void_overlay)
-	for(var/turf/affected_turf as anything in view(effect_range, src))
+	for(var/turf/affected_turf in view(effect_range, src))
 		if(!isopenturf(affected_turf))
 			continue
 		affected_turf.add_overlay(void_overlay)
@@ -72,7 +72,7 @@
 ///Sends out a pulse
 /obj/structure/void_conduit/proc/do_conduit_pulse()
 	var/list/turfs_to_affect = list()
-	for(var/turf/affected_turf as anything in view(effect_range, loc))
+	for(var/turf/affected_turf in view(effect_range, loc))
 		var/distance = get_dist(loc, affected_turf)
 		if(!turfs_to_affect["[distance]"])
 			turfs_to_affect["[distance]"] = list()
@@ -94,7 +94,7 @@
 				var/mob/living/affected_mob = thing_to_affect
 				if(affected_mob.can_block_magic(MAGIC_RESISTANCE))
 					continue
-				if(IS_HERETIC(affected_mob))
+				if(IS_HERETIC_OR_MONSTER(affected_mob) || HAS_TRAIT(affected_mob, TRAIT_MANSUS_TOUCHED))
 					affected_mob.apply_status_effect(/datum/status_effect/void_conduit)
 				else
 					affected_mob.apply_status_effect(/datum/status_effect/void_chill, 1)
@@ -116,13 +116,14 @@
 	falloff_exponent = 20
 
 /datum/status_effect/void_conduit
+	id = "void_conduit"
 	duration = 15 SECONDS
 	status_type = STATUS_EFFECT_REPLACE
 	alert_type = null
 
 /datum/status_effect/void_conduit/on_apply()
-	ADD_TRAIT(owner, TRAIT_RESISTLOWPRESSURE, "void_conduit")
+	ADD_TRAIT(owner, TRAIT_RESISTLOWPRESSURE, TRAIT_STATUS_EFFECT(id))
 	return TRUE
 
 /datum/status_effect/void_conduit/on_remove()
-	REMOVE_TRAIT(owner, TRAIT_RESISTLOWPRESSURE, "void_conduit")
+	REMOVE_TRAIT(owner, TRAIT_RESISTLOWPRESSURE, TRAIT_STATUS_EFFECT(id))

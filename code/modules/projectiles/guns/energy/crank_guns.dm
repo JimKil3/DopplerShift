@@ -44,6 +44,7 @@
 	shaded_charge = 1
 	charge_sections = 1
 	spread = 22.5
+	obj_flags = UNIQUE_RENAME
 
 /obj/item/gun/energy/disabler/smoothbore/Initialize(mapload)
 	. = ..()
@@ -86,7 +87,7 @@
 	ammo_x_offset = 1
 	obj_flags = UNIQUE_RENAME
 	w_class = WEIGHT_CLASS_NORMAL
-	dual_wield_spread = 5 //as intended by the coders
+	//dual_wield_spread = 5 as no longer intended by the coders
 
 /obj/item/gun/energy/laser/thermal/add_bayonet_point()
 	AddComponent(/datum/component/bayonet_attachable, offset_x = 19, offset_y = 13)

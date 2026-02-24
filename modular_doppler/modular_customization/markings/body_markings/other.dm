@@ -211,3 +211,96 @@
 	icon_state = "nips"
 	body_zones = CHEST
 	gender_specific = FALSE
+
+/datum/sprite_accessory/body_marking/other/outer_eye
+	name = "Outer Eye"
+	icon_state = "outereye"
+	body_zones = HEAD
+
+/datum/sprite_accessory/body_marking/other/undereye
+	name = "Undereye"
+	icon_state = "undereye"
+	body_zones = HEAD
+
+/datum/sprite_accessory/body_marking/other/shard_thigh
+	name = "Shard Alpha Thigh Plate"
+	icon_state = "shard_thigh"
+	body_zones = LEG_RIGHT | LEG_LEFT
+
+/datum/sprite_accessory/body_marking/other/shard_calf
+	name = "Shard Alpha Calf Plate"
+	icon_state = "shard_calves"
+	body_zones = LEG_RIGHT | LEG_LEFT
+
+/datum/sprite_accessory/body_marking/other/shard_claw
+	name = "Shard Alpha Claws"
+	icon_state = "shard_claw"
+	body_zones = LEG_RIGHT | LEG_LEFT
+
+/datum/sprite_accessory/body_marking/other/polytronic
+	name = "Polytronic Modular Doll limbs"
+	icon_state = "polytronic"
+	body_zones = HEAD | CHEST | ARM_LEFT | ARM_RIGHT | HAND_LEFT | HAND_RIGHT | LEG_RIGHT | LEG_LEFT
+	gender_specific = FALSE
+
+/datum/sprite_accessory/body_marking/other/polytronic_hair
+	name = "Polytronic Hair Helmet"
+	icon_state = "polytronic_hair"
+	body_zones = HEAD
+
+/datum/sprite_accessory/body_marking/other/polytronic_headwear
+	name = "Polytronic Headwear"
+	icon_state = "polytronic_headwear"
+	body_zones = HEAD
+
+/datum/sprite_accessory/body_marking/other/chelsea_smile
+	name = "Chelsea Smile"
+	icon_state = "chelsea_smile"
+	body_zones = HEAD
+
+/datum/sprite_accessory/body_marking/other/eye_scar_l
+	name = "Eye Scar (L)"
+	icon_state = "eye_scar_left"
+	body_zones = HEAD
+
+/datum/sprite_accessory/body_marking/other/eye_scar_r
+	name = "Eye Scar (R)"
+	icon_state = "eye_scar_right"
+	body_zones = HEAD
+
+/datum/sprite_accessory/body_marking/other/nose_scar
+	name = "Nose Scar"
+	icon_state = "nose_scar"
+	body_zones = HEAD
+
+/datum/sprite_accessory/body_marking/other/battleslayer_l
+	name = "Battleslayer Scar (L)"
+	icon_state = "battleslayer_left"
+	body_zones = HEAD
+
+/datum/sprite_accessory/body_marking/other/battleslayer_r
+	name = "Battleslayer Scar (R)"
+	icon_state = "battleslayer_right"
+	body_zones = HEAD
+
+/datum/sprite_accessory/body_marking/other/scarified
+	name = "Scarified"
+	icon_state = "scarified"
+	body_zones = HEAD
+
+/datum/sprite_accessory/body_marking/other/messed_up
+	name = "Messed Up Scars"
+	icon_state = "messed_up"
+	body_zones = HEAD
+
+/datum/sprite_accessory/body_marking/other/the_stampede
+	name = "The Stampede Scars"
+	icon_state = "the_stampede"
+	body_zones = CHEST
+	gender_specific = FALSE
+
+/datum/sprite_accessory/body_marking/other/chestplate
+	name = "Chest Plate"
+	icon_state = "chestplate"
+	body_zones = CHEST
+	gender_specific = FALSE

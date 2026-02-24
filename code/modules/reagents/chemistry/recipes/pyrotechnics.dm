@@ -30,7 +30,7 @@
 		if(purge_power >= 1)
 			var/has_purging_chemical = FALSE
 			// They need one of the purge reagents in them
-			for(var/purging_chem as anything in PURGING_REAGENTS)
+			for(var/purging_chem in PURGING_REAGENTS)
 				if(holder.has_reagent(purging_chem))
 					// We have a purging chemical
 					has_purging_chemical = TRUE
@@ -509,7 +509,7 @@
 	var/datum/reagent/cryostylane/cryostylane = holder.has_reagent(/datum/reagent/cryostylane)
 	var/turf/local_turf = get_turf(holder.my_atom)
 	playsound(local_turf, 'sound/effects/magic/ethereal_exit.ogg', 50, 1)
-	local_turf.visible_message("The reaction furiously freezes up as a snowman suddenly rises out of the [holder.my_atom.name]!")
+	local_turf.visible_message("The reaction furiously freezes up as a snowman suddenly rises out of \the [holder.my_atom]!")
 	freeze_radius(holder, equilibrium, holder.chem_temp, clamp(cryostylane.volume/15, 3, 10), 180 SECONDS, 5)
 	new /obj/structure/statue/snow/snowman(local_turf)
 	clear_reactants(holder)
@@ -578,7 +578,7 @@
 	required_reagents = list(/datum/reagent/teslium = 1, /datum/reagent/water = 1)
 	strengthdiv = 100
 	modifier = -100
-	mix_message = span_boldannounce("The teslium starts to spark as electricity arcs away from it!")
+	mix_message = span_bolddanger("The teslium starts to spark as electricity arcs away from it!")
 	mix_sound = 'sound/machines/defib/defib_zap.ogg'
 	var/zap_flags = ZAP_MOB_DAMAGE | ZAP_OBJ_DAMAGE | ZAP_MOB_STUN | ZAP_LOW_POWER_GEN
 	reaction_tags = REACTION_TAG_EASY | REACTION_TAG_EXPLOSIVE | REACTION_TAG_DANGEROUS
@@ -640,4 +640,4 @@
 /datum/chemical_reaction/reagent_explosion/patriotism_overload
 	required_reagents = list(/datum/reagent/consumable/ethanol/planet_cracker = 1, /datum/reagent/consumable/ethanol/triumphal_arch = 1)
 	strengthdiv = 20
-	mix_message = span_boldannounce("The two patriotic drinks instantly reject each other!")
+	mix_message = span_bolddanger("The two patriotic drinks instantly reject each other!")

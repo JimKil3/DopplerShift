@@ -49,7 +49,7 @@
 	if(brain)
 		. += "mmi_dead"
 
-/obj/item/mmi/attackby(obj/item/O, mob/user, params)
+/obj/item/mmi/attackby(obj/item/O, mob/user, list/modifiers, list/attack_modifiers)
 	user.changeNext_move(CLICK_CD_MELEE)
 	if(istype(O, /obj/item/organ/brain)) //Time to stick a brain in it --NEO
 		var/obj/item/organ/brain/newbrain = O
@@ -290,6 +290,7 @@
 			if(3)
 				brainmob.emp_damage = min(brainmob.emp_damage + rand(0,10), 30)
 		brainmob.emote("alarm")
+		SEND_SIGNAL(brainmob, COMSIG_LIVING_MINOR_SHOCK) // DOPPLER EDIT ADDITION 
 
 /obj/item/mmi/atom_deconstruct(disassembled = TRUE)
 	if(brain)

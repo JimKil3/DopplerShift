@@ -43,7 +43,7 @@
 		/obj/item/skillchip/sabrage = 5,
 	)
 
-	job_flags = STATION_JOB_FLAGS | HEAD_OF_STAFF_JOB_FLAGS
+	job_flags = STATION_JOB_FLAGS | HEAD_OF_STAFF_JOB_FLAGS | JOB_ANTAG_PROTECTED
 	rpg_title = "Star Duke"
 
 	human_authority = JOB_AUTHORITY_HUMANS_ONLY
@@ -67,7 +67,7 @@
 	uniform = /obj/item/clothing/under/rank/captain
 	suit = /obj/item/clothing/suit/armor/vest/capcarapace
 	backpack_contents = list(
-		/obj/item/melee/baton/telescopic = 1,
+		/obj/item/melee/baton/telescopic/gold = 1,
 		/obj/item/station_charter = 1,
 		)
 	belt = /obj/item/modular_computer/pda/heads/captain

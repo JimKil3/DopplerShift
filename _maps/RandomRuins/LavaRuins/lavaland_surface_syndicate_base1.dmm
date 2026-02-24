@@ -667,6 +667,9 @@
 /area/ruin/syndicate_lava_base/chemistry)
 "fx" = (
 /obj/structure/sign/warning/secure_area,
+/obj/machinery/porta_turret/syndicate{
+	dir = 9
+	},
 /turf/closed/wall/mineral/plastitanium/nodiagonal,
 /area/ruin/syndicate_lava_base/cargo)
 "fA" = (
@@ -1512,8 +1515,7 @@
 /area/ruin/syndicate_lava_base/medbay)
 "lP" = (
 /obj/machinery/atmospherics/components/unary/outlet_injector/monitored{
-	dir = 8;
-	chamber_id = "lavalandsyndieo2"
+	dir = 8
 	},
 /turf/open/floor/engine/o2,
 /area/ruin/syndicate_lava_base/engineering)
@@ -1593,6 +1595,7 @@
 /obj/effect/decal/cleanable/dirt,
 /obj/machinery/airalarm/directional/east,
 /obj/effect/mapping_helpers/airalarm/syndicate_access,
+/obj/item/defibrillator/loaded,
 /turf/open/floor/iron/white/side{
 	dir = 4
 	},
@@ -1770,8 +1773,7 @@
 /area/ruin/syndicate_lava_base/engineering)
 "nR" = (
 /obj/machinery/atmospherics/components/unary/outlet_injector/monitored{
-	dir = 8;
-	chamber_id = "lavalandsyndieplasma"
+	dir = 8
 	},
 /turf/open/floor/engine/plasma,
 /area/ruin/syndicate_lava_base/engineering)
@@ -1866,6 +1868,9 @@
 /area/ruin/syndicate_lava_base/arrivals)
 "oF" = (
 /obj/structure/sign/warning/secure_area,
+/obj/machinery/porta_turret/syndicate{
+	dir = 9
+	},
 /turf/closed/wall/mineral/plastitanium/nodiagonal,
 /area/ruin/syndicate_lava_base/arrivals)
 "oH" = (
@@ -1874,7 +1879,6 @@
 /area/ruin/syndicate_lava_base/engineering)
 "oM" = (
 /obj/machinery/atmospherics/components/unary/vent_pump/siphon/monitored{
-	chamber_id = "lavalandsyndien2";
 	dir = 8
 	},
 /turf/open/floor/engine/n2,
@@ -2162,6 +2166,10 @@
 /obj/effect/turf_decal/box/white/corners,
 /obj/machinery/light/small/directional/east,
 /turf/open/floor/iron/dark,
+/area/ruin/syndicate_lava_base/cargo)
+"sB" = (
+/obj/structure/sign/warning/secure_area,
+/turf/closed/wall/mineral/plastitanium/nodiagonal,
 /area/ruin/syndicate_lava_base/cargo)
 "sH" = (
 /obj/machinery/door/airlock/virology/glass{
@@ -2653,8 +2661,7 @@
 /area/ruin/syndicate_lava_base/engineering)
 "zU" = (
 /obj/machinery/atmospherics/components/unary/outlet_injector/monitored{
-	dir = 8;
-	chamber_id = "lavalandsyndien2"
+	dir = 8
 	},
 /turf/open/floor/engine/n2,
 /area/ruin/syndicate_lava_base/engineering)
@@ -2667,7 +2674,6 @@
 /area/ruin/syndicate_lava_base/bar)
 "Ab" = (
 /obj/machinery/atmospherics/components/unary/vent_pump/siphon/monitored{
-	chamber_id = "lavalandsyndieo2";
 	dir = 8
 	},
 /turf/open/floor/engine/o2,
@@ -3017,7 +3023,7 @@
 /area/ruin/syndicate_lava_base/dormitories)
 "Ev" = (
 /obj/structure/table/wood,
-/obj/item/reagent_containers/cup/rag{
+/obj/item/rag{
 	pixel_x = -4;
 	pixel_y = 9
 	},
@@ -3316,7 +3322,6 @@
 /obj/structure/table/wood,
 /obj/item/ammo_box/magazine/m9mm,
 /obj/machinery/airalarm/directional/north,
-/obj/item/crowbar/red,
 /obj/effect/mapping_helpers/airalarm/syndicate_access,
 /turf/open/floor/carpet/red,
 /area/ruin/syndicate_lava_base/dormitories)
@@ -3372,9 +3377,7 @@
 /turf/open/floor/carpet/red,
 /area/ruin/syndicate_lava_base/dormitories)
 "JV" = (
-/obj/machinery/atmospherics/components/unary/vent_pump/siphon/monitored{
-	chamber_id = "lavalandsyndieco2"
-	},
+/obj/machinery/atmospherics/components/unary/vent_pump/siphon/monitored,
 /turf/open/floor/engine/co2,
 /area/ruin/syndicate_lava_base/engineering)
 "Ks" = (
@@ -3648,6 +3651,10 @@
 	},
 /turf/open/floor/iron,
 /area/ruin/syndicate_lava_base/engineering)
+"Oj" = (
+/obj/structure/sign/warning/secure_area,
+/turf/closed/wall/mineral/plastitanium/nodiagonal,
+/area/ruin/syndicate_lava_base/arrivals)
 "Oq" = (
 /obj/effect/spawner/random/vending/colavend{
 	hacked = 1
@@ -3854,7 +3861,6 @@
 /area/ruin/syndicate_lava_base/main)
 "Ry" = (
 /obj/machinery/atmospherics/components/unary/vent_pump/siphon/monitored{
-	chamber_id = "lavalandsyndieplasma";
 	dir = 8
 	},
 /turf/open/floor/engine/plasma,
@@ -4090,9 +4096,7 @@
 /turf/open/floor/iron/dark,
 /area/ruin/syndicate_lava_base/main)
 "Uw" = (
-/obj/machinery/atmospherics/components/unary/outlet_injector/monitored{
-	chamber_id = "lavalandsyndieco2"
-	},
+/obj/machinery/atmospherics/components/unary/outlet_injector/monitored,
 /turf/open/floor/engine/co2,
 /area/ruin/syndicate_lava_base/engineering)
 "Uz" = (
@@ -4127,7 +4131,6 @@
 /obj/item/ammo_box/magazine/m9mm,
 /obj/item/ammo_box/magazine/sniper_rounds,
 /obj/machinery/airalarm/directional/north,
-/obj/item/crowbar/red,
 /obj/effect/mapping_helpers/airalarm/syndicate_access,
 /turf/open/floor/carpet/red,
 /area/ruin/syndicate_lava_base/dormitories)
@@ -4506,7 +4509,6 @@
 /obj/structure/table/wood,
 /obj/item/ammo_box/magazine/m9mm,
 /obj/item/ammo_box/magazine/sniper_rounds,
-/obj/item/crowbar/red,
 /turf/open/floor/carpet/red,
 /area/ruin/syndicate_lava_base/dormitories)
 "Zw" = (
@@ -5325,7 +5327,7 @@ Vb
 mT
 mT
 mT
-oF
+Oj
 ab
 ab
 ab
@@ -6648,7 +6650,7 @@ ab
 ab
 ab
 ab
-fx
+sB
 gh
 fx
 si

@@ -26,6 +26,7 @@
 		"android_l_leg",
 		"android_r_arm",
 		"android_r_leg",
+		"chassis_kit",
 		// DOPPLER ADDITION END
 	)
 	experiments_to_unlock = list(
@@ -97,6 +98,8 @@
 		"borg_upgrade_piercinghypospray",
 		"borg_upgrade_surgicalprocessor",
 		"borg_upgrade_surgicalomnitool",
+		"borg_upgrade_syringe",
+		"borg_upgrade_threadripper", // DOPPLER EDIT ADDITION - Borg Threadrippers
 	)
 	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = TECHWEB_TIER_3_POINTS)
 	announce_channels = list(RADIO_CHANNEL_SCIENCE)
@@ -133,7 +136,7 @@
 	design_ids = list(
 		"borg_upgrade_rped",
 		"borg_upgrade_engineeringomnitool",
-		"borg_upgrade_circuitapp",
+		"borg_upgrade_engineeringapp",
 		"borg_upgrade_inducer",
 	)
 	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = TECHWEB_TIER_3_POINTS)
@@ -156,7 +159,6 @@
 		"implantcase",
 		"implanter",
 		"locator",
-		"c38_trac",
 	)
 	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = TECHWEB_TIER_1_POINTS)
 	announce_channels = list(RADIO_CHANNEL_SECURITY, RADIO_CHANNEL_MEDICAL)
@@ -226,6 +228,10 @@
 		"cybernetic_stomach_tier2",
 		"cybernetic_liver_tier2",
 		"cybernetic_heart_tier2",
+		// DOPPLER ADDITION START - Synthetic Charging Organs
+		"cybernetic_stomach_power_cord",
+		"cybernetic_stomach_windup_key",
+		// DOPPLER ADDITION END
 	)
 	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = TECHWEB_TIER_2_POINTS)
 	announce_channels = list(RADIO_CHANNEL_SCIENCE, RADIO_CHANNEL_MEDICAL)

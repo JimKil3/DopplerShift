@@ -49,7 +49,7 @@
 	var/list/target_turfs = list(get_turf(owner))
 	var/range = ascended ? 2 : 1
 	var/list/directions = list(turn(owner.dir, 90), turn(owner.dir, 270))
-	for (var/direction as anything in directions)
+	for (var/direction in directions)
 		for (var/i in 1 to range)
 			target_turfs += get_ranged_target_turf(owner, direction, i)
 	return target_turfs
@@ -92,7 +92,7 @@
 	remove_hand_with_no_refund(user)
 
 /obj/item/melee/touch_attack/star_touch/ignition_effect(atom/to_light, mob/user)
-	. = span_notice("[user] effortlessly snaps [user.p_their()] fingers near [to_light], igniting it with cosmic energies. Fucking badass!")
+	. = span_rose("[user] effortlessly snaps [user.p_their()] fingers near [to_light], igniting it with cosmic energies. Fucking badass!")
 	remove_hand_with_no_refund(user)
 
 /obj/item/melee/touch_attack/star_touch/attack_self(mob/living/user)
@@ -200,35 +200,6 @@
 	SSblackbox.record_feedback("tally", "gun_fired", 1, type)
 	if(current_target)
 		on_beam_hit(current_target)
-
-/// Checks if the beam is going through an invalid turf
-/datum/status_effect/cosmic_beam/proc/los_check(atom/movable/user, mob/target)
-	var/turf/user_turf = user.loc
-	if(!istype(user_turf))
-		return FALSE
-	var/obj/dummy = new(user_turf)
-	dummy.pass_flags |= PASSTABLE|PASSGLASS|PASSGRILLE //Grille/Glass so it can be used through common windows
-	var/turf/previous_step = user_turf
-	var/first_step = TRUE
-	for(var/turf/next_step as anything in (get_line(user_turf, target) - user_turf))
-		if(first_step)
-			for(var/obj/blocker in user_turf)
-				if(!blocker.density || !(blocker.flags_1 & ON_BORDER_1))
-					continue
-				if(blocker.CanPass(dummy, get_dir(user_turf, next_step)))
-					continue
-				return FALSE // Could not leave the first turf.
-			first_step = FALSE
-		if(next_step.density)
-			qdel(dummy)
-			return FALSE
-		for(var/atom/movable/movable as anything in next_step)
-			if(!movable.CanPass(dummy, get_dir(next_step, previous_step)))
-				qdel(dummy)
-				return FALSE
-		previous_step = next_step
-	qdel(dummy)
-	return TRUE
 
 /// What to add when the beam connects to a target
 /datum/status_effect/cosmic_beam/proc/on_beam_hit(mob/living/target)

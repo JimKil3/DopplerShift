@@ -5,13 +5,13 @@
 	inhand_icon_state = "galoshes"
 	clothing_traits = list(TRAIT_NO_SLIP_WATER)
 	slowdown = SHOES_SLOWDOWN+1
-	strip_delay = 30
-	equip_delay_other = 50
+	strip_delay = 3 SECONDS
+	equip_delay_other = 5 SECONDS
 	resistance_flags = NONE
 	armor_type = /datum/armor/shoes_galoshes
 	can_be_bloody = FALSE
 	custom_price = PAYCHECK_CREW * 3
-	can_be_tied = FALSE
+	fastening_type = SHOES_SLIPON
 	///How much these boots affect fishing difficulty
 	var/fishing_modifier = -3
 
@@ -39,8 +39,3 @@
 
 	var/turf/open/t_loc = get_turf(src)
 	SEND_SIGNAL(t_loc, COMSIG_TURF_MAKE_DRY, TURF_WET_WATER, TRUE, INFINITY)
-
-/obj/item/clothing/shoes/galoshes/doppler
-	name = "purple galoshes"
-	desc = "A pair of purple rubber boots, designed to prevent slipping on wet surfaces."
-	icon_state = "galoshes_doppler"

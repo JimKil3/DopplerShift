@@ -7,15 +7,19 @@
 		TRAIT_MUTANT_COLORS,
 	)
 	inherent_biotypes = MOB_ORGANIC|MOB_HUMANOID|MOB_REPTILE
-	body_markings = list(/datum/bodypart_overlay/simple/body_marking/lizard = "None")
+	body_markings = list(
+		/datum/bodypart_overlay/simple/body_marking/lizard = SPRITE_ACCESSORY_NONE,
+	)
 	mutant_organs = list(
-		/obj/item/organ/horns = "None",
-		/obj/item/organ/frills = "None",
+		/obj/item/organ/horns = SPRITE_ACCESSORY_NONE,
+		/obj/item/organ/frills = SPRITE_ACCESSORY_NONE,
 		/obj/item/organ/snout = "Round",
-		/obj/item/organ/spines = "None",
+		/obj/item/organ/spines = SPRITE_ACCESSORY_NONE,
 		/obj/item/organ/tail/lizard = "Smooth",
 	)
 	mutanttongue = /obj/item/organ/tongue/lizard
+	mutanteyes = /obj/item/organ/eyes/lizard
+	mutantbrain = /obj/item/organ/brain/lizard
 	coldmod = 1.5
 	heatmod = 0.67
 	payday_modifier = 1.0
@@ -23,8 +27,8 @@
 	species_cookie = /obj/item/food/meat/slab
 	meat = /obj/item/food/meat/slab/human/mutant/lizard
 	skinned_type = /obj/item/stack/sheet/animalhide/lizard
-	exotic_bloodtype = "L"
-	inert_mutation = /datum/mutation/human/firebreath
+	exotic_bloodtype = BLOOD_TYPE_LIZARD
+	inert_mutation = /datum/mutation/firebreath
 	death_sound = 'sound/mobs/humanoids/lizard/deathsound.ogg'
 	species_language_holder = /datum/language_holder/lizard
 	digitigrade_customization = DIGITIGRADE_OPTIONAL
@@ -48,7 +52,7 @@
 
 /datum/species/lizard/randomize_features()
 	var/list/features = ..()
-	features["lizard_markings"] = pick(SSaccessories.lizard_markings_list)
+	features[FEATURE_LIZARD_MARKINGS] = pick(SSaccessories.lizard_markings_list)
 	return features
 
 /datum/species/lizard/get_scream_sound(mob/living/carbon/human/lizard)
@@ -113,6 +117,9 @@
 	if(lizard.physique == FEMALE)
 		return SFX_SNORE_FEMALE
 	return SFX_SNORE_MALE
+
+/datum/species/lizard/get_hiss_sound(mob/living/carbon/human/lizard)
+	return 'sound/mobs/humanoids/lizard/lizard_hiss.ogg'
 
 /datum/species/lizard/get_physical_attributes()
 	return "Lizardpeople can withstand slightly higher temperatures than most species, but they are very vulnerable to the cold \
@@ -218,15 +225,15 @@ Lizard subspecies: SILVER SCALED
 		Mostly identical, they are holy, don't breathe, don't get viruses, their hide cannot be pierced, love the taste of wine, \
 		and their tongue allows them to turn into a statue, for some reason."
 
-/datum/species/lizard/silverscale/on_species_gain(mob/living/carbon/human/new_silverscale, datum/species/old_species, pref_load)
-	old_mutcolor = new_silverscale.dna.features["mcolor"]
-	new_silverscale.dna.features["mcolor"] = "#eeeeee"
+/datum/species/lizard/silverscale/on_species_gain(mob/living/carbon/human/new_silverscale, datum/species/old_species, pref_load, regenerate_icons)
+	old_mutcolor = new_silverscale.dna.features[FEATURE_MUTANT_COLOR]
+	new_silverscale.dna.features[FEATURE_MUTANT_COLOR] = "#eeeeee"
 	new_silverscale.add_eye_color("#0000a0", EYE_COLOR_SPECIES_PRIORITY)
 	. = ..()
 	new_silverscale.add_filter("silver_glint", 2, list("type" = "outline", "color" = "#ffffff63", "size" = 2))
 
 /datum/species/lizard/silverscale/on_species_loss(mob/living/carbon/human/was_silverscale, datum/species/new_species, pref_load)
-	was_silverscale.dna.features["mcolor"] = old_mutcolor
+	was_silverscale.dna.features[FEATURE_MUTANT_COLOR] = old_mutcolor
 	was_silverscale.remove_eye_color(EYE_COLOR_SPECIES_PRIORITY)
 	was_silverscale.remove_filter("silver_glint")
 	return ..()

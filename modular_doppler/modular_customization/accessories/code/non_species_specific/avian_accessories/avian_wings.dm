@@ -1,8 +1,10 @@
 /datum/sprite_accessory/wings_more
+	key = "wings"
 	icon = 'modular_doppler/modular_customization/accessories/icons/non_species_specific/avian/avian_wings.dmi'
 	dimension_x = 46
 	dimension_y = 34
 	center = TRUE
+	color_src = USE_MATRIXED_COLORS
 
 /datum/sprite_accessory/wings_more/feathery
 	name = "Feathery"
@@ -55,3 +57,19 @@
 /datum/sprite_accessory/wings_more/low_jewel
 	name = "Low (Jeweled)"
 	icon_state = "low_jewel"
+
+/datum/sprite_accessory/wings_more/pinioned
+	name = "Pinioned Wings"
+	icon_state = "pinioned"
+
+/datum/sprite_accessory/wings_more/harpybat_top
+	name = "Harpy (Top - Bat)"
+	icon_state = "harpybat_fluffless_top"
+
+/datum/sprite_accessory/wings_more/harpybat
+	name = "Harpy (Bat)"
+	icon_state = "harpybat"
+
+/datum/sprite_accessory/wings_more/bat
+	name = "Bat"
+	icon_state = "bat"

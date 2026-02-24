@@ -53,6 +53,7 @@ Difficulty: Hard
 	armour_penetration = 50
 	melee_damage_lower = 15
 	melee_damage_upper = 15
+	mob_biotypes = MOB_ROBOTIC|MOB_SPECIAL|MOB_MINING
 	speed = 10
 	move_to_delay = 10
 	ranged = TRUE
@@ -330,7 +331,7 @@ Difficulty: Hard
 	for(var/d in GLOB.cardinals)
 		INVOKE_ASYNC(src, PROC_REF(arena_squares), T, d)
 	for(var/t in RANGE_TURFS(11, T))
-		if(t && get_dist(t, T) == 11)
+		if(t && get_dist(t, T) == 11 && !istype(t, /turf/closed/indestructible/riveted/hierophant))
 			new /obj/effect/temp_visual/hierophant/wall(t, src)
 			new /obj/effect/temp_visual/hierophant/blast/damaging(t, src, FALSE)
 	if(get_dist(src, T) >= 11) //hey you're out of range I need to get closer to you!
@@ -454,7 +455,7 @@ Difficulty: Hard
 
 /mob/living/simple_animal/hostile/megafauna/hierophant/CanAttack(atom/the_target)
 	. = ..()
-	if(istype(the_target, /mob/living/basic/legion_brood)) //ignore temporary targets in favor of more permanent targets
+	if(istype(the_target, /mob/living/basic/mining/legion_brood)) //ignore temporary targets in favor of more permanent targets
 		return FALSE
 
 /mob/living/simple_animal/hostile/megafauna/hierophant/GiveTarget(new_target)
@@ -573,8 +574,8 @@ Difficulty: Hard
 	if(mover == caster.pulledby)
 		return
 	if(isprojectile(mover))
-		var/obj/projectile/P = mover
-		if(P.firer == caster)
+		var/obj/projectile/proj = mover
+		if(proj.firer == caster)
 			return
 	if(mover != caster)
 		return FALSE
@@ -767,7 +768,7 @@ Difficulty: Hard
 	layer = LOW_OBJ_LAYER
 	anchored = TRUE
 
-/obj/effect/hierophant/attackby(obj/item/attacking_item, mob/user, params)
+/obj/effect/hierophant/attackby(obj/item/attacking_item, mob/user, list/modifiers, list/attack_modifiers)
 	if(istype(attacking_item, /obj/item/hierophant_club))
 		var/obj/item/hierophant_club/club = attacking_item
 		if(club.beacon == src)

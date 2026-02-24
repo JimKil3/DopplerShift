@@ -334,13 +334,7 @@
 
 	sac_target.visible_message(span_danger("[sac_target] begins to shudder violenty as dark tendrils begin to drag them into thin air!"))
 	sac_target.set_handcuffed(new /obj/item/restraints/handcuffs/energy/cult(sac_target))
-	sac_target.update_handcuffed()
-
-	if(sac_target.legcuffed)
-		sac_target.legcuffed.forceMove(sac_target.drop_location())
-		sac_target.legcuffed.dropped(sac_target)
-		sac_target.legcuffed = null
-		sac_target.update_worn_legcuffs()
+	sac_target.dropItemToGround(sac_target.legcuffed, TRUE)
 
 	sac_target.adjustOrganLoss(ORGAN_SLOT_BRAIN, 85, 150)
 	sac_target.do_jitter_animation()
@@ -426,7 +420,7 @@
 		var/obj/item/organ/to_give = new organ_path
 		to_give.Insert(sac_target)
 
-	new /obj/effect/gibspawner/human/bodypartless(get_turf(sac_target))
+	new /obj/effect/gibspawner/human/bodypartless(get_turf(sac_target), sac_target)
 	sac_target.visible_message(span_boldwarning("Several organs force themselves out of [sac_target]!"))
 
 /**
@@ -455,7 +449,7 @@
 	sac_target.set_jitter_if_lower(20 SECONDS)
 	sac_target.set_dizzy_if_lower(20 SECONDS)
 	sac_target.adjust_hallucinations(24 SECONDS)
-	sac_target.emote("scream")
+	sac_target.painful_scream() // DOPPLER EDIT: check for painkilling before screaming
 
 	to_chat(sac_target, span_reallybig(span_hypnophrase("The grasp of the Mansus reveal themselves to you!")))
 	to_chat(sac_target, span_hypnophrase("You feel invigorated! Fight to survive!"))
@@ -519,7 +513,7 @@
 		return
 
 	// Teleport them to a random safe coordinate on the station z level.
-	var/turf/open/floor/safe_turf = get_safe_random_station_turf()
+	var/turf/open/floor/safe_turf = get_safe_random_station_turf_equal_weight()
 	var/obj/effect/landmark/observer_start/backup_loc = locate(/obj/effect/landmark/observer_start) in GLOB.landmarks_list
 	if(!safe_turf)
 		safe_turf = get_turf(backup_loc)
@@ -632,7 +626,7 @@
 		span_userdanger("Your organs are violently pulled out of your chest by shadowy hands!")
 	)
 
-	new /obj/effect/gibspawner/human/bodypartless(get_turf(sac_target))
+	new /obj/effect/gibspawner/human/bodypartless(get_turf(sac_target), sac_target)
 
 #undef SACRIFICE_SLEEP_DURATION
 #undef SACRIFICE_REALM_DURATION

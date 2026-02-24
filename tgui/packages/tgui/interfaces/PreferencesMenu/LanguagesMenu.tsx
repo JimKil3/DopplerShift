@@ -1,7 +1,7 @@
-// THIS IS A NOVA SECTOR UI FILE
+import { Box, Button, NumberInput, Section, Stack } from 'tgui-core/components';
+
 import { useBackend } from '../../backend';
-import { Box, Button, Section, Stack } from '../../components';
-import { PreferencesMenuData } from './data';
+import { PreferencesMenuData } from './types';
 
 export const KnownLanguage = (props) => {
   const { act } = useBackend<PreferencesMenuData>();
@@ -18,6 +18,21 @@ export const KnownLanguage = (props) => {
         >
           Forget <Box className={'languages16x16 ' + props.language.icon} />
         </Button>
+        Understanding:
+        <NumberInput
+          width="30px"
+          minValue={0}
+          maxValue={100}
+          step={0.5}
+          value={props.language.partial_knowledge}
+          onChange={(new_value) =>
+            act('adjust_partial_language', {
+              language_name: props.language.name,
+              partial_amount: new_value,
+            })
+          }
+        />
+        %
       </Section>
     </Stack.Item>
   );

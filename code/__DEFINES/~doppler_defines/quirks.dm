@@ -4,3 +4,14 @@
 #define DOPPLER_NIGHT_VISION_POWER_MAX 9
 /// percentage of the NIGHT_VISION_POWER_MAX increase that is applied for eyes with low innate flash protection (photophobia quirk/moth eyes). At 0.75, this raises NV to 22.5 at hypersensitive flash_protect.
 #define DOPPLER_NIGHT_VISION_SENSITIVITY_MULT 0.75
+#define BLOOD_VOLUME_OVERSIZED 1120
+#define PULL_OVERSIZED_SLOWDOWN 2
+
+// Limping Quirk Sides, Bitflag
+#define LIMPING_SIDE_LEFT (1<<0)
+#define LIMPING_SIDE_RIGHT (1<<1)
+#define LIMPING_SIDE_BOTH (LIMPING_SIDE_LEFT | LIMPING_SIDE_RIGHT)
+
+// Limping Quirk Severity Keys
+#define LIMPING_SLOWDOWN "limping_slowdown"
+#define LIMPING_CHANCE "limping_chance"

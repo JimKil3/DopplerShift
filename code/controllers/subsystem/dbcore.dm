@@ -2,9 +2,9 @@
 SUBSYSTEM_DEF(dbcore)
 	name = "Database"
 	flags = SS_TICKER
+	init_stage = INITSTAGE_FIRST
 	wait = 10 // Not seconds because we're running on SS_TICKER
 	runlevels = RUNLEVEL_LOBBY|RUNLEVELS_DEFAULT
-	init_order = INIT_ORDER_DBCORE
 	priority = FIRE_PRIORITY_DATABASE
 
 	var/schema_mismatch = 0
@@ -49,6 +49,8 @@ SUBSYSTEM_DEF(dbcore)
 	var/db_daemon_started = FALSE
 
 /datum/controller/subsystem/dbcore/Initialize()
+	Connect()
+
 	//We send warnings to the admins during subsystem init, as the clients will be New'd and messages
 	//will queue properly with goonchat
 	switch(schema_mismatch)
@@ -86,7 +88,7 @@ SUBSYSTEM_DEF(dbcore)
 			log_config("ERROR: POOLING_MAX_SQL_CONNECTIONS ([max_sql_connections]) is set lower than POOLING_MIN_SQL_CONNECTIONS ([min_sql_connections]). Please check your config or the code defaults for sanity")
 
 /datum/controller/subsystem/dbcore/stat_entry(msg)
-	msg = "P:[length(all_queries)]|Active:[length(queries_active)]|Standby:[length(queries_standby)]"
+	msg = "\n  P:[length(all_queries)]|Active:[length(queries_active)]|Standby:[length(queries_standby)]"
 	return ..()
 
 /// Resets the tracking numbers on the subsystem. Used by SStime_track.
@@ -384,12 +386,30 @@ SUBSYSTEM_DEF(dbcore)
 		return FALSE
 	return new /datum/db_query(connection, sql_query, arguments)
 
+/**
+ * Creates and executes a query without waiting for or tracking the results.
+ * Query is executed asynchronously (without blocking) and deleted afterwards - any results or errors are discarded.
+ *
+ * Arguments:
+ * * sql_query - The SQL query string to execute
+ * * arguments - List of arguments to pass to the query for parameter binding
+ * * allow_during_shutdown - If TRUE, allows query to be created during subsystem shutdown. Generally, only cleanup queries should set this.
+ */
+/datum/controller/subsystem/dbcore/proc/FireAndForget(sql_query, arguments, allow_during_shutdown = FALSE)
+	var/datum/db_query/query = NewQuery(sql_query, arguments, allow_during_shutdown)
+	if(!query)
+		return
+	ASYNC
+		query.Execute()
+		qdel(query)
+
 /** QuerySelect
 	Run a list of query datums in parallel, blocking until they all complete.
 	* queries - List of queries or single query datum to run.
 	* warn - Controls rather warn_execute() or Execute() is called.
 	* qdel - If you don't care about the result or checking for errors, you can have the queries be deleted afterwards.
-		This can be combined with invoke_async as a way of running queries async without having to care about waiting for them to finish so they can be deleted.
+		This can be combined with invoke_async as a way of running queries async without having to care about waiting for them to finish so they can be deleted,
+		however you should probably just use FireAndForget instead if it's just a single query.
 */
 /datum/controller/subsystem/dbcore/proc/QuerySelect(list/queries, warn = FALSE, qdel = FALSE)
 	if (!islist(queries))
@@ -414,8 +434,6 @@ SUBSYSTEM_DEF(dbcore)
 		query.sync()
 		if (qdel)
 			qdel(query)
-
-
 
 /*
 Takes a list of rows (each row being an associated list of column => value) and inserts them via a single mass query.
@@ -658,7 +676,7 @@ Ignore_errors instructes mysql to continue inserting rows if some of them have e
 
 
 /datum/db_query/proc/slow_query_check()
-	message_admins("HEY! A database query timed out. Did the server just hang? <a href='?_src_=holder;[HrefToken()];slowquery=yes'>\[YES\]</a>|<a href='?_src_=holder;[HrefToken()];slowquery=no'>\[NO\]</a>")
+	message_admins("HEY! A database query timed out. Did the server just hang? <a href='byond://?_src_=holder;[HrefToken()];slowquery=yes'>\[YES\]</a>|<a href='byond://?_src_=holder;[HrefToken()];slowquery=no'>\[NO\]</a>")
 
 /datum/db_query/proc/NextRow(async = TRUE)
 	Activity("NextRow")

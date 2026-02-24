@@ -12,12 +12,14 @@ GLOBAL_LIST_INIT(raptor_inherit_traits, list(
 	BB_RAPTOR_MOTHERLY = "Motherly",
 	BB_RAPTOR_PLAYFUL = "Playful",
 	BB_RAPTOR_COWARD = "Coward",
-	BB_RAPTOR_TROUBLE_MAKER = "Trouble Maker",
 ))
 
 GLOBAL_LIST_EMPTY(raptor_population)
 
 #define HAPPINESS_BOOST_DAMPENER 0.3
+
+/// Innate raptor offsets
+#define RAPTOR_INNATE_SOURCE "raptor_innate"
 
 /mob/living/basic/raptor
 	name = "raptor"
@@ -39,6 +41,10 @@ GLOBAL_LIST_EMPTY(raptor_population)
 	attack_sound = 'sound/items/weapons/punch1.ogg'
 	faction = list(FACTION_RAPTOR, FACTION_NEUTRAL)
 	speak_emote = list("screeches")
+	butcher_results = list(
+		/obj/item/food/meat/slab/chicken = 4,
+		/obj/item/stack/sheet/bone = 2,
+	)
 	ai_controller = /datum/ai_controller/basic_controller/raptor
 	///can this mob breed
 	var/can_breed = TRUE
@@ -48,11 +54,13 @@ GLOBAL_LIST_EMPTY(raptor_population)
 	var/ridable_component = /datum/component/riding/creature/raptor
 	//pet commands when we tame the raptor
 	var/static/list/pet_commands = list(
+		/datum/pet_command/breed,
 		/datum/pet_command/idle,
+		/datum/pet_command/move,
 		/datum/pet_command/free,
-		/datum/pet_command/point_targeting/attack,
+		/datum/pet_command/attack,
 		/datum/pet_command/follow,
-		/datum/pet_command/point_targeting/fetch,
+		/datum/pet_command/fetch,
 	)
 	///things we inherited from our parent
 	var/datum/raptor_inheritance/inherited_stats
@@ -66,11 +74,18 @@ GLOBAL_LIST_EMPTY(raptor_population)
 
 /mob/living/basic/raptor/Initialize(mapload)
 	. = ..()
-	if(SSmapping.current_map.minetype == "iceland" || SSmapping.is_planetary()) // DOPPLER STATION EDIT, old code: if(SSmapping.is_planetary())
+	if(SSmapping.current_map.minetype == MINETYPE_ICELAND || SSmapping.is_planetary()) // DOPPLER STATION EDIT, old code: if(SSmapping.is_planetary())
 		change_offsets = FALSE
 		icon = 'icons/mob/simple/lavaland/raptor_icebox.dmi'
 
+	AddElement(/datum/element/wears_collar)
 	add_traits(list(TRAIT_LAVA_IMMUNE, TRAIT_ASHSTORM_IMMUNE, TRAIT_SNOWSTORM_IMMUNE), INNATE_TRAIT)
+	AddElement(\
+		/datum/element/crusher_loot,\
+		trophy_type = /obj/item/crusher_trophy/raptor_feather,\
+		drop_mod = 100,\
+		drop_immediately = FALSE,\
+	)
 
 	if(!mapload)
 		GLOB.raptor_population += REF(src)
@@ -97,7 +112,7 @@ GLOBAL_LIST_EMPTY(raptor_population)
 	ai_controller.set_blackboard_key(BB_BASIC_MOB_SPEAK_LINES, display_emote)
 	inherited_stats = new
 	inherit_properties()
-	var/static/list/my_food = list(/obj/item/stack/ore)
+	var/list/my_food = string_list(list(/obj/item/stack/ore))
 	AddElement(/datum/element/basic_eating, food_types = my_food)
 	AddElement(/datum/element/ai_retaliate)
 	AddElement(/datum/element/ai_flee_while_injured, stop_fleeing_at = 0.5, start_fleeing_below = 0.2)
@@ -106,18 +121,12 @@ GLOBAL_LIST_EMPTY(raptor_population)
 		AddElement(/datum/element/ridable, ridable_component)
 
 	if(can_breed)
-		AddComponent(\
-			/datum/component/breed,\
-			can_breed_with = typecacheof(list(/mob/living/basic/raptor)),\
-			baby_path = /obj/item/food/egg/raptor_egg,\
-			post_birth = CALLBACK(src, PROC_REF(egg_inherit)),\
-			breed_timer = 3 MINUTES,\
-		)
+		add_breeding_component()
+
 	AddElement(/datum/element/footstep, footstep_type = FOOTSTEP_MOB_CLAW)
 	RegisterSignal(src, COMSIG_ATOM_DIR_CHANGE, PROC_REF(on_dir_change))
 	adjust_offsets(dir)
 	add_happiness_component()
-
 
 /mob/living/basic/raptor/buckle_mob(mob/living/target, force = FALSE, check_loc = TRUE, buckle_mob_flags= NONE)
 	if(!iscarbon(target))
@@ -140,11 +149,18 @@ GLOBAL_LIST_EMPTY(raptor_population)
 	adjust_offsets(new_dir)
 
 /mob/living/basic/raptor/proc/adjust_offsets(direction)
-	if(!change_offsets)
+	if (!change_offsets)
 		return
-	pixel_x = (direction & EAST) ? -20 : 0
-	pixel_y = (direction & NORTH) ? -5 : 0
 
+	switch (direction)
+		if (NORTH)
+			add_offsets(RAPTOR_INNATE_SOURCE, w_add = -8, animate = FALSE)
+		if (SOUTH)
+			add_offsets(RAPTOR_INNATE_SOURCE, w_add = 0, animate = FALSE)
+		if (EAST, SOUTHEAST, NORTHEAST)
+			add_offsets(RAPTOR_INNATE_SOURCE, w_add = -20, animate = FALSE)
+		if (WEST, SOUTHWEST, NORTHWEST)
+			add_offsets(RAPTOR_INNATE_SOURCE, w_add = -5, animate = FALSE)
 
 /mob/living/basic/raptor/early_melee_attack(atom/target, list/modifiers, ignore_cooldown)
 	. = ..()
@@ -158,8 +174,8 @@ GLOBAL_LIST_EMPTY(raptor_population)
 	if(isnull(ore_food))
 		balloon_alert(src, "no food!")
 	else
-		melee_attack(ore_food)
-	return TRUE
+		UnarmedAttack(ore_food, TRUE, modifiers)
+	return FALSE
 
 /mob/living/basic/raptor/melee_attack(mob/living/target, list/modifiers, ignore_cooldown)
 	if(!combat_mode && istype(target, /mob/living/basic/raptor/baby_raptor))
@@ -195,6 +211,18 @@ GLOBAL_LIST_EMPTY(raptor_population)
 	maxHealth += inherited_stats.health_modifier
 	heal_overall_damage(maxHealth)
 
+/mob/living/basic/raptor/proc/add_breeding_component()
+	var/static/list/partner_types = typecacheof(list(/mob/living/basic/raptor))
+	var/static/list/baby_types = list(/obj/item/food/egg/raptor_egg = 1)
+	AddComponent(\
+		/datum/component/breed,\
+		can_breed_with = typecacheof(list(/mob/living/basic/raptor)),\
+		baby_paths = baby_types,\
+		post_birth = CALLBACK(src, PROC_REF(egg_inherit)),\
+		breed_timer = 3 MINUTES,\
+	)
+
+
 /mob/living/basic/raptor/Destroy()
 	QDEL_NULL(inherited_stats)
 	return ..()
@@ -207,6 +235,7 @@ GLOBAL_LIST_EMPTY(raptor_population)
 	melee_damage_lower = 15
 	melee_damage_upper = 20
 	raptor_color = RAPTOR_RED
+	ridable_component = /datum/component/riding/creature/raptor/combat
 	dex_description = "A resilient breed of raptors, battle-tested and bred for the purpose of humbling its foes in combat, \
 		This breed demonstrates higher combat capabilities than its peers and oozes ruthless aggression."
 	child_path = /mob/living/basic/raptor/baby_raptor/red
@@ -314,3 +343,4 @@ GLOBAL_LIST_EMPTY(raptor_population)
 	return NONE
 
 #undef HAPPINESS_BOOST_DAMPENER
+#undef RAPTOR_INNATE_SOURCE

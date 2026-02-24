@@ -4,9 +4,7 @@
 	preview_outfit = /datum/outfit/snail_preview
 	mutantliver = /obj/item/organ/liver/snail //This is just a better liver to deal with toxins, it's a thematic thing.
 	mutantheart = /obj/item/organ/heart/snail //This gives them the shell buff where they take less damage from behind, and their heart's more durable.
-	exotic_blood = /datum/reagent/bug_blood
-	exotic_bloodtype = "I*"
-
+	exotic_bloodtype = BLOOD_TYPE_INSECTOID
 	digitigrade_customization = DIGITIGRADE_OPTIONAL
 	digi_leg_overrides = list(
 		BODY_ZONE_L_LEG = /obj/item/bodypart/leg/left/digitigrade/insectoid,
@@ -18,15 +16,13 @@
 	uniform = /obj/item/clothing/under/rank/medical/chemist/pharmacologist/skirt
 	mask = /obj/item/clothing/mask/surgical
 
-/datum/species/snail/on_species_gain(mob/living/carbon/new_snailperson, datum/species/old_species, pref_load)
+/datum/species/snail/on_species_gain(mob/living/carbon/new_snailperson, datum/species/old_species, pref_load, regenerate_icons)
 	. = ..()
 	new_snailperson.update_icons()
 
 /obj/item/storage/backpack/snail
 	/// Whether or not a bluespace anomaly core has been inserted
 	var/storage_core = FALSE
-	slowdown = 6 // The snail's shell is what's making them slow.
-	obj_flags = IMMUTABLE_SLOW //This should hopefully solve other issues involing it as well.
 	alternate_worn_layer = ABOVE_BODY_FRONT_LAYER //This makes them layer over tails like the cult backpack; some tails really shouldn't appear over them!
 	uses_advanced_reskins = TRUE
 	unique_reskin = list(
@@ -147,7 +143,7 @@
 		wearer.update_worn_back()
 
 /datum/species/snail/prepare_human_for_preview(mob/living/carbon/human/snail)
-	snail.dna.features["mcolor"] = "#797289"
+	snail.dna.features[FEATURE_MUTANT_COLOR] = "#797289"
 	snail.hairstyle = "Phoenix Half-Shaven"
 	snail.hair_color = "#4C3C7E"
 	snail.eye_color_left = "#615188"

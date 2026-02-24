@@ -10,10 +10,8 @@
 	desc = "Bee business booming? Better be benevolent and boost botany by \
 		bestowing bi-Beekeeper-suits! Contains two beekeeper suits and matching headwear."
 	cost = CARGO_CRATE_VALUE * 2
-	contains = list(/obj/item/clothing/head/utility/beekeeper_head,
-					/obj/item/clothing/suit/utility/beekeeper_suit,
-					/obj/item/clothing/head/utility/beekeeper_head,
-					/obj/item/clothing/suit/utility/beekeeper_suit,
+	contains = list(/obj/item/clothing/head/utility/beekeeper_head = 2,
+					/obj/item/clothing/suit/utility/beekeeper_suit = 2,
 				)
 	crate_name = "beekeeper suits"
 	crate_type = /obj/structure/closet/crate/hydroponics
@@ -231,7 +229,8 @@
 	var/randomize_pizza = pick_weight(rng_pizza_list)
 	rng_pizza_list -= randomize_pizza
 	var/obj/item/pizzabox/new_pizza_box = new(new_crate)
-	new_pizza_box.pizza = new randomize_pizza
+	new_pizza_box.pizza = new randomize_pizza(new_pizza_box)
+	new_pizza_box.pizza.slice()
 	new_pizza_box.boxtag = new_pizza_box.pizza.boxtag
 	new_pizza_box.boxtag_set = TRUE
 	new_pizza_box.update_appearance(UPDATE_ICON | UPDATE_DESC)
@@ -363,8 +362,37 @@
 	desc = "A packaged box containing illegal coffee syrups. Possession of these carries a penalty established in the galactic penal code."
 	cost = CARGO_CRATE_VALUE * 6
 	contains = list(
-		/obj/item/reagent_containers/cup/bottle/syrup_bottle/laughsyrup,
-		/obj/item/reagent_containers/cup/bottle/syrup_bottle/laughsyrup,
+		/obj/item/reagent_containers/cup/bottle/syrup_bottle/laughsyrup = 2,
 	)
 	crate_name = "illegal syrups box"
 	crate_type = /obj/structure/closet/crate/cardboard
+
+/datum/supply_pack/organic/cooking_oil
+	name = "Cooking Oil Vat"
+	desc = "This high-grade cooking oil can make almost anything edible. \
+	From a plasma cutter to a Syndicate bomb, if it fits in the fryer, it's a snack. \
+	Contains a vat of cooking oil."
+	cost = CARGO_CRATE_VALUE * 4.75
+	contains = list(/obj/structure/reagent_dispensers/cooking_oil)
+	crate_name = "cooking oil crate"
+	crate_type = /obj/structure/closet/crate/wooden
+
+/datum/supply_pack/organic/beer_keg
+	name = "Beer Keg"
+	desc = "The perfect way to start your shift... or end it. \
+	Contains a full barrel of Nanotrasen brewed, low-grade alcoholic beverage, \
+	perfect for getting loose after a hard day of not dying."
+	cost = CARGO_CRATE_VALUE * 6.25
+	contains = list(/obj/structure/reagent_dispensers/beerkeg)
+	crate_name = "beer keg crate"
+	crate_type = /obj/structure/closet/crate/wooden
+
+/datum/supply_pack/organic/nutraslop
+	name = "Nutraslop Serving Dish"
+	desc = "A culinary masterpiece created from all of Nanotrasen's previous culinary... innovations. \
+	A single bite will transport you back to the taste of yesterday's prison rations. \
+	Contains a serving dish filled with Nutraslop."
+	cost = CARGO_CRATE_VALUE * 4
+	contains = list(/obj/structure/reagent_dispensers/servingdish)
+	crate_name = "nutraslop serving dish crate"
+

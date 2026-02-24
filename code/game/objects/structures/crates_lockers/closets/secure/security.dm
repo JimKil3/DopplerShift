@@ -21,7 +21,7 @@
 
 /obj/structure/closet/secure_closet/captains/populate_contents_immediate()
 	new /obj/item/gun/energy/e_gun(src)
-	new /obj/item/storage/belt/sabre(src)
+	new /obj/item/storage/belt/sheath/sabre(src)
 
 /obj/structure/closet/secure_closet/hop
 	name = "head of personnel's locker"
@@ -41,10 +41,11 @@
 	new /obj/item/assembly/flash/handheld(src)
 	new /obj/item/clothing/neck/petcollar(src)
 	new /obj/item/pet_carrier(src)
-	new /obj/item/door_remote/civilian(src)
+	new /obj/item/door_remote/head_of_personnel(src)
 	new /obj/item/circuitboard/machine/techfab/department/service(src)
 	new /obj/item/storage/photo_album/hop(src)
 	new /obj/item/storage/lockbox/medal/hop(src)
+	new /obj/item/storage/box/visitor_ids(src) //DOPPLER EDIT ADDITION
 
 /obj/structure/closet/secure_closet/hop/populate_contents_immediate()
 	new /obj/item/gun/energy/e_gun(src)
@@ -67,7 +68,7 @@
 	new /obj/item/storage/lockbox/loyalty(src)
 	new /obj/item/storage/box/flashbangs(src)
 	new /obj/item/shield/riot/tele(src)
-	new /obj/item/storage/belt/security/full(src)
+	new /obj/item/storage/belt/secsword/full(src) // DOPPLER EDIT - new /obj/item/storage/belt/security/full(src)
 	new /obj/item/circuitboard/machine/techfab/department/security(src)
 	new /obj/item/storage/photo_album/hos(src)
 
@@ -77,7 +78,6 @@
 	// Traitor steal objectives
 	new /obj/item/gun/energy/e_gun/hos(src)
 	new /obj/item/pinpointer/nuke(src)
-	new /obj/item/gun/ballistic/shotgun/automatic/combat/compact(src)
 
 /obj/structure/closet/secure_closet/warden
 	name = "warden's locker"
@@ -92,9 +92,16 @@
 	new /obj/item/storage/bag/garment/warden(src)
 	new /obj/item/storage/box/zipties(src)
 	new /obj/item/storage/box/flashbangs(src)
-	new /obj/item/storage/belt/security/full(src)
+	new /obj/item/storage/belt/secsword/full(src) // DOPPLER EDIT - new /obj/item/storage/belt/security/full(src)
 	new /obj/item/flashlight/seclite(src)
 	new /obj/item/door_remote/head_of_security(src)
+
+
+/obj/structure/closet/secure_closet/warden/populate_contents_immediate()
+	. = ..()
+
+	// Traitor steal objective
+	new /obj/item/gun/ballistic/shotgun/automatic/combat/compact(src)
 
 /obj/structure/closet/secure_closet/security
 	name = "security officer's locker"
@@ -115,7 +122,7 @@
 
 /obj/structure/closet/secure_closet/security/sec/PopulateContents()
 	..()
-	new /obj/item/storage/belt/security/full(src)
+	//new /obj/item/storage/belt/security/full(src) // DOPPLER REMOVAL - replaced with a loadout beacon for security officers; c.f. Dopplershift PR #688
 
 /obj/structure/closet/secure_closet/security/cargo
 
@@ -165,6 +172,7 @@
 	new /obj/item/reagent_containers/spray/pepper(src)
 	new /obj/item/clothing/suit/armor/vest/det_suit(src)
 	new /obj/item/storage/belt/holster/detective/full(src)
+	new /obj/item/storage/belt/holster/detective/full(src) // DOPPLER EDIT ADDITION
 	new /obj/item/pinpointer/crew(src)
 	new /obj/item/binoculars(src)
 	new /obj/item/storage/box/rxglasses/spyglasskit(src)
@@ -195,7 +203,7 @@
 	. = ..()
 	. += span_notice("<b>Right-click</b> with a Security-level ID to reset [src]'s registered ID.")
 
-/obj/structure/closet/secure_closet/brig/genpop/attackby(obj/item/card/id/advanced/prisoner/user_id, mob/user, params)
+/obj/structure/closet/secure_closet/brig/genpop/attackby(obj/item/card/id/advanced/prisoner/user_id, mob/user, list/modifiers, list/attack_modifiers)
 	if(!secure || !istype(user_id))
 		return ..()
 
@@ -211,7 +219,7 @@
 	name = initial(name)
 	update_appearance()
 
-/obj/structure/closet/secure_closet/brig/genpop/attackby_secondary(obj/item/card/id/advanced/used_id, mob/user, params)
+/obj/structure/closet/secure_closet/brig/genpop/attackby_secondary(obj/item/card/id/advanced/used_id, mob/user, list/modifiers, list/attack_modifiers)
 	if(!secure || !istype(used_id))
 		return ..()
 

@@ -5,7 +5,7 @@
 	src.target = target
 
 /datum/filter_editor/ui_state(mob/user)
-	return GLOB.admin_state
+	return ADMIN_STATE(R_VAREDIT)
 
 /datum/filter_editor/ui_interact(mob/user, datum/tgui/ui)
 	ui = SStgui.try_update_ui(user, src, ui)
@@ -74,8 +74,7 @@
 		if("modify_icon_value")
 			var/icon/new_icon = input("Pick icon:", "Icon") as null|icon
 			if(new_icon)
-				target.filter_data[params["name"]]["icon"] = new_icon
-				target.update_filters()
+				target.modify_filter(params["name"], list("icon" = new_icon))
 				. = TRUE
 		if("mass_apply")
 			if(!check_rights_for(usr.client, R_FUN))

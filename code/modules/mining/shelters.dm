@@ -17,7 +17,7 @@
 /datum/map_template/shelter/New()
 	. = ..()
 	blacklisted_turfs = typecacheof(/turf/closed)
-	banned_areas = typecacheof(/area/shuttle)
+	banned_areas = typecacheof(list(/area/shuttle, /area/station/holodeck))
 
 /datum/map_template/shelter/proc/check_deploy(turf/deploy_location, obj/item/survivalcapsule/capsule, ignore_flags = NONE)
 	var/affected = get_affected_turfs(deploy_location, centered=TRUE)
@@ -171,4 +171,12 @@
 	mappath = "_maps/templates/fishing_plasma.dmm"
 	description = "A small 2x2 puddle of not-safe-for-live plasma. You can catch lava loops and arctic chrabs here."
 	radial_icon = "plasma"
+	safe = FALSE
+
+/datum/map_template/shelter/fishing/depths
+	name = "Deep Ocean Fishing Spot"
+	shelter_id = "fishing_depths"
+	mappath = "_maps/templates/fishing_depths.dmm"
+	description = "A 3x3 pool of deep water, enough that it's tiring to wade across. You can catch ocean fish here."
+	radial_icon = "depths"
 	safe = FALSE

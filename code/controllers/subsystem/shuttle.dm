@@ -9,7 +9,11 @@
 SUBSYSTEM_DEF(shuttle)
 	name = "Shuttle"
 	wait = 1 SECONDS
-	init_order = INIT_ORDER_SHUTTLE
+	dependencies = list(
+		/datum/controller/subsystem/mapping,
+		/datum/controller/subsystem/atoms,
+		/datum/controller/subsystem/air,
+	)
 	flags = SS_KEEP_TIMING
 	runlevels = RUNLEVEL_SETUP | RUNLEVEL_GAME
 
@@ -17,6 +21,8 @@ SUBSYSTEM_DEF(shuttle)
 	var/list/mobile_docking_ports = list()
 	/// A list of all the stationary docking ports.
 	var/list/stationary_docking_ports = list()
+	/// A list of all the custom shuttles.
+	var/list/custom_shuttles = list()
 	/// A list of all the beacons that can be docked to.
 	var/list/beacon_list = list()
 	/// A list of all the transit docking ports.
@@ -271,7 +277,7 @@ SUBSYSTEM_DEF(shuttle)
 			sender_override = "Emergency Shuttle Uplink Alert",
 			color_override = "orange",
 		)
-		if(emergency.timeLeft(1) > emergency_call_time * ALERT_COEFF_AUTOEVAC_CRITICAL)
+		if(EMERGENCY_IDLE_OR_RECALLED || emergency.timeLeft(1) > emergency_call_time * ALERT_COEFF_AUTOEVAC_CRITICAL)
 			emergency.request(null, set_coefficient = ALERT_COEFF_AUTOEVAC_CRITICAL)
 
 /datum/controller/subsystem/shuttle/proc/block_recall(lockout_timer)
@@ -309,6 +315,8 @@ SUBSYSTEM_DEF(shuttle)
 	WARNING("couldn't find shuttle with id: [id]")
 
 /datum/controller/subsystem/shuttle/proc/getDock(id)
+	if(id == "infinite_transit_super_hell") // DOPPLER ADDITION START
+		return null // DOPPLER ADDITION END
 	for(var/obj/docking_port/stationary/S in stationary_docking_ports)
 		if(S.shuttle_id == id)
 			return S
@@ -356,6 +364,13 @@ SUBSYSTEM_DEF(shuttle)
 
 	return TRUE
 
+/**
+ * Calls the emergency shuttle.
+ *
+ * Arguments:
+ * * user - The mob that called the shuttle.
+ * * call_reason - The reason the shuttle was called, which should be non-html-encoded text.
+ */
 /datum/controller/subsystem/shuttle/proc/requestEvac(mob/user, call_reason)
 	if (!check_backup_emergency_shuttle())
 		return
@@ -378,7 +393,7 @@ SUBSYSTEM_DEF(shuttle)
 		SSblackbox.record_feedback("text", "shuttle_reason", 1, "[call_reason]")
 		log_shuttle("Shuttle call reason: [call_reason]")
 		SSticker.emergency_reason = call_reason
-	message_admins("[ADMIN_LOOKUPFLW(user)] has called the shuttle. (<A HREF='?_src_=holder;[HrefToken()];trigger_centcom_recall=1'>TRIGGER CENTCOM RECALL</A>)")
+	message_admins("[ADMIN_LOOKUPFLW(user)] has called the shuttle. (<A href='byond://?_src_=holder;[HrefToken()];trigger_centcom_recall=1'>TRIGGER CENTCOM RECALL</A>)")
 
 /// Call the emergency shuttle.
 /// If you are doing this on behalf of a player, use requestEvac instead.
@@ -973,7 +988,7 @@ SUBSYSTEM_DEF(shuttle)
 		QDEL_NULL(preview_reservation)
 
 /datum/controller/subsystem/shuttle/ui_state(mob/user)
-	return GLOB.admin_state
+	return ADMIN_STATE(R_ADMIN)
 
 /datum/controller/subsystem/shuttle/ui_interact(mob/user, datum/tgui/ui)
 	ui = SStgui.try_update_ui(user, src, ui)

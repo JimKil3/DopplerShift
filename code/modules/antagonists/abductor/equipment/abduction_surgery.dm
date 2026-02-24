@@ -27,7 +27,7 @@
 /datum/surgery_step/extract_organ
 	name = "remove heart"
 	accept_hand = 1
-	time = 32
+	time = 3.2 SECONDS
 	var/obj/item/organ/IC = null
 	var/list/organ_types = list(/obj/item/organ/heart)
 
@@ -51,7 +51,7 @@
 /datum/surgery_step/gland_insert
 	name = "insert gland"
 	implements = list(/obj/item/organ/heart/gland = 100)
-	time = 32
+	time = 3.2 SECONDS
 
 /datum/surgery_step/gland_insert/preop(mob/user, mob/living/carbon/target, target_zone, obj/item/tool, datum/surgery/surgery)
 	user.visible_message(span_notice("[user] starts to insert [tool] into [target]."), span_notice("You start to insert [tool] into [target]..."))
@@ -60,5 +60,5 @@
 	user.visible_message(span_notice("[user] inserts [tool] into [target]."), span_notice("You insert [tool] into [target]."))
 	user.temporarilyRemoveItemFromInventory(tool, TRUE)
 	var/obj/item/organ/heart/gland/gland = tool
-	gland.Insert(target, 2)
-	return 1
+	gland.Insert(target, special = TRUE, movement_flags = FROM_ABDUCTOR_SURGERY)
+	return TRUE

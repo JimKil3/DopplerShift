@@ -8,25 +8,36 @@
 /datum/loadout_item/glasses
 	abstract_type = /datum/loadout_item/glasses
 
+/* DOPPLER EDIT START - ORIGINAL:
 /datum/loadout_item/glasses/insert_path_into_outfit(datum/outfit/outfit, mob/living/carbon/human/equipper, visuals_only = FALSE)
 	if(outfit.glasses)
 		LAZYADD(outfit.backpack_contents, outfit.glasses)
 	outfit.glasses = item_path
+*/
 
-/datum/loadout_item/glasses/prescription_glasses
+/datum/loadout_item/glasses/insert_path_into_outfit(datum/outfit/outfit, mob/living/carbon/human/equipper, visuals_only = FALSE, override_items = LOADOUT_OVERRIDE_BACKPACK)
+	if(override_items == LOADOUT_OVERRIDE_BACKPACK && !visuals_only)
+		if(outfit.glasses)
+			LAZYADD(outfit.backpack_contents, outfit.glasses)
+		outfit.glasses = item_path
+	else
+		outfit.glasses = item_path
+// DOPPLER EDIT END
+
+/* // DOPPLER EDIT REMOVAL START - Custom Loadout Organization
+/datum/loadout_item/glasses/regular
 	name = "Glasses"
 	item_path = /obj/item/clothing/glasses/regular
-	additional_displayed_text = list("Prescription")
 
-/datum/loadout_item/glasses/prescription_glasses/circle_glasses
+/datum/loadout_item/glasses/circle_glasses
 	name = "Circle Glasses"
 	item_path = /obj/item/clothing/glasses/regular/circle
 
-/datum/loadout_item/glasses/prescription_glasses/hipster_glasses
+/datum/loadout_item/glasses/hipster_glasses
 	name = "Hipster Glasses"
 	item_path = /obj/item/clothing/glasses/regular/hipster
 
-/datum/loadout_item/glasses/prescription_glasses/jamjar_glasses
+/datum/loadout_item/glasses/jamjar_glasses
 	name = "Jamjar Glasses"
 	item_path = /obj/item/clothing/glasses/regular/jamjar
 
@@ -57,3 +68,12 @@
 /datum/loadout_item/glasses/eyepatch/medical
 	name = "Medical Eyepatch"
 	item_path = /obj/item/clothing/glasses/eyepatch/medical
+
+/datum/loadout_item/glasses/kim
+	name = "Thin Glasses"
+	item_path = /obj/item/clothing/glasses/regular/kim
+
+/datum/loadout_item/glasses/monocle
+	name = "Monocle"
+	item_path = /obj/item/clothing/glasses/monocle
+*/ // DOPPLER EDIT REMOVAL END

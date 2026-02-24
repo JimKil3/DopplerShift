@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it } from 'bun:test';
+
 import { ChannelIterator } from './ChannelIterator';
 
 describe('ChannelIterator', () => {
@@ -15,6 +17,7 @@ describe('ChannelIterator', () => {
     expect(channelIterator.next()).toBe('Whis');
     expect(channelIterator.next()).toBe('LOOC');
     expect(channelIterator.next()).toBe('Do');
+    expect(channelIterator.next()).toBe('IRC');
     // DOPPLER EDIT ADDITION END
     expect(channelIterator.next()).toBe('OOC');
     expect(channelIterator.next()).toBe('Say'); // Admin is blacklisted so it should be skipped

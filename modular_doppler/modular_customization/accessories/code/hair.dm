@@ -655,6 +655,51 @@
 	name = "Inari"
 	icon_state = "inari"
 
+/datum/sprite_accessory/hair/modular/punktails
+	name = "Punktails"
+	icon_state = "hair_punktails"
+
+/datum/sprite_accessory/hair/modular/firestarter
+	name = "Firestarter"
+	icon_state = "hair_firestarter"
+
+/datum/sprite_accessory/hair/modular/impish
+	name = "Impish"
+	icon_state = "hair_impish"
+
+/datum/sprite_accessory/hair/modular/mermaid
+	name = "Mermaid"
+	icon_state = "hair_mermaid"
+
+/datum/sprite_accessory/hair/modular/royal_curls
+	name = "Royal Curls"
+	icon_state = "hair_royal_curls"
+
+/datum/sprite_accessory/hair/modular/halfcut
+	name = "Halfcut"
+	icon_state = "hair_halfcut"
+
+/datum/sprite_accessory/hair/modular/halfcut_rough
+	name = "Halfcut Rough"
+	icon_state = "hair_halfcut_rough"
+
+/datum/sprite_accessory/hair/modular/mia
+	name = "Mia"
+	icon_state = "hair_mia"
+
+/datum/sprite_accessory/hair/modular/braided_sidetail
+	name = "Braided Sidetail"
+	icon_state = "hair_braided_sidetail"
+
+/datum/sprite_accessory/hair/modular/hugeafro_eyescovered
+	name = "Huge Afro (Eyes Covered)"
+	y_offset = 6
+	icon_state = "hair_hugeafro_eyescovered"
+
+/datum/sprite_accessory/hair/modular/frills_big
+	name = "Reptile Frills"
+	icon_state = "hair_frillsbig"
+
 // Facial hair
 
 /datum/sprite_accessory/facial_hair/modular
@@ -695,3 +740,4 @@
 /datum/sprite_accessory/facial_hair/modular/selleckreceeded
 	name = "Moustache (Selleck - Alt)"
 	icon_state = "facial_selleckreceeded"
+

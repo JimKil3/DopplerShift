@@ -22,6 +22,7 @@
 		guns_typecache = typecacheof(list(/obj/item/gun/ballistic, /obj/item/gun/energy, /obj/item/gun/grenadelauncher, /obj/item/gun/chem, /obj/item/gun/syringe))
 
 /obj/item/mod/module/magnetic_harness/on_install()
+	. = ..()
 	var/obj/item/clothing/suit = mod.get_part_from_slot(ITEM_SLOT_OCLOTHING)
 	if(!istype(suit))
 		return
@@ -29,6 +30,7 @@
 	suit.allowed |= guns_typecache
 
 /obj/item/mod/module/magnetic_harness/on_uninstall(deleting = FALSE)
+	. = ..()
 	if(deleting)
 		return
 	var/obj/item/clothing/suit = mod.get_part_from_slot(ITEM_SLOT_OCLOTHING)
@@ -80,7 +82,7 @@
 /obj/item/mod/module/pepper_shoulders/on_part_deactivation(deleting = FALSE)
 	UnregisterSignal(mod.wearer, COMSIG_LIVING_CHECK_BLOCK)
 
-/obj/item/mod/module/pepper_shoulders/on_use()
+/obj/item/mod/module/pepper_shoulders/on_use(mob/activator)
 	playsound(src, 'sound/effects/spray.ogg', 30, TRUE, -6)
 	var/datum/reagents/capsaicin_holder = new(10)
 	capsaicin_holder.add_reagent(/datum/reagent/consumable/condensedcapsaicin, 10)
@@ -112,18 +114,17 @@
 	incompatible_modules = list(/obj/item/mod/module/holster)
 	cooldown_time = 0.5 SECONDS
 	allow_flags = MODULE_ALLOW_INACTIVE
-	required_slots = list(ITEM_SLOT_OCLOTHING|ITEM_SLOT_GLOVES|ITEM_SLOT_FEET)
 	/// Gun we have holstered.
 	var/obj/item/gun/holstered
 
-/obj/item/mod/module/holster/on_use()
+/obj/item/mod/module/holster/on_use(mob/activator)
 	if(!holstered)
 		var/obj/item/gun/holding = mod.wearer.get_active_held_item()
 		if(!holding)
 			balloon_alert(mod.wearer, "nothing to holster!")
 			return
 		if(!istype(holding) || holding.w_class > WEIGHT_CLASS_BULKY)
-			balloon_alert(mod.wearer, "it doesn't fit!")
+			balloon_alert(mod.wearer, "doesn't fit!")
 			return
 		if(mod.wearer.transferItemToLoc(holding, src, force = FALSE, silent = TRUE))
 			holstered = holding
@@ -136,6 +137,7 @@
 		balloon_alert(mod.wearer, "holster full!")
 
 /obj/item/mod/module/holster/on_uninstall(deleting = FALSE)
+	. = ..()
 	if(holstered)
 		holstered.forceMove(drop_location())
 
@@ -161,17 +163,23 @@
 	/// List of spans we add to the speaker.
 	var/list/voicespan = list(SPAN_COMMAND)
 
-/obj/item/mod/module/megaphone/on_activation()
+/obj/item/mod/module/megaphone/on_activation(mob/activator)
 	RegisterSignal(mod.wearer, COMSIG_MOB_SAY, PROC_REF(handle_speech))
+	RegisterSignal(mod.wearer, COMSIG_LIVING_TREAT_MESSAGE, PROC_REF(add_tts_filter))
 
-/obj/item/mod/module/megaphone/on_deactivation(display_message = TRUE, deleting = FALSE)
-	UnregisterSignal(mod.wearer, COMSIG_MOB_SAY)
+/obj/item/mod/module/megaphone/on_deactivation(mob/activator, display_message = TRUE, deleting = FALSE)
+	UnregisterSignal(mod.wearer, list(COMSIG_LIVING_TREAT_MESSAGE, COMSIG_MOB_SAY))
 
 /obj/item/mod/module/megaphone/proc/handle_speech(datum/source, list/speech_args)
 	SIGNAL_HANDLER
 
 	speech_args[SPEECH_SPANS] |= voicespan
 	drain_power(use_energy_cost)
+
+/obj/item/mod/module/megaphone/proc/add_tts_filter(mob/living/carbon/user, list/message_args)
+	SIGNAL_HANDLER
+	///A sharper and louder sound with a bit of echo
+	message_args[TREAT_TTS_FILTER_ARG] += "acrusher=samples=2:level_out=6,aecho=delays=90:decays=0.3,aemphasis=type=cd,acontrast=30,crystalizer=i=5"
 
 ///Criminal Capture - Generates hardlight bags you can put people in and sinch.
 /obj/item/mod/module/criminalcapture
@@ -201,7 +209,7 @@
 	idle_power_cost = linked_bodybag ? (DEFAULT_CHARGE_DRAIN * 3) : 0
 	return ..()
 
-/obj/item/mod/module/criminalcapture/on_deactivation(display_message = TRUE, deleting = FALSE)
+/obj/item/mod/module/criminalcapture/on_deactivation(mob/activator, display_message = TRUE, deleting = FALSE)
 	if(!linked_bodybag)
 		return
 	packup()
@@ -267,7 +275,7 @@
 	overlay_state_inactive = "module_mirage_grenade"
 	dispense_type = /obj/item/grenade/mirage
 
-/obj/item/mod/module/dispenser/mirage/on_use()
+/obj/item/mod/module/dispenser/mirage/on_use(mob/activator)
 	var/obj/item/grenade/mirage/grenade = ..()
 	grenade.arm_grenade(mod.wearer)
 
@@ -310,47 +318,25 @@
 	/// Debuff multiplier on projectiles.
 	var/debuff_multiplier = 0.66
 	/// Speed multiplier on projectiles, higher means slower.
-	var/speed_multiplier = 2.5
+	var/speed_multiplier = 0.4
 	/// List of all tracked projectiles.
 	var/list/tracked_projectiles = list()
 	/// Effect image on projectiles.
 	var/image/projectile_effect
 	/// The dampening field
-	var/datum/proximity_monitor/advanced/projectile_dampener/dampening_field
+	var/datum/proximity_monitor/advanced/bubble/projectile_dampener/dampening_field
 
 /obj/item/mod/module/projectile_dampener/Initialize(mapload)
 	. = ..()
 	projectile_effect = image('icons/effects/fields.dmi', "projectile_dampen_effect")
 
-/obj/item/mod/module/projectile_dampener/on_activation()
+/obj/item/mod/module/projectile_dampener/on_activation(mob/activator)
 	if(istype(dampening_field))
 		QDEL_NULL(dampening_field)
 	dampening_field = new(mod.wearer, field_radius, TRUE, src)
-	RegisterSignal(dampening_field, COMSIG_DAMPENER_CAPTURE, PROC_REF(dampen_projectile))
-	RegisterSignal(dampening_field, COMSIG_DAMPENER_RELEASE, PROC_REF(release_projectile))
 
-/obj/item/mod/module/projectile_dampener/on_deactivation(display_message, deleting = FALSE)
+/obj/item/mod/module/projectile_dampener/on_deactivation(mob/activator, display_message, deleting = FALSE)
 	QDEL_NULL(dampening_field)
-
-/obj/item/mod/module/projectile_dampener/proc/dampen_projectile(datum/source, obj/projectile/projectile)
-	SIGNAL_HANDLER
-
-	projectile.damage *= damage_multiplier
-	projectile.stamina *= damage_multiplier
-	projectile.stun *= debuff_multiplier
-	projectile.knockdown *= debuff_multiplier
-	projectile.speed *= speed_multiplier
-	projectile.add_overlay(projectile_effect)
-
-/obj/item/mod/module/projectile_dampener/proc/release_projectile(datum/source, obj/projectile/projectile)
-	SIGNAL_HANDLER
-
-	projectile.damage /= damage_multiplier
-	projectile.speed /= speed_multiplier
-	projectile.stamina /= damage_multiplier
-	projectile.stun /= debuff_multiplier
-	projectile.knockdown /= debuff_multiplier
-	projectile.cut_overlay(projectile_effect)
 
 ///Active Sonar - Displays a hud circle on the turf of any living creatures in the given radius
 /obj/item/mod/module/active_sonar
@@ -449,12 +435,12 @@
 		scanned_slice = 1
 	COOLDOWN_START(src, scan_cooldown, scan_cooldown_time)
 
-/obj/item/mod/module/active_sonar/on_use()
-	balloon_alert(mod.wearer, "readying sonar...")
+/obj/item/mod/module/active_sonar/on_use(mob/activator)
+	balloon_alert(activator, "readying sonar...")
 	playsound(mod.wearer, 'sound/vehicles/mecha/skyfall_power_up.ogg', vol = 20, vary = TRUE, extrarange = SHORT_RANGE_SOUND_EXTRARANGE)
 	if(!do_after(mod.wearer, 1.1 SECONDS, target = mod))
 		return
-	playsound(mod.wearer, 'sound/effects/ping_hit.ogg', vol = 75, vary = TRUE) // Should be audible for the radius of the sonar
+	playsound(src, 'sound/effects/ping_hit.ogg', vol = 75, vary = TRUE) // Should be audible for the radius of the sonar
 	to_chat(mod.wearer, span_notice("You slam your fist into the ground, sending out a sonic wave that detects [detect_living_creatures()] living beings nearby!"))
 	for(var/mob/living/creature as anything in keyed_creatures)
 		new /obj/effect/temp_visual/sonar_ping(mod.wearer.loc, mod.wearer, creature)
@@ -522,11 +508,11 @@
 			idle_power_cost = 0
 		if(STORMTROOPER_MODE)
 			idle_power_cost = DEFAULT_CHARGE_DRAIN * 0.4
-			mod.wearer.add_traits(list(TRAIT_NO_GUN_AKIMBO, TRAIT_DOUBLE_TAP), MOD_TRAIT)
+			mod.wearer.add_traits(list(TRAIT_NO_GUN_AKIMBO, TRAIT_DOUBLE_TAP), REF(src))
 			RegisterSignal(mod.wearer, COMSIG_MOB_FIRED_GUN, PROC_REF(stormtrooper_fired_gun))
 		if(SHARPSHOOTER_MODE)
 			idle_power_cost = DEFAULT_CHARGE_DRAIN * 0.6
-			mod.wearer.add_traits(list(TRAIT_NO_GUN_AKIMBO, TRAIT_NICE_SHOT), MOD_TRAIT)
+			mod.wearer.add_traits(list(TRAIT_NO_GUN_AKIMBO, TRAIT_NICE_SHOT), REF(src))
 			RegisterSignal(mod.wearer, COMSIG_MOB_FIRED_GUN, PROC_REF(sharpshooter_fired_gun))
 			RegisterSignal(mod.wearer, COMSIG_PROJECTILE_FIRER_BEFORE_FIRE, PROC_REF(apply_ricochet))
 			mod.wearer.add_movespeed_modifier(/datum/movespeed_modifier/shooting_assistant)
@@ -535,10 +521,10 @@
 	switch(selected_mode)
 		if(STORMTROOPER_MODE)
 			UnregisterSignal(mod.wearer, COMSIG_MOB_FIRED_GUN)
-			mod.wearer.remove_traits(list(TRAIT_NO_GUN_AKIMBO, TRAIT_DOUBLE_TAP), MOD_TRAIT)
+			mod.wearer.remove_traits(list(TRAIT_NO_GUN_AKIMBO, TRAIT_DOUBLE_TAP), REF(src))
 		if(SHARPSHOOTER_MODE)
 			UnregisterSignal(mod.wearer, list(COMSIG_MOB_FIRED_GUN, COMSIG_PROJECTILE_FIRER_BEFORE_FIRE))
-			mod.wearer.remove_traits(list(TRAIT_NO_GUN_AKIMBO, TRAIT_NICE_SHOT), MOD_TRAIT)
+			mod.wearer.remove_traits(list(TRAIT_NO_GUN_AKIMBO, TRAIT_NICE_SHOT), REF(src))
 			mod.wearer.remove_movespeed_modifier(/datum/movespeed_modifier/shooting_assistant)
 
 /obj/item/mod/module/shooting_assistant/drain_power(amount)
@@ -582,10 +568,10 @@
 	required_slots = list(ITEM_SLOT_OCLOTHING)
 
 /obj/item/mod/module/shove_blocker/on_part_activation()
-	mod.wearer.add_traits(list(TRAIT_BRAWLING_KNOCKDOWN_BLOCKED, TRAIT_NO_STAGGER, TRAIT_NO_THROW_HITPUSH), MOD_TRAIT)
+	mod.wearer.add_traits(list(TRAIT_BRAWLING_KNOCKDOWN_BLOCKED, TRAIT_NO_STAGGER, TRAIT_NO_THROW_HITPUSH), REF(src))
 
 /obj/item/mod/module/shove_blocker/on_part_deactivation(deleting = FALSE)
-	mod.wearer.remove_traits(list(TRAIT_BRAWLING_KNOCKDOWN_BLOCKED, TRAIT_NO_STAGGER, TRAIT_NO_THROW_HITPUSH), MOD_TRAIT)
+	mod.wearer.remove_traits(list(TRAIT_BRAWLING_KNOCKDOWN_BLOCKED, TRAIT_NO_STAGGER, TRAIT_NO_THROW_HITPUSH), REF(src))
 
 /obj/item/mod/module/shove_blocker/locked
 	name = "superglued MOD bulwark module"
@@ -595,15 +581,15 @@
 
 /obj/item/mod/module/quick_cuff
 	name = "MOD restraint assist module"
-	desc = "Enhanced gauntlent grip pads that help with placing individuals in restraints more quickly. Doesn't look like they'll come off."
+	desc = "Enhanced gauntlet grip pads that help with placing individuals in restraints more quickly. Doesn't look like they'll come off."
 	removable = FALSE
 	complexity = 0
 	required_slots = list(ITEM_SLOT_GLOVES)
 
 /obj/item/mod/module/quick_cuff/on_part_activation()
 	. = ..()
-	ADD_TRAIT(mod.wearer, TRAIT_FAST_CUFFING, MOD_TRAIT)
+	ADD_TRAIT(mod.wearer, TRAIT_FAST_CUFFING, REF(src))
 
 /obj/item/mod/module/quick_cuff/on_part_deactivation(deleting = FALSE)
 	. = ..()
-	REMOVE_TRAIT(mod.wearer, TRAIT_FAST_CUFFING, MOD_TRAIT)
+	REMOVE_TRAIT(mod.wearer, TRAIT_FAST_CUFFING, REF(src))

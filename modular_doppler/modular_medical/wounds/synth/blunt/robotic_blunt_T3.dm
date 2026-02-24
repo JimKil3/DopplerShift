@@ -4,6 +4,7 @@
 	treat_text = "Reforming of superstructure via either RCD or manual molding, followed by typical treatment of loosened internals. \
 				To manually mold, the limb must be aggressively grabbed and welded held to it to make it malleable (though attacking it til thermal overload may be adequate) \
 				followed by firmly grasping and molding the limb with heat-resistant gloves."
+	treat_text_short = "Reform with an RCD, then screw together and solder with a heat source. Grab strongly, apply heat, and mold with your hands if an RCD is unavailable."
 	occur_text = "caves in on itself, damaged solder and shrapnel flying out in a miniature explosion"
 	examine_desc = "has caved in, with internal components visible through gaps in the metal"
 	severity = WOUND_SEVERITY_CRITICAL
@@ -33,7 +34,7 @@
 
 	sound_effect = 'sound/effects/wounds/crack2.ogg'
 
-	wound_flags = (ACCEPTS_GAUZE|MANGLES_EXTERIOR|SPLINT_OVERLAY|CAN_BE_GRASPED)
+	wound_flags = (ACCEPTS_GAUZE|MANGLES_EXTERIOR|MANGLES_INTERIOR|SPLINT_OVERLAY|CAN_BE_GRASPED)
 	treatable_by = list(/obj/item/stack/medical/bone_gel)
 	status_effect_type = /datum/status_effect/wound/blunt/robotic/critical
 	treatable_tools = list(TOOL_WELDER, TOOL_CROWBAR)

@@ -17,7 +17,8 @@
 #define ADMIN_IGNORE_CULT_GHOST (1<<21)
 #define SPLIT_ADMIN_TABS (1<<23)
 
-#define TOGGLES_DEFAULT (SOUND_ADMINHELP|MEMBER_PUBLIC|SOUND_PRAYERS)
+#define TOGGLES_DEADMIN_DEFAULT (DEADMIN_ANTAGONIST|DEADMIN_POSITION_HEAD|DEADMIN_POSITION_SECURITY|DEADMIN_POSITION_SILICON)
+#define TOGGLES_DEFAULT (SOUND_ADMINHELP|MEMBER_PUBLIC|SOUND_PRAYERS|TOGGLES_DEADMIN_DEFAULT)
 
 // Legacy chat toggles.
 // !!! DO NOT ADD ANY NEW ONES HERE !!!
@@ -36,6 +37,11 @@
 #define CHAT_LOGIN_LOGOUT (1<<12)
 
 #define TOGGLES_DEFAULT_CHAT (CHAT_OOC|CHAT_DEAD|CHAT_PRAYER|CHAT_PULLR|CHAT_GHOSTPDA|CHAT_GHOSTRADIO|CHAT_BANKCARD|CHAT_GHOSTLAWS|CHAT_LOGIN_LOGOUT)
+
+/// File path to where we save backups of preference savefiles when updating them.
+#define PREFS_BACKUP_PATH(base_path) "[base_path].updatebac"
+/// File path to the dev preference json file, which is loaded by guests while localhosting.
+#define DEV_PREFS_PATH "config/dev_preferences.json"
 
 #define PARALLAX_INSANE "Insane"
 #define PARALLAX_HIGH "High"
@@ -78,6 +84,11 @@
 
 #define DEFAULT_CYBORG_NAME "Default Cyborg Name"
 
+// Choose grid or list TGUI layouts for UI's, when possible.
+/// Force grid layout, even if default is a list.
+#define TGUI_LAYOUT_GRID "grid"
+/// Force list layout, even if default is a grid.
+#define TGUI_LAYOUT_LIST "list"
 
 //Job preferences levels
 #define JP_ANY 0
@@ -157,3 +168,8 @@
 #define INFO_RESKIN "reskin"
 /// Handles which layer the item will be on, for accessories
 #define INFO_LAYER "layer"
+
+// Lipstick styles
+#define UPPER_LIP "Upper"
+#define MIDDLE_LIP "Middle"
+#define LOWER_LIP "Lower"

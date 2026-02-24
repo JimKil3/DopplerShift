@@ -22,11 +22,8 @@
 				/obj/item/stack/medical/mesh = 4,
 				/obj/item/stack/medical/mesh/bloody = 2,
 				/obj/item/stack/medical/bandage = 4,
-				/obj/item/reagent_containers/pill/robotic_patch/synth_repair = 4,
-				/obj/item/stack/medical/wound_recovery = 2,
-				/obj/item/stack/medical/wound_recovery/rapid_coagulant = 2,
-				/obj/item/stack/medical/wound_recovery/robofoam = 2,
-				/obj/item/stack/medical/wound_recovery/robofoam_super = 1,
+				/obj/item/reagent_containers/applicator/patch/robotic_patch/synth_repair = 4,
+				/obj/item/stack/medical/gauze/alu_splint = 2,
 				/obj/item/storage/pill_bottle/painkiller = 4,
 				/obj/item/storage/medkit/civil_defense/stocked = 2,
 			),
@@ -62,6 +59,7 @@
 	)
 
 	refill_canister = /obj/item/vending_refill/medical_deforest
+	allow_custom = TRUE
 	default_price = PAYCHECK_CREW
 	extra_price = PAYCHECK_COMMAND * 4
 	payment_department = NO_FREEBIES

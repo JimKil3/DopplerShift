@@ -36,7 +36,7 @@ MAPPING_DIRECTIONAL_HELPERS(/obj/structure/urinal, 32)
 				return
 			user.changeNext_move(CLICK_CD_MELEE)
 			user.visible_message(span_danger("[user] slams [grabbed_mob] into [src]!"), span_danger("You slam [grabbed_mob] into [src]!"))
-			grabbed_mob.emote("scream")
+			grabbed_mob.painful_scream() // DOPPLER EDIT: check for painkilling before screaming
 			grabbed_mob.adjustBruteLoss(8)
 		else
 			to_chat(user, span_warning("You need a tighter grip!"))
@@ -51,7 +51,7 @@ MAPPING_DIRECTIONAL_HELPERS(/obj/structure/urinal, 32)
 		return
 	return ..()
 
-/obj/structure/urinal/attackby(obj/item/attacking_item, mob/user, params)
+/obj/structure/urinal/attackby(obj/item/attacking_item, mob/user, list/modifiers, list/attack_modifiers)
 	if(exposed)
 		if(hidden_item)
 			to_chat(user, span_warning("There is already something in the drain enclosure!"))

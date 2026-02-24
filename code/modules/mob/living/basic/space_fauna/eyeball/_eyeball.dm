@@ -58,7 +58,8 @@
 	grant_actions_by_list(innate_actions)
 
 	AddElement(/datum/element/simple_flying)
-	AddComponent(/datum/component/tameable, food_types = list(/obj/item/food/grown/carrot), tame_chance = 100)
+	var/list/food_types = string_list(list(/obj/item/food/grown/carrot))
+	AddComponent(/datum/component/tameable, food_types = food_types, tame_chance = 100)
 	ADD_TRAIT(src, TRAIT_SPACEWALK, INNATE_TRAIT)
 	on_hit_overlay = mutable_appearance(icon, "[icon_state]_crying")
 
@@ -76,7 +77,7 @@
 		qdel(attack_target)
 		return TRUE
 
-/mob/living/basic/eyeball/attackby(obj/item/weapon, mob/living/carbon/human/user, list/modifiers)
+/mob/living/basic/eyeball/attackby(obj/item/weapon, mob/living/carbon/human/user, list/modifiers, list/attack_modifiers)
 	. = ..()
 	if(!weapon.force && !user.combat_mode)
 		return

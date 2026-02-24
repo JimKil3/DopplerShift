@@ -2,7 +2,7 @@
 	name = "Make Everything Embeddable"
 	weight = 2
 	typepath = /datum/round_event/wizard/embedpocalypse
-	max_occurrences = 1
+	max_occurrences = 0
 	earliest_start = 0 MINUTES
 	description = "Everything becomes pointy enough to embed in people when thrown."
 	min_wizard_trigger_potency = 3
@@ -43,10 +43,10 @@ GLOBAL_DATUM(global_funny_embedding, /datum/global_funny_embedding)
  * Makes every item in the world embed when thrown, but also hooks into global signals for new items created to also bless them with embed-ability(??).
  */
 /datum/global_funny_embedding
-	var/embed_type = /datum/embed_data/global_funny
+	var/embed_type = /datum/embedding/global_funny
 	var/prefix = "error"
 
-/datum/embed_data/global_funny
+/datum/embedding/global_funny
 	ignore_throwspeed_threshold = TRUE
 
 /datum/global_funny_embedding/New()
@@ -91,9 +91,9 @@ GLOBAL_DATUM(global_funny_embedding, /datum/global_funny_embedding)
 
 ///everything will be... sticky? sure, why not
 /datum/global_funny_embedding/sticky
-	embed_type = /datum/embed_data/global_funny/sticky
+	embed_type = /datum/embedding/global_funny/sticky
 	prefix = "sticky"
 
-/datum/embed_data/global_funny/sticky
+/datum/embedding/global_funny/sticky
 	pain_mult = 0
 	jostle_pain_mult = 0

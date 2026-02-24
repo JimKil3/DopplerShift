@@ -10,6 +10,9 @@
 	// Provides a href link with the `species_info` arg, to be consumed by a Topic override (intended for species/model descriptions)
 	return "<a href='?src=[REF(src)];species_info=1;examine_time=[world.time]'>[input_text]</a>"
 
+/mob/living/proc/get_exploitables_href(input_text)
+	return "<a href='?src=[REF(src)];exploitables=1;examine_time=[world.time]'>[input_text]</a>"
+
 /mob/living/proc/compile_examined_text(short_desc, extended_desc, headshot, ooc_notes)
 	// Compiles the full examined description because I HATE code duplication
 	var/full_examine = span_slightly_larger(separator_hr("<em>[src]</em>"))
@@ -69,37 +72,41 @@
 	if (href_list["full_desc"])
 		// scuffed not-tgui flavor text stuff
 		var/mob/viewer = usr
-		var/can_see = (viewer in viewers(src))
 
-		if (HAS_TRAIT(src, TRAIT_UNKNOWN))
+		if (HAS_TRAIT(src, TRAIT_EXAMINE_SKIP))
 			to_chat(viewer, span_notice("You can't discern a thing about them!"))
 			return
 
-		if (can_see)
-			var/short_desc = src.dna.features["flavor_short_desc"]
-			var/extended_desc = src.dna.features["flavor_extended_desc"]
-			var/headshot_url = src.dna.features["headshot_url"]
-			var/ooc_notes = src.dna.features["ooc_notes"]
+		var/short_desc = src.dna.features["flavor_short_desc"]
+		var/extended_desc = src.dna.features["flavor_extended_desc"]
+		var/headshot_url = src.dna.features["headshot_url"]
+		var/ooc_notes = src.dna.features["ooc_notes"]
 
-			var/full_examine = compile_examined_text(short_desc, extended_desc, headshot_url, ooc_notes)
+		var/full_examine = compile_examined_text(short_desc, extended_desc, headshot_url, ooc_notes)
 
-			to_chat(viewer, examine_block(span_info(full_examine)))
-			return
-		else
-			to_chat(viewer, span_notice("You're too far away to get a good look at [src]!"))
-			return
+		to_chat(viewer, boxed_message(span_info(full_examine)))
+		return
+
 	else if (href_list["species_info"])
 		// return a blurb detailing their species
 		var/mob/viewer = usr
-		var/can_see = (viewer in viewers(src))
-		if (can_see)
-			var/species_name = src.dna.features["custom_species_name"] ? src.dna.features["custom_species_name"] : src.dna.species.name
-			var/species_desc = src.dna.features["custom_species_desc"] ? src.dna.features["custom_species_desc"] : src.dna.species.get_species_description()
 
-			var/full_examine = compile_species_info_text(species_name, species_desc, FALSE)
+		var/species_name = src.dna.features["custom_species_name"] ? src.dna.features["custom_species_name"] : src.dna.species.name
+		var/species_desc = src.dna.features["custom_species_desc"] ? src.dna.features["custom_species_desc"] : src.dna.species.get_species_description()
 
-			to_chat(viewer, examine_block(span_info(full_examine)))
-			return
+		var/full_examine = compile_species_info_text(species_name, species_desc, FALSE)
+
+		to_chat(viewer, boxed_message(span_info(full_examine)))
+		return
+
+	else if (href_list["exploitables"])
+		// show the vulnerable information ENCODED INTO THEIR VERY DNA!!!!
+		var/mob/viewer = usr
+
+		var/the_goss = src.dna.features["exploitables"] ? src.dna.features["exploitables"] : "Your contacts are unaware of anything involving this person."
+
+		to_chat(viewer, boxed_message(span_orange(the_goss)))
+		return
 /*
 	SILICONS (AKA HORRIBLE RUSTBUCKETS)
 */
@@ -118,34 +125,71 @@
 
 	if (href_list["full_desc"])
 		var/mob/viewer = usr
-		var/can_see = (viewer in viewers(src))
 
-		if (HAS_TRAIT(src, TRAIT_UNKNOWN))
+		if (HAS_TRAIT(src, TRAIT_EXAMINE_SKIP))
 			to_chat(viewer, span_notice("You can't discern a thing about them!"))
 			return
 
-		if (can_see)
-			var/short_desc = READ_PREFS(src, text/silicon_short_desc)
-			var/extended_desc = READ_PREFS(src, text/silicon_extended_desc)
-			var/headshot_url = READ_PREFS(src, text/headshot/silicon)
-			var/ooc_notes = READ_PREFS(src, text/ooc_notes)
+		var/short_desc = READ_PREFS(src, text/silicon_short_desc)
+		var/extended_desc = READ_PREFS(src, text/silicon_extended_desc)
+		var/headshot_url = READ_PREFS(src, text/headshot/silicon)
+		var/ooc_notes = READ_PREFS(src, text/ooc_notes)
 
-			var/full_examine = compile_examined_text(short_desc, extended_desc, headshot_url, ooc_notes)
+		var/full_examine = compile_examined_text(short_desc, extended_desc, headshot_url, ooc_notes)
 
-			to_chat(viewer, examine_block(span_info(full_examine)))
-			return
-		else
-			to_chat(viewer, span_notice("You're too far away to get a good look at [src]!"))
-			return
+		to_chat(viewer, boxed_message(span_info(full_examine)))
+		return
+
 	else if (href_list["species_info"])
 		var/mob/viewer = usr
-		var/can_see = (viewer in viewers(src))
 
-		if (can_see)
-			var/model_name = READ_PREFS(src, text/silicon_model_name)
-			var/model_desc = READ_PREFS(src, text/silicon_model_desc)
+		var/model_name = READ_PREFS(src, text/silicon_model_name)
+		var/model_desc = READ_PREFS(src, text/silicon_model_desc)
 
-			var/full_examine = compile_species_info_text(model_name, model_desc, TRUE)
+		var/full_examine = compile_species_info_text(model_name, model_desc, TRUE)
 
-			to_chat(viewer, examine_block(span_info(full_examine)))
+		to_chat(viewer, boxed_message(span_info(full_examine)))
+		return
+
+/*
+	AIS (AKA ALSO HORRIBLE RUSTBUCKETS)
+*/
+
+/mob/living/silicon/ai/examine_title(mob/user, thats)
+	. = ..()
+
+	// much simpler for silicons since disguises aren't really a thing... for now
+	var/model_name = READ_PREFS(src, text/silicon_model_name)
+	if (model_name)
+		. += ", [prefix_a_or_an(model_name)] <EM>[model_name]</EM>"
+
+
+/mob/living/silicon/ai/Topic(href, href_list)
+	. = ..()
+
+	if (href_list["full_desc"])
+		var/mob/viewer = usr
+
+		if (HAS_TRAIT(src, TRAIT_EXAMINE_SKIP))
+			to_chat(viewer, span_notice("You can't discern a thing about them!"))
 			return
+
+		var/short_desc = READ_PREFS(src, text/silicon_short_desc)
+		var/extended_desc = READ_PREFS(src, text/silicon_extended_desc)
+		var/headshot_url = READ_PREFS(src, text/headshot/silicon)
+		var/ooc_notes = READ_PREFS(src, text/ooc_notes)
+
+		var/full_examine = compile_examined_text(short_desc, extended_desc, headshot_url, ooc_notes)
+
+		to_chat(viewer, boxed_message(span_info(full_examine)))
+		return
+	else if (href_list["species_info"])
+		var/mob/viewer = usr
+
+		var/model_name = READ_PREFS(src, text/silicon_model_name)
+		var/model_desc = READ_PREFS(src, text/silicon_model_desc)
+
+		var/full_examine = compile_species_info_text(model_name, model_desc, TRUE)
+
+		to_chat(viewer, boxed_message(span_info(full_examine)))
+		return

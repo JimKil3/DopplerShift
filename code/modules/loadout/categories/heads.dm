@@ -8,14 +8,21 @@
 /datum/loadout_item/head
 	abstract_type = /datum/loadout_item/head
 
-/datum/loadout_item/head/insert_path_into_outfit(datum/outfit/outfit, mob/living/carbon/human/equipper, visuals_only = FALSE)
+/datum/loadout_item/head/insert_path_into_outfit(datum/outfit/outfit, mob/living/carbon/human/equipper, visuals_only = FALSE, override_items = LOADOUT_OVERRIDE_BACKPACK) // DOPPLER EDIT CHANGE - Original: /datum/loadout_item/head/insert_path_into_outfit(datum/outfit/outfit, mob/living/carbon/human/equipper, visuals_only = FALSE)
 	if(equipper.dna?.species?.outfit_important_for_life)
 		if(!visuals_only)
 			to_chat(equipper, "Your loadout helmet was not equipped directly due to your species outfit.")
 			LAZYADD(outfit.backpack_contents, item_path)
 	else
-		outfit.head = item_path
+		if(override_items == LOADOUT_OVERRIDE_BACKPACK && !visuals_only) //DOPPLER EDIT START- Original: outfit.head = item_path
+			if(outfit.head)
+				LAZYADD(outfit.backpack_contents, outfit.head)
+			outfit.head = item_path
+		else
+			outfit.head = item_path
+		// DOPPLER EDIT END
 
+/* // DOPPLER EDIT REMOVAL START - Custom Loadout Organization
 /datum/loadout_item/head/beanie
 	name = "Beanie (Colorable)"
 	item_path = /obj/item/clothing/head/beanie
@@ -66,7 +73,7 @@
 
 /datum/loadout_item/head/white_cap
 	name = "Cap (White)"
-	item_path = /obj/item/clothing/head/soft
+	item_path = /obj/item/clothing/head/soft/mime
 
 /datum/loadout_item/head/yellow_cap
 	name = "Cap (Yellow)"
@@ -124,9 +131,9 @@
 	name ="Ushanka"
 	item_path = /obj/item/clothing/head/costume/ushanka
 
-/datum/loadout_item/head/plague_doctor
+/* /datum/loadout_item/head/plague_doctor // DOPPLER EDIT REMOVAL
 	name = "Cap (Plague Doctor)"
-	item_path = /obj/item/clothing/head/bio_hood/plague
+	item_path = /obj/item/clothing/head/bio_hood/plague */
 
 /datum/loadout_item/head/rose
 	name = "Rose"
@@ -147,12 +154,12 @@
 /datum/loadout_item/head/geranium
 	name = "Geranium"
 	item_path = /obj/item/food/grown/poppy/geranium
-	
+
 /datum/loadout_item/head/harebell
 	name = "Harebell"
 	item_path = /obj/item/food/grown/harebell
 
 /datum/loadout_item/head/wig
-	name = "Wig"
+	name = "Natural Wig"
 	item_path = /obj/item/clothing/head/wig/natural
-	additional_displayed_text = list("Hair Color")
+*/ // DOPPLER EDIT REMOVAL END

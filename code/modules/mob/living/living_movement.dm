@@ -23,7 +23,7 @@
 	var/area/old_area = old_turf.loc
 	var/area/new_area = new_turf.loc
 	// If the area gravity has changed, then it's possible that our state has changed, so update
-	if(old_area.has_gravity != new_area.has_gravity)
+	if(old_area.default_gravity != new_area.default_gravity)
 		refresh_gravity()
 
 /mob/living/on_changed_z_level(turf/old_turf, turf/new_turf, same_z_layer, notify_contents)
@@ -90,6 +90,11 @@
 	if(pulling)
 		if(isliving(pulling))
 			var/mob/living/L = pulling
+			//DOPPLER EDIT ADDITION
+			if(HAS_TRAIT(L, TRAIT_OVERSIZED) && !HAS_TRAIT(src, TRAIT_OVERSIZED) && !HAS_TRAIT(src, TRAIT_STURDY_FRAME) && !iscyborg(src))
+				add_or_update_variable_movespeed_modifier(/datum/movespeed_modifier/bulky_drag, multiplicative_slowdown = PULL_OVERSIZED_SLOWDOWN)
+				return
+			//DOPPLER EDIT END
 			if(!slowed_by_drag || L.body_position == STANDING_UP || L.buckled || grab_state >= GRAB_AGGRESSIVE)
 				remove_movespeed_modifier(/datum/movespeed_modifier/bulky_drag)
 				return

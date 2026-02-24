@@ -44,10 +44,10 @@
 	/// If you have the use_age_restriction_for_jobs config option enabled and the database set up, this option will add a requirement for players to be at least minimal_player_age days old. (meaning they first signed in at least that many days before.)
 	var/minimal_player_age = 0
 
-	var/outfit = null
+	var/datum/outfit/outfit = null
 
 	/// The job's outfit that will be assigned for plasmamen.
-	var/plasmaman_outfit = null
+	var/datum/outfit/plasmaman/plasmaman_outfit = null
 
 	/// Minutes of experience-time required to play in this job. The type is determined by [exp_required_type] and [exp_required_type_department] depending on configs.
 	var/exp_requirements = 0
@@ -147,7 +147,6 @@
 /// Executes after the mob has been spawned in the map. Client might not be yet in the mob, and is thus a separate variable.
 /datum/job/proc/after_spawn(mob/living/spawned, client/player_client)
 	SHOULD_CALL_PARENT(TRUE)
-	SEND_GLOBAL_SIGNAL(COMSIG_GLOB_JOB_AFTER_SPAWN, src, spawned, player_client)
 	if(length(mind_traits))
 		spawned.mind.add_traits(mind_traits, JOB_TRAIT)
 
@@ -156,10 +155,15 @@
 		liver.add_traits(liver_traits, JOB_TRAIT)
 
 	if(!ishuman(spawned))
+		SEND_GLOBAL_SIGNAL(COMSIG_GLOB_JOB_AFTER_SPAWN, src, spawned, player_client)
 		return
 
 	var/mob/living/carbon/human/spawned_human = spawned
 	var/list/roundstart_experience
+
+	if(player_client)
+		for(var/obj/item/organ/our_organ in spawned_human.organs)
+			ADD_TRAIT(our_organ, TRAIT_CLIENT_STARTING_ORGAN, ROUNDSTART_TRAIT)
 
 	if(!config) //Needed for robots.
 		roundstart_experience = minimal_skills
@@ -173,15 +177,17 @@
 		for(var/i in roundstart_experience)
 			spawned_human.mind.adjust_experience(i, roundstart_experience[i], TRUE)
 
+	SEND_GLOBAL_SIGNAL(COMSIG_GLOB_JOB_AFTER_SPAWN, src, spawned, player_client)
+
 /// Return the outfit to use
 /datum/job/proc/get_outfit(consistent)
 	return outfit
 
 /// Announce that this job as joined the round to all crew members.
 /// Note the joining mob has no client at this point.
-/datum/job/proc/announce_job(mob/living/joining_mob)
+/datum/job/proc/announce_job(mob/living/joining_mob, job_title) // DOPPLER EDIT: alt title support
 	if(head_announce)
-		announce_head(joining_mob, head_announce)
+		announce_head(joining_mob, head_announce, job_title) // DOPPLER EDIT: alt title support
 
 
 //Used for a special check of whether to allow a client to latejoin as this job.
@@ -197,7 +203,7 @@
 /mob/living/carbon/human/on_job_equipping(datum/job/equipping, client/player_client)
 	if(equipping.paycheck_department)
 		var/datum/bank_account/bank_account = new(real_name, equipping, dna.species.payday_modifier)
-		bank_account.payday(STARTING_PAYCHECKS, TRUE)
+		bank_account.payday(STARTING_PAYCHECKS, free = TRUE)
 		account_id = bank_account.account_id
 		bank_account.replaceable = FALSE
 		add_mob_memory(/datum/memory/key/account, remembered_id = account_id)
@@ -221,20 +227,10 @@
 	dna.species.pre_equip_species_outfit(equipping, src, visual_only)
 	equip_outfit_and_loadout(equipping.get_outfit(consistent), player_client?.prefs, visual_only)
 
-/datum/job/proc/announce_head(mob/living/carbon/human/human, channels) //tells the given channel that the given mob is the new department head. See communications.dm for valid channels.
-	if(!human)
-		return
-	var/obj/machinery/announcement_system/system
-	var/list/available_machines = list()
-	for(var/obj/machinery/announcement_system/announce as anything in GLOB.announcement_systems)
-		if(announce.newhead_toggle)
-			available_machines += announce
-			break
-	if(!length(available_machines))
-		return
-	system = pick(available_machines)
-	//timer because these should come after the captain announcement
-	SSticker.OnRoundstart(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(_addtimer), CALLBACK(system, TYPE_PROC_REF(/obj/machinery/announcement_system, announce), AUTO_ANNOUNCE_NEWHEAD, human.real_name, human.job, channels), 1))
+/datum/job/proc/announce_head(mob/living/carbon/human/human, channels, job_title) // DOPPLER EDIT: alternative job titles//tells the given channel that the given mob is the new department head. See communications.dm for valid channels.
+	if(human)
+		//timer because these should come after the captain announcement
+		SSticker.OnRoundstart(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(_addtimer), CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(aas_config_announce), /datum/aas_config_entry/newhead, list("PERSON" = human.real_name, "RANK" = human.job), null, channels, null, TRUE), 1))
 
 //If the configuration option is set to require players to be logged as old enough to play certain jobs, then this proc checks that they are, otherwise it just returns 1
 /datum/job/proc/player_old_enough(client/player)
@@ -297,21 +293,21 @@
 	return TRUE
 
 /// Gets the message that shows up when spawning as this job
-/datum/job/proc/get_spawn_message()
+/datum/job/proc/get_spawn_message(alt_title) // DOPPLER EDIT CHANGE - ALTERNATIVE_JOB_TITLES - ORIGINAL: /datum/job/proc/get_spawn_message()
 	SHOULD_NOT_OVERRIDE(TRUE)
-	return examine_block(span_infoplain(jointext(get_spawn_message_information(), "\n&bull; ")))
+	return boxed_message(span_infoplain(jointext(get_spawn_message_information(alt_title), "\n&bull; ")))
 
 /// Returns a list of strings that correspond to chat messages sent to this mob when they join the round.
-/datum/job/proc/get_spawn_message_information()
+/datum/job/proc/get_spawn_message_information(alt_title = title) // DOPPLER EDIT CHANGE - ALTERNATIVE_JOB_TITLES - ORIGINAL: /datum/job/proc/get_spawn_message_information()
 	SHOULD_CALL_PARENT(TRUE)
 	var/list/info = list()
-	info += "<b>You are the [title].</b>\n"
+	info += "<b>You are the [alt_title].</b>\n" // DOPPLER EDIT CHANGE - ALTERNATIVE_JOB_TITLES - ORIGINAL: info += "<b>You are the [title].</b>\n"
 	var/related_policy = get_policy(policy_override || title)
 	var/radio_info = get_radio_information()
 	if(related_policy)
 		info += related_policy
 	if(supervisors)
-		info += "As the [title] you answer directly to [supervisors]. Special circumstances may change this."
+		info += "As the [alt_title == title ? alt_title : "[alt_title] ([title])"] you answer directly to [supervisors]. Special circumstances may change this." // DOPPLER EDIT CHANGE - ALTERNATIVE_JOB_TITLES - ORIGINAL: info += "As the [title] you answer directly to [supervisors]. Special circumstances may change this."
 	if(radio_info)
 		info += radio_info
 	if(req_admin_notify)
@@ -321,6 +317,11 @@
 		info += span_boldnotice("As this station was initially staffed with a \
 			[CONFIG_GET(flag/jobs_have_minimal_access) ? "full crew, only your job's necessities" : "skeleton crew, additional access may"] \
 			have been added to your ID card.")
+	//DOPPLER EDIT ADDITION START - ALTERNATIVE_JOB_TITLES
+	if(alt_title != title)
+		info += span_warning("Remember that alternate titles are purely for flavor and roleplay.")
+		info += span_warning("Do not use your \"[alt_title]\" alt title as an excuse to forego your duties as a [title].")
+	//DOPPLER EDIT END
 
 	return info
 
@@ -419,7 +420,7 @@
 			card.registered_account = account
 			account.bank_cards += card
 
-		equipped.sec_hud_set_ID()
+		equipped.update_ID_card()
 
 	var/obj/item/modular_computer/pda/pda = equipped.get_item_by_slot(pda_slot)
 
@@ -648,3 +649,11 @@
 /datum/job/proc/after_latejoin_spawn(mob/living/spawning)
 	SHOULD_CALL_PARENT(TRUE)
 	SEND_GLOBAL_SIGNAL(COMSIG_GLOB_JOB_AFTER_LATEJOIN_SPAWN, src, spawning)
+
+/// Called when a mob that has this job is admin respawned
+/datum/job/proc/on_respawn(mob/new_character)
+	SSjob.equip_rank(new_character, new_character.mind.assigned_role, new_character.client)
+
+/// This proc may be called when someone of this job is made into a traitor to create custom objectives related to the job.
+/datum/job/proc/generate_traitor_objective()
+	return null

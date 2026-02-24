@@ -9,7 +9,7 @@
 	inhand_icon_state = null
 	armor_type = /datum/armor/utility_hardhat
 	flags_inv = 0
-	hair_mask = HAIR_MASK_HIDE_ABOVE_45_DEG_MEDIUM
+	hair_mask = /datum/hair_mask/standard_hat_middle
 	actions_types = list(/datum/action/item_action/toggle_helmet_light)
 	clothing_flags = SNUG_FIT | STACKABLE_HELMET_EXEMPT
 	resistance_flags = FIRE_PROOF
@@ -118,6 +118,8 @@
 	name = "welding hard hat"
 	desc = "A piece of headgear used in dangerous working conditions to protect the head. Comes with a built-in flashlight AND welding shield! The bulb seems a little smaller though."
 	light_range = 3 //Needs a little bit of tradeoff
+	toggle_message = "You pull the visor down"
+	alt_toggle_message = "You push the visor up"
 	dog_fashion = null
 	actions_types = list(/datum/action/item_action/toggle_helmet_light, /datum/action/item_action/toggle_welding_screen)
 	flash_protect = FLASH_PROTECTION_WELDER
@@ -143,15 +145,17 @@
 /obj/item/clothing/head/utility/hardhat/welding/adjust_visor(mob/living/user)
 	. = ..()
 	if(.)
-		playsound(src, 'sound/vehicles/mecha/mechmove03.ogg', 50, TRUE)
+		playsound(src, up ? SFX_VISOR_UP : SFX_VISOR_DOWN, 50, TRUE)
 
 /obj/item/clothing/head/utility/hardhat/welding/worn_overlays(mutable_appearance/standing, isinhands)
 	. = ..()
 	if(isinhands)
 		return
 
-	if(!up)
+	if(!up && !mask_overlay_icon) // DOPPLER EDIT - ORIGINAL - if(!up)
 		. += mutable_appearance('icons/mob/clothing/head/utility.dmi', visor_state)
+	else if(!up) // DOPPLER EDIT ADDITION - SEE modular_doppler/modular_cosmetics/code/hats/doppler_command_hats.dm
+		. += mutable_appearance(mask_overlay_icon, visor_state) // DOPPLER EDIT ADDITION
 
 /obj/item/clothing/head/utility/hardhat/welding/update_overlays()
 	. = ..()
@@ -220,7 +224,7 @@
 /obj/item/clothing/head/utility/hardhat/welding/atmos/worn_overlays(mutable_appearance/standing, isinhands, icon_file)
 	. = ..()
 	if(!isinhands)
-		. += emissive_appearance(icon_file, "[icon_state]-emissive", src, alpha = src.alpha)
+		. += emissive_appearance(icon_file, "[icon_state]-emissive", src, alpha = src.alpha, effect_type = EMISSIVE_SPECULAR)
 
 /obj/item/clothing/head/utility/hardhat/pumpkinhead
 	name = "carved pumpkin"
@@ -251,9 +255,9 @@
 	if(isnull(.))
 		return
 	if(new_value)
-		AddElement(/datum/element/wearable_client_colour, /datum/client_colour/halloween_helmet, ITEM_SLOT_HEAD, forced = TRUE)
+		AddElement(/datum/element/wearable_client_colour, /datum/client_colour/halloween_helmet, ITEM_SLOT_HEAD, HELMET_TRAIT, forced = TRUE)
 	else
-		RemoveElement(/datum/element/wearable_client_colour, /datum/client_colour/halloween_helmet, ITEM_SLOT_HEAD, forced = TRUE)
+		RemoveElement(/datum/element/wearable_client_colour, /datum/client_colour/halloween_helmet, ITEM_SLOT_HEAD, HELMET_TRAIT, forced = TRUE)
 	update_icon(UPDATE_OVERLAYS)
 
 /obj/item/clothing/head/utility/hardhat/pumpkinhead/update_overlays()

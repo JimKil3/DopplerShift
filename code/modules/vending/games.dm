@@ -55,8 +55,11 @@
 				/obj/item/storage/box/fishing_lures = 2,
 				/obj/item/book/manual/fish_catalog = 5,
 				/obj/item/reagent_containers/cup/fish_feed = 4,
+				/obj/item/storage/box/aquarium_props = 4,
 				/obj/item/fish_analyzer = 2,
+				/obj/item/storage/bag/fishing = 2,
 				/obj/item/fishing_rod/telescopic = 1,
+				/obj/item/fish_tank = 1,
 			),
 		),
 		list(
@@ -73,6 +76,7 @@
 				/obj/item/skillchip/useless_adapter = 5,
 				/obj/item/skillchip/wine_taster = 2,
 				/obj/item/skillchip/big_pointer = 2,
+				/obj/item/skillchip/pacification = 2, //DOPPLER EDIT ADDITION - Just throws a couple of these in there.
 			),
 		),
 		list(
@@ -112,6 +116,7 @@
 	extra_price = PAYCHECK_COMMAND * 1.25
 	payment_department = ACCOUNT_SRV
 	light_mask = "games-light-mask"
+	allow_custom = TRUE
 
 /obj/item/vending_refill/games
 	machine_name = "\improper Good Clean Fun"

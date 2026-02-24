@@ -1,0 +1,25 @@
+// Gotta add to the selector
+/datum/preference/choiced/taur_type/compile_constant_data()
+	var/list/data = ..()
+	data[SUPPLEMENTAL_FEATURE_KEY] = /datum/preference/tri_color/taur_color::savefile_key
+	return data
+
+/datum/preference/tri_color/taur_color
+	priority = PREFERENCE_PRIORITY_BODY_TYPE
+	savefile_key = "taur_color"
+	savefile_identifier = PREFERENCE_CHARACTER
+	category = PREFERENCE_CATEGORY_SUPPLEMENTAL_FEATURES
+	//relevant_external_organ = /obj/item/organ/horns
+
+/datum/preference/tri_color/taur_color/create_default_value()
+	return list(sanitize_hexcolor("[pick("7F", "FF")][pick("7F", "FF")][pick("7F", "FF")]"),
+	sanitize_hexcolor("[pick("7F", "FF")][pick("7F", "FF")][pick("7F", "FF")]"),
+	sanitize_hexcolor("[pick("7F", "FF")][pick("7F", "FF")][pick("7F", "FF")]"))
+
+/datum/preference/tri_color/taur_color/apply_to_human(mob/living/carbon/human/target, value)
+	target.dna.features[FEATURE_TAUR_COLORS] = value
+
+/datum/preference/tri_color/taur_color/is_valid(value)
+	if (!..(value))
+		return FALSE
+	return TRUE

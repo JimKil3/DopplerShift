@@ -46,14 +46,12 @@
 // Operates TGUI
 /obj/item/modular_computer/ui_interact(mob/user, datum/tgui/ui)
 	if(!enabled || !user.can_read(src, READING_CHECK_LITERACY))
-		if(ui)
-			ui.close()
+		ui?.close()
 		return
 
 	// Robots don't really need to see the screen, their wireless connection works as long as computer is on.
 	if(!screen_on && !issilicon(user))
-		if(ui)
-			ui.close()
+		ui?.close()
 		return
 
 	if(honkvirus_amount > 0) // EXTRA annoying, huh!
@@ -63,6 +61,8 @@
 	ui = SStgui.try_update_ui(user, src, ui)
 	if(!ui)
 		update_tablet_open_uis(user)
+	else if(active_program?.always_update_ui)
+		active_program.ui_interact(user, ui)
 
 /obj/item/modular_computer/ui_assets(mob/user)
 	var/list/data = list()
@@ -97,9 +97,9 @@
 	)
 
 	data["proposed_login"] = list(
-		IDInserted = computer_id_slot ? TRUE : FALSE,
-		IDName = computer_id_slot?.registered_name,
-		IDJob = computer_id_slot?.assignment,
+		IDInserted = stored_id ? TRUE : FALSE,
+		IDName = stored_id?.registered_name,
+		IDJob = stored_id?.assignment,
 	)
 
 	data["removable_media"] = list()
@@ -120,6 +120,10 @@
 			"alert" = program.alert_pending,
 		))
 
+	data["alert_style"] = get_security_level_relevancy()
+	data["alert_color"] = SSsecurity_level?.current_security_level?.announcement_color
+	data["alert_name"] = SSsecurity_level?.current_security_level?.name_shortform
+
 	return data
 
 // Handles user's GUI input
@@ -139,6 +143,25 @@
 			//you can't close apps in emergency mode.
 			if(isnull(internal_cell) || internal_cell.charge)
 				active_program.kill_program(usr)
+			// DOPPLER EDIT ADDITION START - NTNRC_FOR_ALL
+			else // Slightly cursed code to let you swap between the chat client or messenger instead
+
+				if(istype(active_program, /datum/computer_file/program/chatclient))
+					var/datum/computer_file/program/messenger/our_messenger = locate() in stored_files
+					if(isnull(our_messenger))
+						return TRUE
+					open_program(usr, our_messenger)
+
+				else if(istype(active_program, /datum/computer_file/program/messenger))
+					var/datum/computer_file/program/chatclient/our_chat_client = locate() in stored_files
+					if(isnull(our_chat_client))
+						return TRUE
+					if(!get_ntnet_status()) // Can't swap to NTNRC without NTNet.
+						to_chat(usr, span_danger("\The [src]'s screen shows \"Unable to connect to NTNet. Please retry. If problem persists contact your system administrator.\" warning."))
+						return TRUE
+					open_program(usr, our_chat_client)
+
+			// DOPPLER EDIT ADDITION END - NTNRC_FOR_ALL
 			return TRUE
 		if("PC_shutdown")
 			shutdown_computer()
@@ -189,7 +212,10 @@
 					if(!inserted_disk)
 						return
 
-					user.put_in_hands(inserted_disk)
+					if(!user || !Adjacent(user))
+						inserted_disk.forceMove(drop_location())
+					else
+						user.put_in_hands(inserted_disk)
 					inserted_disk = null
 					playsound(src, 'sound/machines/card_slide.ogg', 50)
 					return TRUE
@@ -204,7 +230,7 @@
 						return TRUE
 
 				if("ID")
-					if(RemoveID(user))
+					if(remove_id(user))
 						playsound(src, 'sound/machines/card_slide.ogg', 50)
 						return TRUE
 

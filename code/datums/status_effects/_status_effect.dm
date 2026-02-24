@@ -12,6 +12,10 @@
 	/// While processing, this becomes the world.time when the next tick will occur.
 	/// -1 = will prevent ticks, and if duration is also unlimited (-1), stop processing wholesale.
 	var/tick_interval = 1 SECONDS
+	///If our tick intervals are set to be a dynamic value within a range, the lowerbound of said range
+	var/tick_interval_lowerbound
+	///If our tick intervals are set to be a dynamic value within a range, the upperbound of said range
+	var/tick_interval_upperbound
 	/// The mob affected by the status effect.
 	VAR_FINAL/mob/living/owner
 	/// How many of the effect can be on one mob, and/or what happens when you try to add a duplicate.
@@ -71,9 +75,11 @@
 				START_PROCESSING(SSfastprocess, src)
 			if(STATUS_EFFECT_NORMAL_PROCESS)
 				START_PROCESSING(SSprocessing, src)
+			if(STATUS_EFFECT_PRIORITY)
+				START_PROCESSING(SSpriority_effects, src)
 
 	update_particles()
-
+	SEND_SIGNAL(owner, COMSIG_LIVING_STATUS_APPLIED, src)
 	return TRUE
 
 /datum/status_effect/Destroy()
@@ -82,12 +88,15 @@
 			STOP_PROCESSING(SSfastprocess, src)
 		if(STATUS_EFFECT_NORMAL_PROCESS)
 			STOP_PROCESSING(SSprocessing, src)
+		if(STATUS_EFFECT_PRIORITY)
+			STOP_PROCESSING(SSpriority_effects, src)
 	if(owner)
 		linked_alert = null
 		owner.clear_alert(id)
 		LAZYREMOVE(owner.status_effects, src)
 		on_remove()
 		UnregisterSignal(owner, COMSIG_LIVING_POST_FULLY_HEAL)
+		SEND_SIGNAL(owner, COMSIG_LIVING_STATUS_REMOVED, src)
 		owner = null
 	if(particle_effect)
 		QDEL_NULL(particle_effect)
@@ -111,13 +120,16 @@
 		qdel(src)
 		return
 
-	if(tick_interval != STATUS_EFFECT_NO_TICK && tick_interval < world.time)
-		var/tick_length = initial(tick_interval)
+	if(tick_interval == STATUS_EFFECT_AUTO_TICK)
+		tick(seconds_per_tick)
+	else if(tick_interval != STATUS_EFFECT_NO_TICK && tick_interval < world.time)
+		var/tick_length = (tick_interval_upperbound && tick_interval_lowerbound) ? rand(tick_interval_lowerbound, tick_interval_upperbound) : initial(tick_interval)
 		tick(tick_length / (1 SECONDS))
 		tick_interval = world.time + tick_length
-		if(QDELING(src))
-			// tick deleted us, no need to continue
-			return
+
+	if(QDELING(src))
+		// tick deleted us, no need to continue
+		return
 
 	if(duration != STATUS_EFFECT_PERMANENT)
 		if(duration < world.time)

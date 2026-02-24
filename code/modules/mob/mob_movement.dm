@@ -1,5 +1,5 @@
 /**
- * If your mob is concious, drop the item in the active hand
+ * If your mob is conscious, drop the item in the active hand
  *
  * This is a hidden verb, likely for binding with winset for hotkeys
  */
@@ -101,8 +101,10 @@
 
 	//We are now going to move
 	var/add_delay = mob.cached_multiplicative_slowdown
-	var/new_glide_size = DELAY_TO_GLIDE_SIZE(add_delay * ( (NSCOMPONENT(direct) && EWCOMPONENT(direct)) ? sqrt(2) : 1 ) )
-	mob.set_glide_size(new_glide_size) // set it now in case of pulled objects
+	var/glide_delay = add_delay
+	if(NSCOMPONENT(direct) && EWCOMPONENT(direct))
+		glide_delay = FLOOR(glide_delay * sqrt(2), world.tick_lag)
+	mob.set_glide_size(DELAY_TO_GLIDE_SIZE(glide_delay)) // set it now in case of pulled objects
 	//If the move was recent, count using old_move_delay
 	//We want fractional behavior and all
 	if(old_move_delay + world.tick_lag > world.time)
@@ -120,7 +122,7 @@
 	. = ..()
 
 	if((direct & (direct - 1)) && mob.loc == new_loc) //moved diagonally successfully
-		add_delay *= sqrt(2)
+		add_delay = FLOOR(add_delay * sqrt(2), world.tick_lag)
 
 	var/after_glide = 0
 	if(visual_delay)
@@ -281,6 +283,9 @@
 	if (SEND_SIGNAL(src, COMSIG_MOB_ATTEMPT_HALT_SPACEMOVE, movement_dir, continuous_move, backup) & COMPONENT_PREVENT_SPACEMOVE_HALT)
 		return FALSE
 
+	if (drift_handler?.attempt_halt(movement_dir, continuous_move, backup))
+		return FALSE
+
 	if(continuous_move || !istype(backup) || !movement_dir || backup.anchored)
 		return TRUE
 
@@ -300,8 +305,9 @@
 /**
  * Finds a target near a mob that is viable for pushing off when moving.
  * Takes the intended movement direction as input, alongside if the context is checking if we're allowed to continue drifting
+ * If include_floors is TRUE, includes floors *with gravity*
  */
-/mob/get_spacemove_backup(moving_direction, continuous_move)
+/mob/get_spacemove_backup(moving_direction, continuous_move, include_floors = FALSE)
 	var/atom/secondary_backup
 	var/list/priority_dirs = (moving_direction in GLOB.cardinals) ? GLOB.cardinals : GLOB.diagonals
 	for(var/atom/pushover as anything in range(1, get_turf(src)))
@@ -309,13 +315,15 @@
 			continue
 		if(isarea(pushover))
 			continue
+		var/is_priority = pushover.loc == loc || (get_dir(src, pushover) in priority_dirs)
 		if(isturf(pushover))
 			var/turf/turf = pushover
 			if(isspaceturf(turf))
 				continue
 			if(!turf.density && !mob_negates_gravity())
-				continue
-			if (get_dir(src, pushover) in priority_dirs)
+				if (!include_floors || !turf.has_gravity())
+					continue
+			if (is_priority)
 				return pushover
 			secondary_backup = pushover
 			continue
@@ -335,21 +343,21 @@
 		if(rebound.last_pushoff == world.time)
 			continue
 		if(continuous_move && !pass_allowed)
-			var/datum/move_loop/move/rebound_engine = GLOB.move_manager.processing_on(rebound, SSnewtonian_movement)
+			var/datum/move_loop/smooth_move/rebound_engine = GLOB.move_manager.processing_on(rebound, SSnewtonian_movement)
 			// If you're moving toward it and you're both going the same direction, stop
-			if(moving_direction == get_dir(src, pushover) && rebound_engine && moving_direction == rebound_engine.direction)
+			if(moving_direction == get_dir(src, pushover) && rebound_engine && moving_direction == angle2dir(rebound_engine.angle))
 				continue
 		else if(!pass_allowed)
 			if(moving_direction == get_dir(src, pushover)) // Can't push "off" of something that you're walking into
 				continue
 		if(rebound.anchored)
-			if (get_dir(src, rebound) in priority_dirs)
+			if (is_priority)
 				return rebound
 			secondary_backup = rebound
 			continue
 		if(pulling == rebound)
 			continue
-		if (get_dir(src, rebound) in priority_dirs)
+		if (is_priority)
 			return rebound
 		secondary_backup = rebound
 	return secondary_backup
@@ -370,12 +378,13 @@
  * slipped_on - optional, what'd we slip on? if not set, we assume they just fell over
  * lube - bitflag of "lube flags", see [mobs.dm] for more information
  * paralyze - time (in deciseconds) the slip leaves them paralyzed / unable to move
+ * daze - time (in deciseconds) the slip leaves them vulnerable to shove stuns
  * force_drop = the slip forces them to drop held items
  */
-/mob/proc/slip(knockdown_amount, obj/slipped_on, lube_flags, paralyze, force_drop = FALSE)
+/mob/proc/slip(knockdown_amount, obj/slipped_on, lube_flags, paralyze, daze, force_drop = FALSE)
 	add_mob_memory(/datum/memory/was_slipped, antagonist = slipped_on)
 
-	SEND_SIGNAL(src, COMSIG_MOB_SLIPPED, knockdown_amount, slipped_on, lube_flags, paralyze, force_drop)
+	SEND_SIGNAL(src, COMSIG_MOB_SLIPPED, knockdown_amount, slipped_on, lube_flags, paralyze, daze, force_drop)
 
 //bodypart selection verbs - Cyberboss
 //8: repeated presses toggles through head - eyes - mouth

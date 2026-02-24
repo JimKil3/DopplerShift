@@ -19,7 +19,7 @@
 
 ///For JPS pathing, the maximum length of a path we'll try to generate. Should be modularized depending on what we're doing later on
 #define AI_MAX_PATH_LENGTH 30 // 30 is possibly overkill since by default we lose interest after 14 tiles of distance, but this gives wiggle room for weaving around obstacles
-#define AI_BOT_PATH_LENGTH 75
+#define AI_BOT_PATH_LENGTH 60
 
 // How far should we, by default, be looking for interesting things to de-idle?
 #define AI_DEFAULT_INTERESTING_DIST 10
@@ -61,6 +61,13 @@
 #define PAUSE_DURING_DO_AFTER (1<<2)
 /// Continue processing while in stasis
 #define CAN_ACT_IN_STASIS (1<<3)
+/// Continue processing while aggressively grabbed
+#define CAN_ACT_WHILE_GRABBED (1<<4)
+
+/// Flags we expect for most AI controllers
+#define DEFAULT_AI_FLAGS (PAUSE_DURING_DO_AFTER | CAN_ACT_WHILE_GRABBED)
+/// Flags for passive mobs that are easy to push around
+#define PASSIVE_AI_FLAGS (PAUSE_DURING_DO_AFTER | STOP_MOVING_WHEN_PULLED)
 
 //Base Subtree defines
 

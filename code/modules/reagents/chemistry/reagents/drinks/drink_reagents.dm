@@ -228,7 +228,7 @@
 
 /datum/reagent/milk/used_on_fish(obj/item/fish/fish)
 	if(HAS_TRAIT(fish, TRAIT_FISH_MADE_OF_BONE))
-		fish.adjust_health(fish.health + initial(fish.health) * max(fish.get_hunger() * 0.5, 0.12))
+		fish.repair_damage(fish.max_integrity * max(fish.get_hunger() * 0.5, 0.12))
 		fish.sate_hunger()
 		return TRUE
 
@@ -278,7 +278,7 @@
 	. = ..()
 	affected_mob.adjust_dizzy(-10 SECONDS * REM * seconds_per_tick)
 	affected_mob.adjust_drowsiness(-6 SECONDS * REM * seconds_per_tick)
-	affected_mob.AdjustSleeping(-40 * REM * seconds_per_tick)
+	affected_mob.AdjustSleeping(-4 SECONDS * REM * seconds_per_tick)
 	//310.15 is the normal bodytemp.
 	affected_mob.adjust_bodytemperature(25 * REM * TEMPERATURE_DAMAGE_COEFFICIENT * seconds_per_tick, 0, affected_mob.get_body_temp_normal())
 	if(holder.has_reagent(/datum/reagent/consumable/frostoil))
@@ -300,7 +300,7 @@
 	affected_mob.adjust_dizzy(-4 SECONDS * REM * seconds_per_tick)
 	affected_mob.adjust_drowsiness(-2 SECONDS * REM * seconds_per_tick)
 	affected_mob.adjust_jitter(-6 SECONDS * REM * seconds_per_tick)
-	affected_mob.AdjustSleeping(-20 * REM * seconds_per_tick)
+	affected_mob.AdjustSleeping(-2 SECONDS * REM * seconds_per_tick)
 	if(affected_mob.getToxLoss() && SPT_PROB(10, seconds_per_tick))
 		if(affected_mob.adjustToxLoss(-1 * REM * seconds_per_tick, updating_health = FALSE, required_biotype = affected_biotype))
 			. = UPDATE_MOB_HEALTH
@@ -377,7 +377,7 @@
 	. = ..()
 	affected_mob.adjust_dizzy(-10 SECONDS * REM * seconds_per_tick)
 	affected_mob.adjust_drowsiness(-6 SECONDS * REM * seconds_per_tick)
-	affected_mob.AdjustSleeping(-40 * REM * seconds_per_tick)
+	affected_mob.AdjustSleeping(-4 SECONDS * REM * seconds_per_tick)
 	affected_mob.adjust_bodytemperature(-5 * REM * TEMPERATURE_DAMAGE_COEFFICIENT * seconds_per_tick, affected_mob.get_body_temp_normal())
 
 /datum/reagent/consumable/hot_ice_coffee
@@ -398,7 +398,7 @@
 	. = ..()
 	affected_mob.adjust_dizzy(-10 SECONDS * REM * seconds_per_tick)
 	affected_mob.adjust_drowsiness(-6 SECONDS * REM * seconds_per_tick)
-	affected_mob.AdjustSleeping(-60 * REM * seconds_per_tick)
+	affected_mob.AdjustSleeping(-6 SECONDS * REM * seconds_per_tick)
 	affected_mob.adjust_bodytemperature(-7 * REM * TEMPERATURE_DAMAGE_COEFFICIENT * seconds_per_tick, affected_mob.get_body_temp_normal())
 	if(affected_mob.adjustToxLoss(1 * REM * seconds_per_tick, updating_health = FALSE, required_biotype = affected_biotype))
 		return UPDATE_MOB_HEALTH
@@ -416,7 +416,7 @@
 	. = ..()
 	affected_mob.adjust_dizzy(-4 SECONDS * REM * seconds_per_tick)
 	affected_mob.adjust_drowsiness(-2 SECONDS * REM * seconds_per_tick)
-	affected_mob.AdjustSleeping(-40 * REM * seconds_per_tick)
+	affected_mob.AdjustSleeping(-4 SECONDS * REM * seconds_per_tick)
 	if(affected_mob.getToxLoss() && SPT_PROB(10, seconds_per_tick))
 		if(affected_mob.adjustToxLoss(-1 * REM * seconds_per_tick, updating_health = FALSE, required_biotype = affected_biotype))
 			. = UPDATE_MOB_HEALTH
@@ -529,7 +529,7 @@
 	affected_mob.set_jitter_if_lower(40 SECONDS * REM * seconds_per_tick)
 	affected_mob.adjust_dizzy(2 SECONDS * REM * seconds_per_tick)
 	affected_mob.remove_status_effect(/datum/status_effect/drowsiness)
-	affected_mob.AdjustSleeping(-40 * REM * seconds_per_tick)
+	affected_mob.AdjustSleeping(-4 SECONDS * REM * seconds_per_tick)
 	affected_mob.adjust_bodytemperature(-5 * REM * TEMPERATURE_DAMAGE_COEFFICIENT * seconds_per_tick, affected_mob.get_body_temp_normal())
 
 /datum/reagent/consumable/spacemountainwind
@@ -543,7 +543,7 @@
 /datum/reagent/consumable/spacemountainwind/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
 	. = ..()
 	affected_mob.adjust_drowsiness(-14 SECONDS * REM * seconds_per_tick)
-	affected_mob.AdjustSleeping(-20 * REM * seconds_per_tick)
+	affected_mob.AdjustSleeping(-2 SECONDS * REM * seconds_per_tick)
 	affected_mob.adjust_bodytemperature(-5 * REM * TEMPERATURE_DAMAGE_COEFFICIENT * seconds_per_tick, affected_mob.get_body_temp_normal())
 	affected_mob.set_jitter_if_lower(10 SECONDS * REM * seconds_per_tick)
 
@@ -642,7 +642,7 @@
 	. = ..()
 	affected_mob.adjust_dizzy(-10 SECONDS * REM * seconds_per_tick)
 	affected_mob.adjust_drowsiness(-6 SECONDS * REM * seconds_per_tick)
-	affected_mob.AdjustSleeping(-40 * REM * seconds_per_tick)
+	affected_mob.AdjustSleeping(-4 SECONDS * REM * seconds_per_tick)
 	affected_mob.adjust_bodytemperature(-5 * REM * TEMPERATURE_DAMAGE_COEFFICIENT * seconds_per_tick, affected_mob.get_body_temp_normal())
 
 /datum/reagent/consumable/wellcheers
@@ -680,7 +680,7 @@
 	affected_mob.set_jitter_if_lower(80 SECONDS * REM * seconds_per_tick)
 	affected_mob.adjust_dizzy(2 SECONDS * REM * seconds_per_tick)
 	affected_mob.remove_status_effect(/datum/status_effect/drowsiness)
-	affected_mob.AdjustSleeping(-40 * REM * seconds_per_tick)
+	affected_mob.AdjustSleeping(-4 SECONDS * REM * seconds_per_tick)
 	affected_mob.adjust_bodytemperature(-5 * REM * TEMPERATURE_DAMAGE_COEFFICIENT * seconds_per_tick, affected_mob.get_body_temp_normal())
 
 /datum/reagent/consumable/monkey_energy/on_mob_metabolize(mob/living/affected_mob)
@@ -702,7 +702,6 @@
 /datum/reagent/consumable/ice
 	name = "Ice"
 	description = "Frozen water, your dentist wouldn't like you chewing this."
-	reagent_state = SOLID
 	color = "#619494" // rgb: 97, 148, 148
 	taste_description = "ice"
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
@@ -997,6 +996,18 @@
 	taste_description = "sweet pomegranates"
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
+/datum/reagent/consumable/grenadine/on_mob_metabolize(mob/living/drinker)
+	. = ..()
+	if(IS_REVOLUTIONARY(drinker))
+		to_chat(drinker, span_warning("Antioxidants are weakening your radical spirit!"))
+
+/datum/reagent/consumable/grenadine/on_mob_life(mob/living/carbon/drinker, seconds_per_tick, times_fired)
+	. = ..()
+	if(IS_REVOLUTIONARY(drinker))
+		drinker.set_dizzy_if_lower(10 SECONDS * REM * seconds_per_tick)
+		if(drinker.getStaminaLoss() < 80)
+			drinker.adjustStaminaLoss(12, required_biotype = affected_biotype) //The pomegranate stops free radicals! Har har.
+
 /datum/reagent/consumable/parsnipjuice
 	name = "Parsnip Juice"
 	description = "Why..."
@@ -1074,7 +1085,7 @@
 	affected_mob.update_transform(newsize/current_size)
 	current_size = newsize
 	if(SPT_PROB(23, seconds_per_tick))
-		affected_mob.sneeze()
+		affected_mob.emote("sneeze")
 
 /datum/reagent/consumable/red_queen/on_mob_end_metabolize(mob/living/affected_mob)
 	. = ..()
@@ -1257,7 +1268,7 @@
 		return
 	affected_mob.set_silence_if_lower(MIMEDRINK_SILENCE_DURATION)
 	affected_mob.adjust_drowsiness(-6 SECONDS * REM * seconds_per_tick)
-	affected_mob.AdjustSleeping(-40 * REM * seconds_per_tick)
+	affected_mob.AdjustSleeping(-4 SECONDS * REM * seconds_per_tick)
 	if(affected_mob.getToxLoss() && SPT_PROB(25, seconds_per_tick))
 		if(affected_mob.adjustToxLoss(-2 * REM * seconds_per_tick, updating_health = FALSE, required_biotype = affected_biotype))
 			return UPDATE_MOB_HEALTH
@@ -1299,4 +1310,74 @@
 	var/mob/living/carbon/exposed_carbon = exposed_mob
 	var/obj/item/organ/stomach/ethereal/stomach = exposed_carbon.get_organ_slot(ORGAN_SLOT_STOMACH)
 	if(istype(stomach))
-		stomach.adjust_charge(reac_volume * 0.02 * ETHEREAL_CHARGE_NORMAL)
+		stomach.adjust_charge(reac_volume * 20 * ETHEREAL_DISCHARGE_RATE)
+
+/datum/reagent/consumable/fruit_punch
+	name = "fruit punch"
+	description = "Impossibly sweet fruit punch. Nobody knows what fruits were used to make it, not even it's creators... \
+		It's unique recipe heals and rejuvinates the drinker, but is unsafe to consume without the support of a nearby watercooler."
+	color = "#f7b2e3"
+	taste_description = "dangerously sweet fruit"
+	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
+	quality = DRINK_VERYGOOD
+
+/datum/reagent/consumable/fruit_punch/on_mob_life(mob/living/affected_mob, seconds_per_tick)
+	. = ..()
+	var/need_mob_update
+	var/found_valid_cooler = FALSE
+	for(var/obj/structure/reagent_dispensers/water_cooler/found_cooler in range(4, affected_mob))
+		if(found_cooler.anchored)
+			found_valid_cooler = TRUE
+			var/obj/effect/temp_visual/heal/heal_effect = new /obj/effect/temp_visual/heal(get_turf(found_cooler))
+			heal_effect.color = "#f7b2e3"
+			break
+
+	if(found_valid_cooler)
+		affected_mob.clear_alert("punch_bad")
+		affected_mob.throw_alert("punch_good", /atom/movable/screen/alert/fruit_punch_good)
+		need_mob_update = affected_mob.adjustToxLoss(-0.6 * REM * seconds_per_tick, updating_health = FALSE)
+		need_mob_update = affected_mob.adjustBruteLoss(-0.6 * REM * seconds_per_tick, updating_health = FALSE)
+		need_mob_update = affected_mob.adjustFireLoss(-0.6 * REM * seconds_per_tick, updating_health = FALSE)
+		affected_mob.remove_movespeed_modifier(/datum/movespeed_modifier/punch_punishment)
+	else
+		affected_mob.clear_alert("punch_good")
+		affected_mob.throw_alert("punch_bad", /atom/movable/screen/alert/fruit_punch_bad)
+		need_mob_update = affected_mob.apply_damage(1.5 * REM * seconds_per_tick, TOX)
+		affected_mob.add_movespeed_modifier(/datum/movespeed_modifier/punch_punishment)
+		if(SPT_PROB(10, seconds_per_tick))
+			affected_mob.Knockdown(3 SECONDS, 6 SECONDS) //Gives daze effect. Using the cooler is a commitment and if you get jumped during it or have to run away to fight something, you should be vulnerable.
+			to_chat(affected_mob, span_warning("The overwhelming sweetness of the fruit punch disorients and confounds you!"))
+	if(need_mob_update)
+		return UPDATE_MOB_HEALTH
+
+/datum/movespeed_modifier/punch_punishment
+	multiplicative_slowdown = 0.30
+
+/datum/reagent/consumable/fruit_punch/on_mob_end_metabolize(mob/living/affected_mob)
+	. = ..()
+	affected_mob.clear_alert("punch_bad")
+	affected_mob.clear_alert("punch_good")
+	affected_mob.remove_movespeed_modifier(/datum/movespeed_modifier/punch_punishment)
+
+/atom/movable/screen/alert/fruit_punch_good
+	name = "Fruit Punch Blessing"
+	desc = "The sweetness of the fruit punch and the friendly company of the liquid cooler are slowly restoring your health..."
+	icon_state = "punch_blessing"
+
+/atom/movable/screen/alert/fruit_punch_bad
+	name = "Fruit Punishment"
+	desc = "The unbearable sweetness of the fruit punch is too much to bear without the soothing aura of a liquid cooler! Your body is going into shock!"
+	icon_state = "punch_punishment"
+
+/datum/reagent/consumable/ethanol/bitters_soda
+	name = "Bitters and Soda"
+	description = "A simple beverage of soda water flavored with aromatic bitters. Soothes upset stomachs."
+	boozepwr = 0
+	color = "#f1c1b3"
+	quality = DRINK_NICE
+	taste_description = "mild aromatics"
+	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
+	
+/datum/reagent/consumable/ethanol/bitters_soda/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	affected_mob.adjust_disgust(-5 * REM * seconds_per_tick)

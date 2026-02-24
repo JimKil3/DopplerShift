@@ -10,12 +10,14 @@
 	return list("[BIO_METAL]")
 
 /datum/wound/burn/robotic/overheat
-	treat_text = "Introduction of a cold environment or lowering of body temperature."
+	treat_text = "Cool down the overheating metal in the patient's body. This can be done safely with cryogenics or other cold environments. \
+				For rapid cooling, spraying water or coolant directly on the metal will rapidly decrease temperatures, damaging in the process. Gauze can mitigate the shock."
+	treat_text_short = "Introduce to a cold environment, or rapidly cool with sprays after applying gauze to mitigate shock."
 
 	simple_desc = "Metals are overheated, increasing damage taken significantly and raising body temperature!"
-	simple_treat_text = "Ideally <b>cryogenics</b>, but any source of <b>low body temperature</b> can work. <b>Spraying</b> with <b>spray bottles/extinguishers/showers</b> \
-	will quickly cool the limb, but <b>cause damage</b>. <b>Hercuri</b> is <b>especially effective</b> in quick cooling. \
-	<b>Clothing</b> reduces the water/hercuri that makes it to the metal, and <b>gauze</b> binds it and <b>reduces</b> the <b>damage</b> taken."
+	simple_treat_text = "<b>Cryogenics</b> is the ideal way to cool the patient down, but any source of <b>low body temperature</b> can work. <b>Spraying</b> with <b>spray bottles, extinguishers, or showers</b> \
+	will quickly cool the limb, but will <b>cause damage</b> from thermal shock. <b>Hercuri</b> is <b>especially effective</b> in quick cooling. \
+	<b>Gauze</b> binds the metal and <b>reduces</b> the <b>damage</b> taken, but <b>clothing</b> reduces the amount of cooling that makes it to the metal."
 	homemade_treat_text = "You can also splash <b>any liquid</b> on it for a rather <b>inefficient</b> and <b>damaging</b> coolant!"
 
 	default_scar_file = METAL_SCAR_FILE
@@ -148,12 +150,12 @@
 	if (victim)
 		QDEL_NULL(mob_glow)
 		UnregisterSignal(victim, COMSIG_MOB_AFTER_APPLY_DAMAGE)
-		UnregisterSignal(victim, COMSIG_ATOM_AFTER_EXPOSE_REAGENTS)
+		UnregisterSignal(victim, COMSIG_ATOM_EXPOSE_REAGENTS)
 	if (new_victim)
 		mob_glow = new_victim.mob_light(light_range, light_power, light_color)
 		mob_glow.set_light_on(TRUE)
 		RegisterSignal(new_victim, COMSIG_MOB_AFTER_APPLY_DAMAGE, PROC_REF(victim_attacked))
-		RegisterSignal(new_victim, COMSIG_ATOM_AFTER_EXPOSE_REAGENTS, PROC_REF(victim_exposed_to_reagents))
+		RegisterSignal(new_victim, COMSIG_ATOM_EXPOSE_REAGENTS, PROC_REF(victim_exposed_to_reagents))
 
 	return ..()
 
@@ -187,7 +189,7 @@
 	victim.adjust_bodytemperature(amount_to_adjust)
 
 /// Signal proc for when our victim is externally attacked. Increases chassis temp based on burn damage received.
-/datum/wound/burn/robotic/overheat/proc/victim_attacked(datum/source, damage, damagetype, def_zone, blocked, wound_bonus, bare_wound_bonus, sharpness, attack_direction, attacking_item)
+/datum/wound/burn/robotic/overheat/proc/victim_attacked(datum/source, damage, damagetype, def_zone, blocked, wound_bonus, exposed_wound_bonus, sharpness, attack_direction, attacking_item)
 	SIGNAL_HANDLER
 
 	if (def_zone != limb.body_zone) // use this proc since receive damage can also be called for like, chems and shit
@@ -343,7 +345,10 @@
 		sustain additional wounds."
 	occur_text = "lets out a slight groan as it turns a dull shade of thermal red"
 	examine_desc = "is glowing a dull thermal red and giving off heat"
-	treat_text = "Reduction of body temperature to expedite the passive heat dissipation - or, if thermal shock is to be risked, application of a fire extinguisher/shower."
+	treat_text = "Cool down the overheating metal in the patient's body. This can be done safely with cryogenics or other cold environments. \
+				For rapid cooling, spraying water or coolant directly on the metal will rapidly decrease temperatures, inflicting moderate harm in the process. \
+				Gauze can somewhat mitigate the high risk of temperature shock."
+	treat_text_short = "Introduce to a cold environment, or rapidly cool with sprays after applying gauze to mitigate shock."
 	severity = WOUND_SEVERITY_MODERATE
 
 	damage_multiplier_penalty = 1.15 //1.15x damage taken
@@ -392,8 +397,10 @@
 	desc = "Exterior plating has surpassed critical thermal levels, causing significant failure in structural integrity and overheating of internal systems."
 	occur_text = "sizzles, the externals turning a dull shade of orange"
 	examine_desc = "appears discolored and polychromatic, parts of it glowing a dull orange"
-	treat_text = "Isolation from physical hazards, and accommodation of passive heat dissipation - active cooling may be used, but temperature differentials significantly \
-		raise the risk of thermal shock."
+	treat_text = "Cool down the near-molten metal in the patient's body. This can be done safely with cryogenics or other cold environments. \
+				In an emergency, spraying water or coolant directly on the metal will rapidly decrease temperatures, inflicting incredible harm in the process. \
+				Gauze can slightly mitigate the extreme risk of temperature shock."
+	treat_text_short = "Introduce to a cold environment. In an emergency, rapidly cool with sprays after applying gauze to mitigate shock."
 	severity = WOUND_SEVERITY_SEVERE
 
 	a_or_from = "from"
@@ -436,8 +443,9 @@
 	desc = "Carapace is beyond melting point, causing catastrophic structural integrity failure as well as massively heating up the subject."
 	occur_text = "turns a bright shade of radiant white as it sizzles and melts"
 	examine_desc = "is a blinding shade of white, almost melting from the heat"
-	treat_text = "Immediate confinement to cryogenics, as rapid overheating and physical vulnerability may occur. Active cooling is not advised, \
-		since the thermal shock may be lethal with such a temperature differential."
+	treat_text = "Immediately cool the melting superstructure of the patient, ideally via cryogenics. \
+				Coolant sprays and other rapid cooling carry an extreme risk of total collapse if used, but still function."
+	treat_text_short = "Immediately move to cryogenics if possible. Rapid cooling may cause total structural collapse."
 	severity = WOUND_SEVERITY_CRITICAL
 
 	a_or_from = "from"
@@ -468,7 +476,7 @@
 
 	demotes_to = /datum/wound/burn/robotic/overheat/severe
 
-	wound_flags = (MANGLES_EXTERIOR|ACCEPTS_GAUZE|SPLINT_OVERLAY|CAN_BE_GRASPED)
+	wound_flags = (MANGLES_EXTERIOR|MANGLES_INTERIOR|ACCEPTS_GAUZE|SPLINT_OVERLAY|CAN_BE_GRASPED)
 
 	light_color = COLOR_VERY_SOFT_YELLOW
 	light_power = 1.3

@@ -3,7 +3,6 @@
 	desc = "Fishing anywhere, anytime... anyway what was I talking about?"
 	icon = 'icons/obj/fishing.dmi'
 	icon_state = "portal"
-	idle_power_usage = 0
 	active_power_usage = BASE_MACHINE_ACTIVE_CONSUMPTION * 2
 	anchored = FALSE
 	density = TRUE
@@ -19,6 +18,8 @@
 	var/long_range_link = FALSE
 	/// contains ALL fishing destinations.
 	var/all_destinations = FALSE
+	/// If the current active fishing spot is from multitool linkage, this value is the atom it would originally belong to.
+	var/atom/current_linked_atom
 
 /obj/machinery/fishing_portal_generator/Initialize(mapload)
 	. = ..()
@@ -202,7 +203,7 @@
 	if(machine_stat & NOPOWER)
 		balloon_alert(user, "no power!")
 		return ITEM_INTERACT_BLOCKING
-	if(!istype(selected_source, /datum/fish_source/portal)) //likely from a linked fishing spot
+	if(!all_destinations && !istype(selected_source, /datum/fish_source/portal)) //likely from a linked fishing spot
 		var/abort = TRUE
 		for(var/atom/spot as anything in linked_fishing_spots)
 			if(linked_fishing_spots[spot] != selected_source)
@@ -215,6 +216,7 @@
 				abort = FALSE
 			if(!abort)
 				RegisterSignal(spot, COMSIG_MOVABLE_Z_CHANGED, PROC_REF(on_fishing_spot_z_level_changed))
+				current_linked_atom = spot
 			break
 		if(abort && !all_destinations)
 			balloon_alert(user, "cannot reach linked!")
@@ -222,8 +224,7 @@
 
 	active = AddComponent(/datum/component/fishing_spot, selected_source)
 	ADD_TRAIT(src, TRAIT_CATCH_AND_RELEASE, INNATE_TRAIT)
-	if(use_power != NO_POWER_USE)
-		use_power = ACTIVE_POWER_USE
+	update_use_power(ACTIVE_POWER_USE)
 	update_icon()
 
 /obj/machinery/fishing_portal_generator/proc/deactivate()
@@ -233,12 +234,12 @@
 		for(var/atom/spot as anything in linked_fishing_spots)
 			if(linked_fishing_spots[spot] == active.fish_source)
 				UnregisterSignal(spot, COMSIG_MOVABLE_Z_CHANGED)
+		current_linked_atom = null
 	QDEL_NULL(active)
 
 	REMOVE_TRAIT(src, TRAIT_CATCH_AND_RELEASE, INNATE_TRAIT)
 	if(!QDELETED(src))
-		if(use_power != NO_POWER_USE)
-			use_power = IDLE_POWER_USE
+		update_use_power(IDLE_POWER_USE)
 		update_icon()
 
 /obj/machinery/fishing_portal_generator/proc/on_fishing_spot_z_level_changed(atom/spot, turf/old_turf, turf/new_turf, same_z_layer)

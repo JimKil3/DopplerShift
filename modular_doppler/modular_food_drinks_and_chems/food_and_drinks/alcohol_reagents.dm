@@ -171,21 +171,6 @@
 	name = "glass of sin's delight"
 	desc = "You can smell the seven sins rolling off the top of the glass."
 
-/datum/reagent/consumable/ethanol/strawberry_daiquiri
-	name = "Strawberry Daiquiri"
-	description = "Pink looking alcoholic drink."
-	boozepwr = 20
-	color = "#FF4A74"
-	quality = DRINK_NICE
-	taste_description = "sweet strawberry, lime and the ocean breeze"
-
-/datum/glass_style/drinking_glass/strawberry_daiquiri
-	required_drink_type = /datum/reagent/consumable/ethanol/strawberry_daiquiri
-	icon = 'modular_doppler/modular_food_drinks_and_chems/icons/drinks.dmi'
-	icon_state = "strawberry_daiquiri"
-	name = "glass of strawberry daiquiri"
-	desc = "Pink looking drink with flowers and a big straw to sip it. Looks sweet and refreshing, perfect for warm days."
-
 /datum/reagent/consumable/ethanol/liz_fizz
 	name = "Liz Fizz"
 	description = "Triple citrus layered with some ice and cream."
@@ -629,7 +614,7 @@
 	cube.color = COLOR_CYAN
 	cube.set_anchored(TRUE)
 	drinker.forceMove(cube)
-	cryostylane_alert = drinker.throw_alert("cryostylane_alert", /atom/movable/screen/alert/status_effect/freon/cryostylane)
+	cryostylane_alert = drinker.throw_alert("cryostylane_alert", /atom/movable/screen/alert/status_effect/freon)
 	cryostylane_alert.attached_effect = src //so the alert can reference us, if it needs to
 
 /datum/reagent/consumable/ethanol/blizzard_brew/on_mob_delete(mob/living/carbon/drinker, amount)
@@ -888,3 +873,11 @@
 	icon_state = "shakiri_rogers"
 	name = "glass of shakiri rogers"
 	desc = "A take on the classic Roy Rogers, with shakiri instead of grenadine. Sweet and refreshing."
+
+/datum/reagent/consumable/ethanol/null_strength_lemon_grapefruit
+	name = "NULL STRENGTH Lemon-Grapefruit Fruit Cooler"
+	description = "Flash frozen pressed juice mixed with shochu spirits. Very light and drinkable."
+	color = "#d6b679"
+	quality = DRINK_GOOD
+	boozepwr = 30
+	taste_description = "light fruit essence and alcohol"

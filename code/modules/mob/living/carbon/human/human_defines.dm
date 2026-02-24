@@ -8,13 +8,13 @@
 	hud_possible = list(HEALTH_HUD,STATUS_HUD,ID_HUD,WANTED_HUD,IMPLOYAL_HUD,IMPSEC_FIRST_HUD,IMPSEC_SECOND_HUD,ANTAG_HUD,GLAND_HUD,FAN_HUD,SEC_IMPLANT_HUD) // DOPPLER EDIT, old code: hud_possible = list(HEALTH_HUD,STATUS_HUD,ID_HUD,WANTED_HUD,IMPLOYAL_HUD,IMPSEC_FIRST_HUD,IMPSEC_SECOND_HUD,ANTAG_HUD,GLAND_HUD,FAN_HUD)
 	hud_type = /datum/hud/human
 	pressure_resistance = 25
-	can_buckle = TRUE
 	buckle_lying = 0
 	mob_biotypes = MOB_ORGANIC|MOB_HUMANOID
 	can_be_shoved_into = TRUE
 	initial_language_holder = /datum/language_holder/empty // We get stuff from our species
 	flags_1 = PREVENT_CONTENTS_EXPLOSION_1
 	max_grab = GRAB_KILL
+	examine_thats = "This is"
 
 	//Hair colour and style
 	var/hair_color = COLOR_BLACK
@@ -71,16 +71,10 @@
 	var/obj/item/l_store = null
 	var/obj/item/s_store = null
 
-	var/special_voice = "" // For changing our voice. Used by a symptom.
+	/// Allows for special overrides of voice
+	var/override_voice = ""
 
 	var/datum/physiology/physiology
-
-	/// What types of mobs are allowed to ride/buckle to this mob
-	var/static/list/can_ride_typecache = typecacheof(list(
-		/mob/living/basic/parrot,
-		/mob/living/carbon/human,
-		/mob/living/basic/slime,
-	))
 
 	var/account_id
 
@@ -98,5 +92,13 @@
 	/// When an braindead player has their equipment fiddled with, we log that info here for when they come back so they know who took their ID while they were DC'd for 30 seconds
 	var/list/afk_thefts
 
-	/// Height of the mob
-	VAR_PROTECTED/mob_height = HUMAN_HEIGHT_MEDIUM
+	/// Base height of the mob, modified by stuff like dwarfism or species
+	VAR_PRIVATE/base_mob_height = HUMAN_HEIGHT_MEDIUM
+	/// Actual height of the mob. Don't touch this one, it is set via update_mob_height()
+	VAR_FINAL/mob_height = HUMAN_HEIGHT_MEDIUM
+
+	// DOPPLER EDIT START - Floating Hands quirk
+	var/obj/effect/abstract/held_tk_effect/left/held_left
+	var/obj/effect/abstract/held_tk_effect/right/held_right
+	var/held_hover_color
+	// DOPPLER EDIT END

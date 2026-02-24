@@ -36,7 +36,6 @@
 		/datum/reagent/medicine/c2/penthrite = 5,
 		/datum/reagent/consumable/vinegar = 5,
 	)
-	drink_type = NONE
 	age_restricted = FALSE
 
 /// Abstract holder object for shared behaviour
@@ -46,11 +45,7 @@
 
 /obj/structure/meateor_fluff/Initialize(mapload)
 	. = ..()
-	AddComponent(/datum/component/bloody_spreader,\
-		blood_left = INFINITY,\
-		blood_dna = list("meaty DNA" = "MT-"),\
-		diseases = null,\
-	)
+	AddComponent(/datum/component/bloody_spreader)
 
 /obj/structure/meateor_fluff/play_attack_sound(damage_amount, damage_type, damage_flag)
 	switch(damage_type)
@@ -100,8 +95,8 @@
 	. = ..()
 	stored_organ = pick_weight(allowed_organs)
 
-/obj/structure/meateor_fluff/flesh_pod/attackby(obj/item/attacking_item, mob/user, params)
-	if (attacking_item.sharpness & SHARP_EDGED)
+/obj/structure/meateor_fluff/flesh_pod/attackby(obj/item/attacking_item, mob/user, list/modifiers, list/attack_modifiers)
+	if (attacking_item.get_sharpness() & SHARP_EDGED)
 		cut_open(user)
 		return
 	return ..()
@@ -138,6 +133,6 @@
 	max_integrity = 15
 
 /obj/structure/meateor_fluff/abandoned_headcrab_egg/atom_destruction(damage_flag)
-	new /obj/effect/decal/cleanable/xenoblood(loc)
+	new /obj/effect/decal/cleanable/blood/xeno(loc)
 	playsound(loc, 'sound/effects/footstep/gib_step.ogg', vol = 50, vary = TRUE, pressure_affected = FALSE)
 	return ..()

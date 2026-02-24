@@ -2,19 +2,13 @@
 	icon = 'modular_doppler/modular_cosmetics/icons/obj/suit/jacket.dmi'
 	worn_icon = 'modular_doppler/modular_cosmetics/icons/mob/suit/jacket.dmi'
 	slot_flags = ITEM_SLOT_OCLOTHING|ITEM_SLOT_NECK
-
-/obj/item/clothing/suit/jacket/doppler/Initialize(mapload)
-	. = ..()
-	create_storage(storage_type = /datum/storage/pockets/jacket)
+	pocket_storage_type = /datum/storage/pockets/jacket
 
 /obj/item/clothing/suit/hooded/doppler
 	icon = 'modular_doppler/modular_cosmetics/icons/obj/suit/jacket.dmi'
 	worn_icon = 'modular_doppler/modular_cosmetics/icons/mob/suit/jacket.dmi'
 	slot_flags = ITEM_SLOT_OCLOTHING|ITEM_SLOT_NECK
-
-/obj/item/clothing/suit/hooded/doppler/Initialize(mapload)
-	. = ..()
-	create_storage(storage_type = /datum/storage/pockets/jacket)
+	pocket_storage_type = /datum/storage/pockets/jacket
 
 /datum/armor/jacket_armor //because our jackets can go in the neck slot, they should have little to no armor
 	melee = 0
@@ -70,11 +64,11 @@
 		/obj/item/storage/fancy/cigarettes,
 		/obj/item/lighter,
 		)
+	pocket_storage_type = /datum/storage/pockets/jacket/jumbo
 
 /obj/item/clothing/suit/jacket/doppler/departmental_jacket/engi/Initialize(mapload)
 	. = ..()
 	AddComponent(/datum/component/toggle_icon, "zipper")
-	create_storage(storage_type = /datum/storage/pockets/jacket/jumbo)
 
 /obj/item/clothing/suit/jacket/doppler/departmental_jacket/sci
 	name = "science department jacket"
@@ -95,11 +89,11 @@
 	desc = "A hardwearing jacket for chilly warehouses and cargo holds. By popular and incessant request \
 	these are fitted with extra large pockets."
 	icon_state = "supply_dep_jacket"
+	pocket_storage_type = /datum/storage/pockets/jacket/jumbo
 
 /obj/item/clothing/suit/jacket/doppler/departmental_jacket/supply/Initialize(mapload)
 	. = ..()
 	AddComponent(/datum/component/toggle_icon, "zipper")
-	create_storage(storage_type = /datum/storage/pockets/jacket/jumbo)
 
 /obj/item/clothing/suit/jacket/doppler/departmental_jacket/sec
 	name = "blue security department jacket"
@@ -107,12 +101,12 @@
 	on the shell, and to readily accomodate a holstered weapon."
 	icon_state = "sec_dep_jacket"
 	armor_type = /datum/armor/jacket_armor
+	pocket_storage_type = /datum/storage/pockets/jacket/jumbo
 
 /obj/item/clothing/suit/jacket/doppler/departmental_jacket/sec/Initialize(mapload)
 	. = ..()
 	AddComponent(/datum/component/toggle_icon, "zipper")
 	allowed = GLOB.security_vest_allowed
-	create_storage(storage_type = /datum/storage/pockets/jacket/jumbo)
 
 /obj/item/clothing/suit/jacket/doppler/departmental_jacket/sec/red
 	name = "red security department jacket"
@@ -125,11 +119,11 @@
 	desc = "A tight synthetic knit protects the wearer from errant needlestabs, though the sleeves are often rolled \
 	away from the forarm. Its pockets are very generous."
 	icon_state = "secmed_labcoat_blue"
+	pocket_storage_type = /datum/storage/pockets/jacket/jumbo
 
 /obj/item/clothing/suit/jacket/doppler/sec_medic/Initialize(mapload)
 	. = ..()
 	allowed = GLOB.security_vest_allowed
-	create_storage(storage_type = /datum/storage/pockets/jacket/jumbo)
 
 ////////////////////
 //MORE SEC JACKETS//
@@ -142,13 +136,13 @@
 	body_parts_covered = CHEST|GROIN|ARMS
 	cold_protection = CHEST|GROIN|ARMS
 	heat_protection = CHEST|GROIN|ARMS
-	armor_type = /datum/armor/jacket_armor
+	armor_type = /datum/armor/cosmetic_sec
+	pocket_storage_type = /datum/storage/pockets/jacket/jumbo
 
 /obj/item/clothing/suit/jacket/doppler/peacekeeper_jacket/Initialize(mapload)
 	. = ..()
 	AddComponent(/datum/component/toggle_icon, "zipper")
 	allowed = GLOB.security_vest_allowed
-	create_storage(storage_type = /datum/storage/pockets/jacket/jumbo)
 
 /obj/item/clothing/suit/jacket/doppler/peacekeeper_jacket/badged
 	name = "badged peacekeeper jacket"
@@ -165,12 +159,12 @@
 	desc = "A weighty coat of thick synthshearling still bears the patternmaking concessions to the limited size \
 	of pre-printed sheepskin. What was once a style of necessity has become a matter of authenticity."
 	icon_state = "runner_coat"
-	armor_type = /datum/armor/jacket_armor
+	armor_type = /datum/armor/cosmetic_sec
+	pocket_storage_type = /datum/storage/pockets/jacket/jumbo
 
 /obj/item/clothing/suit/jacket/doppler/runner_coat/Initialize(mapload)
 	. = ..()
 	allowed = GLOB.security_vest_allowed
-	create_storage(storage_type = /datum/storage/pockets/jacket/jumbo)
 
 ////////////////
 //MORE JACKETS//
@@ -181,11 +175,11 @@
 	desc = "Something like this style of gabardine jacket has been in and out of style for military forces for \
 	centuries. Simple drab is sometimes used where camoflauge would be irrelevant even now."
 	icon_state = "field_jacket"
+	pocket_storage_type = /datum/storage/pockets/jacket/jumbo
 
 /obj/item/clothing/suit/jacket/doppler/field_jacket/Initialize(mapload)
 	. = ..()
 	AddComponent(/datum/component/toggle_icon, "zipper")
-	create_storage(storage_type = /datum/storage/pockets/jacket/jumbo)
 
 /obj/item/clothing/suit/jacket/doppler/field_jacket/tan
 	name = "venerable old tan jacket"
@@ -236,7 +230,9 @@
 		right down the precise tension of thread spun on the precisely correct looms. The pilots it pays homage \
 		to worked in small ships and in close proximity to their supercooled drives and needed extreme insulation, \
 		hence the bulk."
-	icon_state = "big_jacket"
+	icon = 'icons/map_icons/clothing/suit/_suit.dmi'
+	icon_state = "/obj/item/clothing/suit/jacket/doppler/big_jacket"
+	post_init_icon_state = "big_jacket"
 	greyscale_config = /datum/greyscale_config/big_jacket
 	greyscale_config_worn = /datum/greyscale_config/big_jacket/worn
 	greyscale_colors = "#666633#333300#666633"
@@ -245,6 +241,31 @@
 	cold_protection = CHEST|ARMS
 	min_cold_protection_temperature = FIRE_SUIT_MIN_TEMP_PROTECT
 
+/obj/item/clothing/suit/jacket/doppler/gacket
+	name = "crop-top jacket"
+	desc = "A remarkably fancy-looking two-tone cropped jacket with a nice gold trim, and a golden middle finger on the back."
+	icon_state = "gacket"
+	worn_icon_state = "gacket"
+
+/obj/item/clothing/suit/jacket/doppler/bad_for_school
+	name = "'Bad for School' jacket"
+	desc = "An oversized moto jacket of thick and protective synthhide. Padded double-layer patches guard the shoulders and elbows, \
+	and a patch on the back expresses disdain for conformity."
+	icon = 'icons/map_icons/clothing/suit/_suit.dmi'
+	icon_state = "/obj/item/clothing/suit/jacket/doppler/bad_for_school"
+	post_init_icon_state = "bad_for_school"
+	greyscale_config = /datum/greyscale_config/bad_for_school
+	greyscale_config_worn = /datum/greyscale_config/bad_for_school/worn
+	greyscale_colors = "#872c2c#780a0a#a06262#3399ff"
+	flags_1 = IS_PLAYER_COLORABLE_1
+	body_parts_covered = CHEST|ARMS
+	cold_protection = CHEST|ARMS
+	min_cold_protection_temperature = FIRE_SUIT_MIN_TEMP_PROTECT
+
+/obj/item/clothing/suit/jacket/doppler/bad_for_school/Initialize(mapload)
+	. = ..()
+	AddComponent(/datum/component/toggle_icon, "zipper")
+
 /////////
 //COATS//
 /////////
@@ -252,11 +273,14 @@
 /obj/item/clothing/suit/jacket/doppler/chokha
 	name = "\improper Iseurian chokha"
 	desc = "A ceremonial woolen coat sporting a high neck and decorative gunpowder cases on the breast. The label on this one bears the Iseurian Revolutionary flag."
-	icon_state = "chokha"
+	icon = 'icons/map_icons/clothing/suit/_suit.dmi'
+	icon_state = "/obj/item/clothing/suit/jacket/doppler/chokha"
+	post_init_icon_state = "chokha"
 	greyscale_config = /datum/greyscale_config/chokha
 	greyscale_config_worn = /datum/greyscale_config/chokha/worn
 	greyscale_colors = "#1c1c1c#491618#1c1c1c#491618"
 	flags_1 = IS_PLAYER_COLORABLE_1
+	pocket_storage_type = /datum/storage/pockets/jacket/jumbo
 
 /obj/item/clothing/suit/jacket/doppler/fur_coat
 	name = "rugged fur coat"
@@ -264,12 +288,14 @@
 	the pelts of 'real' creatures to wear. The unnecessary suffering gives this coat a grim aura."
 	icon_state = "fur_coat"
 	armor_type = /datum/armor/jacket_armor
+	pocket_storage_type = /datum/storage/pockets/jacket/jumbo
 
 /obj/item/clothing/suit/jacket/doppler/wrap_coat
 	name = "chic wrap coat"
 	desc = "A jacket possessed of measured asymmetry, its fly-front closure conceals its fasteners as if the single \
 	wide belt is all that holds it closed. Surprisingly warm."
 	icon_state = "wrap_coat"
+	pocket_storage_type = /datum/storage/pockets/jacket/jumbo
 
 /obj/item/clothing/suit/jacket/doppler/red_trench
 	name = "Marsian PLA trenchcoat by Alpha Atelier"
@@ -277,7 +303,161 @@
 	movement who would likely shoot its wearer if they were alive to see the price tag."
 	icon_state = "red_trench"
 	armor_type = /datum/armor/jacket_armor
+	pocket_storage_type = /datum/storage/pockets/jacket/jumbo
 
-/obj/item/clothing/suit/jacket/doppler/red_trench/Initialize(mapload)
+/obj/item/clothing/suit/warm_coat
+	name = "warm coat"
+	desc = "A long insulated coat with fur, it looks quite comfortable."
+	icon = 'icons/map_icons/clothing/suit/_suit.dmi'
+	icon_state = "/obj/item/clothing/suit/warm_coat"
+	post_init_icon_state = "warm_coat"
+	greyscale_config = /datum/greyscale_config/warm_coat
+	greyscale_config_worn = /datum/greyscale_config/warm_coat/worn
+	greyscale_colors = "#7a5f4f#d9cec7"
+	flags_1 = IS_PLAYER_COLORABLE_1
+	cold_protection = CHEST|GROIN|ARMS
+	body_parts_covered = CHEST|GROIN|ARMS
+	min_cold_protection_temperature = FIRE_SUIT_MIN_TEMP_PROTECT
+	pocket_storage_type = /datum/storage/pockets/jacket/jumbo
+
+/obj/item/clothing/suit/hooded/crop_cold_hoodie
+	name = "cropped cold shoulder hoodie"
+	desc = "Ringspun sweatshirt fleece has been hemmed raw at elbow height and left to roll upon itself, and \
+	the patternmaker took the time to ensure the cutout shoulders lay just so."
+	icon = 'icons/map_icons/clothing/suit/_suit.dmi'
+	icon_state = "/obj/item/clothing/suit/hooded/crop_cold_hoodie"
+	post_init_icon_state = "crop_cold_hoodie"
+	greyscale_config = /datum/greyscale_config/crop_cold_hoodie
+	greyscale_config_worn = /datum/greyscale_config/crop_cold_hoodie/worn
+	greyscale_colors = "#4fc5c9"
+	hoodtype = /obj/item/clothing/head/hooded/crop_cold_hoodie_hood
+	flags_1 = IS_PLAYER_COLORABLE_1
+	body_parts_covered = CHEST|ARMS
+
+/obj/item/clothing/head/hooded/crop_cold_hoodie_hood
+	name = "cropped cold shoulder hood"
+	desc = "A fleece hood with jersey lining. It's surprisingly warm in spite of the garment that it is \
+	attached to."
+	icon = 'icons/map_icons/clothing/head/_head.dmi'
+	icon_state = "/obj/item/clothing/head/hooded/crop_cold_hoodie_hood"
+	post_init_icon_state = "crop_cold_hoodie_hood"
+	body_parts_covered = HEAD
+	cold_protection = HEAD
+	flags_inv = HIDEEARS|HIDEHAIR
+	flags_1 = IS_PLAYER_COLORABLE_1
+	hair_mask = /datum/hair_mask/winterhood
+	min_cold_protection_temperature = FIRE_SUIT_MIN_TEMP_PROTECT
+	greyscale_config = /datum/greyscale_config/crop_cold_hoodie_hood
+	greyscale_config_worn = /datum/greyscale_config/crop_cold_hoodie_hood/worn
+	greyscale_colors = "#4fc5c9"
+
+/obj/item/clothing/suit/hooded/crop_cold_hoodie/set_greyscale(list/colors, new_config, new_worn_config, new_inhand_left, new_inhand_right)
 	. = ..()
-	create_storage(storage_type = /datum/storage/pockets/jacket/jumbo)
+	if(!hood)
+		return
+	var/list/hoodie_colors = SSgreyscale.ParseColorString(greyscale_colors)
+	var/list/new_hoodie_colors = hoodie_colors.Copy(1)
+	hood.set_greyscale(new_hoodie_colors)
+	hood.update_slot_icon()
+
+/obj/item/clothing/suit/hooded/crop_cold_hoodie/on_hood_created(obj/item/clothing/head/hooded/hood)
+	. = ..()
+	var/list/hoodie_colors = (SSgreyscale.ParseColorString(greyscale_colors))
+	var/list/new_hoodie_colors = hoodie_colors.Copy(1)
+	hood.set_greyscale(new_hoodie_colors)
+
+/obj/item/clothing/suit/hooded/big_hoodie
+	name = "oversized hoodie"
+	desc = "Cotton fibres grown in vertical aeroponic farming systems were ringspun and knit into a continuous loop fleece with \
+	a soft pile and little stretch. This fabric was cut oversized with soft sloping shoulders and cuffs that fall right at the first knuckle."
+	icon = 'icons/map_icons/clothing/suit/_suit.dmi'
+	icon_state = "/obj/item/clothing/suit/hooded/big_hoodie"
+	post_init_icon_state = "big_hoodie"
+	greyscale_config = /datum/greyscale_config/big_hoodie
+	greyscale_config_worn = /datum/greyscale_config/big_hoodie/worn
+	greyscale_colors = "#5d6161"
+	hoodtype = /obj/item/clothing/head/hooded/big_hoodie_hood
+	flags_1 = IS_PLAYER_COLORABLE_1
+	body_parts_covered = CHEST|GROIN|ARMS
+	cold_protection = CHEST|GROIN|ARMS
+	min_cold_protection_temperature = FIRE_SUIT_MIN_TEMP_PROTECT
+	pocket_storage_type = /datum/storage/pockets/jacket
+
+/obj/item/clothing/head/hooded/big_hoodie_hood
+	name = "oversized hood"
+	desc = "Cotton fibres grown in vertical aeroponic farming systems were ringspun and knit into a continuous loop fleece with \
+	a soft pile and little stretch. The hood was cut comfortably oversized."
+	icon = 'icons/map_icons/clothing/head/_head.dmi'
+	icon_state = "/obj/item/clothing/head/hooded/big_hoodie_hood"
+	post_init_icon_state = "big_hoodie_hood"
+	body_parts_covered = HEAD
+	cold_protection = HEAD
+	flags_inv = HIDEEARS|HIDEHAIR
+	flags_1 = IS_PLAYER_COLORABLE_1
+	hair_mask = /datum/hair_mask/winterhood
+	min_cold_protection_temperature = FIRE_SUIT_MIN_TEMP_PROTECT
+	greyscale_config = /datum/greyscale_config/big_hoodie_hood
+	greyscale_config_worn = /datum/greyscale_config/big_hoodie_hood/worn
+	greyscale_colors = "#5d6161"
+
+/obj/item/clothing/suit/hooded/big_hoodie/set_greyscale(list/colors, new_config, new_worn_config, new_inhand_left, new_inhand_right)
+	. = ..()
+	if(!hood)
+		return
+	var/list/hoodie_colors = SSgreyscale.ParseColorString(greyscale_colors)
+	var/list/new_hoodie_colors = hoodie_colors.Copy(1)
+	hood.set_greyscale(new_hoodie_colors)
+	hood.update_slot_icon()
+
+/obj/item/clothing/suit/hooded/big_hoodie/on_hood_created(obj/item/clothing/head/hooded/hood)
+	. = ..()
+	var/list/hoodie_colors = (SSgreyscale.ParseColorString(greyscale_colors))
+	var/list/new_hoodie_colors = hoodie_colors.Copy(1)
+	hood.set_greyscale(new_hoodie_colors)
+
+/obj/item/clothing/suit/hooded/twee_hoodie
+	name = "disconcertingly twee hoodie"
+	desc = "A sweatshirt of heavy and soft ringspun fleece has been adorned with a fabric simulation of ears."
+	icon = 'icons/map_icons/clothing/suit/_suit.dmi'
+	icon_state = "/obj/item/clothing/suit/hooded/twee_hoodie"
+	post_init_icon_state = "twee_hoodie"
+	greyscale_config = /datum/greyscale_config/twee_hoodie
+	greyscale_config_worn = /datum/greyscale_config/twee_hoodie/worn
+	greyscale_colors = "#dbc0e0"
+	hoodtype = /obj/item/clothing/head/hooded/twee_hoodie_hood
+	flags_1 = IS_PLAYER_COLORABLE_1
+	body_parts_covered = CHEST|GROIN|ARMS
+	cold_protection = CHEST|GROIN|ARMS
+	min_cold_protection_temperature = FIRE_SUIT_MIN_TEMP_PROTECT
+	pocket_storage_type = /datum/storage/pockets/jacket
+
+/obj/item/clothing/head/hooded/twee_hoodie_hood
+	name = "disconcertingly twee hood"
+	desc = "A hood of heavy and soft ringspun fleece has been adorned with a fabric simulation of ears."
+	icon = 'icons/map_icons/clothing/head/_head.dmi'
+	icon_state = "/obj/item/clothing/head/hooded/twee_hoodie_hood"
+	post_init_icon_state = "twee_hoodie_hood"
+	body_parts_covered = HEAD
+	cold_protection = HEAD
+	flags_inv = HIDEEARS|HIDEHAIR
+	flags_1 = IS_PLAYER_COLORABLE_1
+	hair_mask = /datum/hair_mask/winterhood
+	min_cold_protection_temperature = FIRE_SUIT_MIN_TEMP_PROTECT
+	greyscale_config = /datum/greyscale_config/twee_hoodie_hood
+	greyscale_config_worn = /datum/greyscale_config/twee_hoodie_hood/worn
+	greyscale_colors = "#dbc0e0"
+
+/obj/item/clothing/suit/hooded/twee_hoodie/set_greyscale(list/colors, new_config, new_worn_config, new_inhand_left, new_inhand_right)
+	. = ..()
+	if(!hood)
+		return
+	var/list/hoodie_colors = SSgreyscale.ParseColorString(greyscale_colors)
+	var/list/new_hoodie_colors = hoodie_colors.Copy(1,2)
+	hood.set_greyscale(new_hoodie_colors)
+	hood.update_slot_icon()
+
+/obj/item/clothing/suit/hooded/twee_hoodie/on_hood_created(obj/item/clothing/head/hooded/hood)
+	. = ..()
+	var/list/hoodie_colors = (SSgreyscale.ParseColorString(greyscale_colors))
+	var/list/new_hoodie_colors = hoodie_colors.Copy(1,2)
+	hood.set_greyscale(new_hoodie_colors)

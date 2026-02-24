@@ -38,35 +38,29 @@
 	neck = /obj/item/clothing/neck/scarf/primitive_genemod_scarf
 	back = /obj/item/forging/reagent_weapon/axe/fake_copper
 
-/datum/species/human/genemod/primitive/on_species_gain(mob/living/carbon/new_primitive, datum/species/old_species, pref_load)
+/datum/species/human/genemod/primitive/on_species_gain(mob/living/carbon/new_primitive, datum/species/old_species, pref_load, regenerate_icons)
 	. = ..()
 	var/mob/living/carbon/human/hearthkin = new_primitive
 	if(!istype(hearthkin))
 		return
-	hearthkin.dna.add_mutation(/datum/mutation/human/olfaction, MUT_NORMAL)
-	hearthkin.dna.activate_mutation(/datum/mutation/human/olfaction)
-
-    	// >mfw I take mutadone and my nose clogs
-	var/datum/mutation/human/olfaction/mutation = locate() in hearthkin.dna.mutations
-	mutation.mutadone_proof = TRUE
-	mutation.instability = 0
+	hearthkin.dna.add_mutation(/datum/mutation/olfaction, MUTATION_SOURCE_SPECIES)
 
 /datum/species/human/genemod/primitive/on_species_loss(mob/living/carbon/former_primitive, datum/species/new_species, pref_load)
 	. = ..()
 	var/mob/living/carbon/human/hearthkin = former_primitive
 	if(!istype(hearthkin))
 		return
-	hearthkin.dna.remove_mutation(/datum/mutation/human/olfaction)
+	hearthkin.dna.remove_mutation(/datum/mutation/olfaction, MUTATION_SOURCE_SPECIES)
 
 /datum/species/human/genemod/primitive/prepare_human_for_preview(mob/living/carbon/human/human_for_preview)
 	human_for_preview.dna.ear_type = CAT
-	human_for_preview.dna.features["ears"] = "Coeurl"
-	human_for_preview.dna.features["ears_color_1"] = "#e9eff5"
-	human_for_preview.dna.features["ears_color_2"] = "#f5afaf"
-	human_for_preview.dna.features["ears_color_3"] = "#222222"
+	human_for_preview.dna.features[FEATURE_EARS] = "Coeurl"
+	human_for_preview.dna.features[FEATURE_EARS_COLORS][1] = "#e9eff5"
+	human_for_preview.dna.features[FEATURE_EARS_COLORS][2] = "#f5afaf"
+	human_for_preview.dna.features[FEATURE_EARS_COLORS][3] = "#222222"
 	human_for_preview.set_haircolor("#E9EFF5", update = FALSE)
 	human_for_preview.set_hairstyle("Fluffy long", update = TRUE)
-	human_for_preview.dna.features["mcolor"] = skintone2hex("albino")
+	human_for_preview.dna.features[FEATURE_MUTANT_COLOR] = skintone2hex("albino")
 	human_for_preview.eye_color_left = "#96dbe7"
 	human_for_preview.eye_color_right = "#96dbe7"
 	regenerate_organs(human_for_preview)

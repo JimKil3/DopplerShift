@@ -1,11 +1,9 @@
-import { sendAct } from '../../backend';
-import { LabeledList } from '../../components/LabeledList';
-import { Stack } from '../../components/Stack';
-import features from './preferences/features';
+import { LabeledList, Stack } from 'tgui-core/components';
+
+import { features } from './preferences/features';
 import { FeatureValueInput } from './preferences/features/base';
 
 export const PreferenceSingle = (props: {
-  act: typeof sendAct;
   pref_key: string;
   preferences: Record<string, unknown>;
 }) => {
@@ -29,7 +27,6 @@ export const PreferenceSingle = (props: {
     >
       <Stack.Item grow>
         <FeatureValueInput
-          act={props.act}
           feature={feature}
           featureId={props.pref_key}
           value={value}

@@ -7,11 +7,8 @@
 	var/outfit_weight = 0
 
 
-/// DOPPLER SHIFT REMOVAL BEGIN
-/*/datum/outfit/job/assistant/gimmick/give_jumpsuit(mob/living/carbon/human/target)
+/datum/outfit/job/assistant/gimmick/give_jumpsuit(mob/living/carbon/human/target)
 	return //dont do colorized and stuff, it messes with our uniforms
-	*/
-/// DOPPLER SHIFT REMOVAL END
 
 /datum/outfit/job/assistant/gimmick/bee
 	name = "Gimmick Assistant - Bee"
@@ -213,3 +210,11 @@
 	backpack_contents = list(/obj/item/storage/crayons)
 
 	outfit_weight = 3
+
+/datum/outfit/job/assistant/gimmick/bear
+	name = "Gimmick Assistant - Bear"
+	head = /obj/item/clothing/head/costume/bearpelt
+	suit = /obj/item/clothing/suit/costume/bear_suit
+	shoes = /obj/item/clothing/shoes/sneakers/black
+	uniform = /obj/item/clothing/under/color/black
+	outfit_weight = 6

@@ -16,7 +16,7 @@
 /obj/item/slime_scanner/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	if(!isliving(interacting_with))
 		return NONE
-	if(!user.can_read(src) || user.is_blind())
+	if(!user.can_read(src)) //DOPPLER EDIT - Blind People Can Analyze Again
 		return ITEM_INTERACT_BLOCKING
 	if (!isslime(interacting_with))
 		to_chat(user, span_warning("This device can only scan slimes!"))
@@ -57,4 +57,4 @@
 		to_render += "\n[span_notice("Core mutation in progress: [scanned_slime.crossbreed_modification]")]\
 					  \n[span_notice("Progress in core mutation: [scanned_slime.applied_crossbreed_amount] / [SLIME_EXTRACT_CROSSING_REQUIRED]")]"
 
-	to_chat(user, examine_block(jointext(to_render,"")))
+	to_chat(user, boxed_message(jointext(to_render,"")))

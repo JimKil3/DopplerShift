@@ -8,17 +8,31 @@
 	resistance_flags = FIRE_PROOF | ACID_PROOF // It is better to die for the Emperor than live for yourself.
 	max_heat_protection_temperature = FIRE_SUIT_MAX_TEMP_PROTECT
 	siemens_coefficient = 0
-	complexity_max = DEFAULT_MAX_COMPLEXITY - 5
-	charge_drain = DEFAULT_CHARGE_DRAIN
-	slowdown_inactive = 2.5 // very slow because the quirk infers you rely on this to move/exist
-	slowdown_active = 0.95
+	complexity_max = DEFAULT_MAX_COMPLEXITY
+	charge_drain = DEFAULT_CHARGE_DRAIN * 0.6
 	inbuilt_modules = list(
-		/obj/item/mod/module/joint_torsion/entombed,
 		/obj/item/mod/module/storage,
+		/obj/item/mod/module/status_readout,
+		/obj/item/mod/module/emp_shield,
 	)
-	allowed_suit_storage = list(
-		/obj/item/tank/internals,
+	allowed_suit_storage = list( // If GLOB.colonist_suit_allowed has it this can have it (minus forge weapons 🖕)
+		/obj/item/ammo_box,
+		/obj/item/ammo_casing,
 		/obj/item/flashlight,
+		/obj/item/gun,
+		/obj/item/melee,
+		/obj/item/tank/internals,
+		/obj/item/storage/belt/holster,
+		/obj/item/construction,
+		/obj/item/fireaxe,
+		/obj/item/pipe_dispenser,
+		/obj/item/storage/bag,
+		/obj/item/pickaxe,
+		/obj/item/resonator,
+		/obj/item/t_scanner,
+		/obj/item/analyzer,
+		/obj/item/storage/medkit,
+		/obj/item/fireaxe/metal_h2_axe,
 	)
 
 /datum/armor/mod_entombed
@@ -27,17 +41,10 @@
 	laser = ARMOR_LEVEL_WEAK
 	energy = ARMOR_LEVEL_WEAK
 	bomb = ARMOR_LEVEL_WEAK
-	bio = ARMOR_LEVEL_WEAK
+	bio = 100 // Everyone has bio protection it came free with your vacuum sealed space suit
 	fire = ARMOR_LEVEL_WEAK
 	acid = ARMOR_LEVEL_WEAK
 	wound = WOUND_ARMOR_WEAK
-
-/obj/item/mod/module/joint_torsion/entombed
-	name = "internal joint torsion adaptation"
-	desc = "Your adaptation to life in this MODsuit shell allows you to ambulate in such a way that your movements recharge the suit's internal batteries slightly, but only while under the effect of gravity."
-	removable = FALSE
-	complexity = 0
-	power_per_step = DEFAULT_CHARGE_DRAIN * 0.4
 
 /obj/item/mod/module/plasma_stabilizer/entombed
 	name = "colony-stabilized interior seal"
@@ -45,6 +52,16 @@
 	complexity = 0
 	idle_power_cost = 0
 	removable = FALSE
+
+/obj/item/mod/module/anomaly_locked/antigrav/entombed
+	name = "assistive anti-gravity ambulator"
+	desc = "An obligatory addition from the NanoTrasen science division as part of the Space Disabilities Act, this augmentation allows your suit to project a limited anti-gravity field to aid in your ambulation around the station for both general use and emergencies. It is powered by a tiny sliver of a gravitational anomaly core, inextricably linked to the power systems that keep you alive. Warning: not rated for EMP protection."
+	complexity = 1
+	allow_flags = MODULE_ALLOW_INACTIVE // the suit is never off, so this just allows this to be used w/o being parts-deployed for cosmetic reasons
+	removable = FALSE
+	active_power_cost = 0
+	prebuilt = TRUE
+	core_removable = FALSE
 
 // ENTOMBED MOD CLOTHING COMPONENT
 
@@ -76,16 +93,6 @@
 	if (!isnull(piece))
 		piece.doMove(host_suit)
 
-/obj/item/mod/module/anomaly_locked/antigrav/entombed
-	name = "assistive anti-gravity ambulator"
-	desc = "An obligatory addition from the NanoTrasen science division as part of the Space Disabilities Act, this augmentation allows your suit to project a limited anti-gravity field to aid in your ambulation around the station for both general use and emergencies. It is powered by a tiny sliver of a gravitational anomaly core, inextricably linked to the power systems that keep you alive. Warning: not rated for EMP protection."
-	complexity = 1
-	allow_flags = MODULE_ALLOW_INACTIVE // the suit is never off, so this just allows this to be used w/o being parts-deployed for cosmetic reasons
-	removable = FALSE
-	active_power_cost = 0 // torsion does not generate power in antigrav, so this is effectively -0.4 * DEFAULT_CHARGE_DRAIN
-	prebuilt = TRUE
-	core_removable = FALSE
-
 // MOD CONTROL UNIT
 
 /obj/item/mod/control/pre_equipped/entombed
@@ -110,7 +117,7 @@
 	who.balloon_alert(who, "can't strip a fused MODsuit!")
 	return ..()
 
-/obj/item/mod/control/pre_equipped/entombed/retract(mob/user, obj/item/part)
+/obj/item/mod/control/pre_equipped/entombed/retract(mob/user, obj/item/part, instant = FALSE)
 	if (ishuman(user))
 		var/mob/living/carbon/human/human_user = user
 		var/datum/quirk/equipping/entombed/tomb_quirk = human_user.get_quirk(/datum/quirk/equipping/entombed)
@@ -146,3 +153,41 @@
 	. = ..()
 	// we do this so that in the rare event that someone gets gibbed/destroyed, their suit can be retrieved easily w/o requiring admin intervention
 	REMOVE_TRAIT(src, TRAIT_NODROP, QUIRK_TRAIT)
+
+// VISUAL MODULES
+// this is a set of integrated dummy modules to allow specific visual variants to have their characteristic equipment sprites
+
+/obj/item/mod/module/visual_dummy
+	name = "MOD dummy module"
+	desc = "You're not quite certain what this is supposed to do."
+	icon = 'icons/obj/clothing/modsuit/mod_modules.dmi'
+	icon_state = "module"
+	removable = FALSE
+	use_mod_colors = TRUE
+
+/obj/item/mod/module/visual_dummy/hydraulic
+	name = "MOD barebones auxiliary arms module"
+	desc = "A pair of questionably useful arms hooked up to central control systems. \
+		They get in the way so often that there's no practical benefit from having them, \
+		so they're most likely just installed for aesthetic purposes."
+	icon_state = "launch_loader"
+	module_type = MODULE_TOGGLE
+	overlay_state_inactive = "module_hydraulic"
+	overlay_state_active = "module_hydraulic_active"
+
+/obj/item/mod/module/visual_dummy/armor_booster
+	name = "MOD plating adjustment module"
+	desc = "A set of retractable external plates around the user's helmet. \
+		While some military suits use tech like this for armor and other combat functionality, \
+		these are just installed for aesthetic purposes."
+	icon_state = "armor_booster"
+	module_type = MODULE_TOGGLE
+	overlay_state_inactive = "module_armorbooster_off"
+	overlay_state_active = "module_armorbooster_on"
+	mask_worn_overlay = TRUE
+
+/obj/item/mod/module/visual_dummy/armor_booster/generate_worn_overlay(mutable_appearance/standing)
+	// mirrored here to allow this to properly apply visual states
+	overlay_state_inactive = "[initial(overlay_state_inactive)]-[mod.skin]"
+	overlay_state_active = "[initial(overlay_state_active)]-[mod.skin]"
+	return ..()

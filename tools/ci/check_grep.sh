@@ -125,6 +125,14 @@ if $grep 'allocate\(/mob/living/carbon/human[,\)]' $unit_test_files ||
 	st=1
 fi;
 
+section "516 Href Styles"
+part "byond href styles"
+if $grep "href[\s='\"\\\\]*\?" $code_files ; then
+    echo
+    echo -e "${RED}ERROR: BYOND requires internal href links to begin with \"byond://\".${NC}"
+    st=1
+fi;
+
 section "common mistakes"
 part "global vars"
 if $grep '^/*var/' $code_files; then
@@ -201,6 +209,27 @@ if $grep 'AddElement\(/datum/element/update_icon_updates_onmob.+ITEM_SLOT_HANDS'
 	echo
 	echo -e "${RED}ERROR: update_icon_updates_onmob element automatically updates ITEM_SLOT_HANDS, this is redundant and should be removed.${NC}"
 	st=1
+fi;
+
+part "forceMove sanity"
+if $grep 'forceMove\(\s*(\w+\(\)|\w+)\s*,\s*(\w+\(\)|\w+)\s*\)' $code_files; then
+	echo
+	echo -e "${RED}ERROR: forceMove() call with two arguments - this is not how forceMove() is invoked! It's x.forceMove(y), not forceMove(x, y).${NC}"
+	st=1
+fi;
+
+part "as anything on typeless loops"
+if $grep 'var/[^/]+ as anything' $code_files; then
+    echo
+    echo -e "${RED}ERROR: 'as anything' used in a typeless for loop. This doesn't do anything and should be removed.${NC}"
+    st=1
+fi;
+
+part "as anything on internal functions"
+if $grep 'var\/(turf|mob|obj|atom\/movable).+ as anything in o?(view|range|hearers)\(' $code_files; then
+    echo
+    echo -e "${RED}ERROR: 'as anything' typed for loop over an internal function. These functions have some internal optimization that relies on the loop not having 'as anything' in it.${NC}"
+    st=1
 fi;
 
 part "common spelling mistakes"

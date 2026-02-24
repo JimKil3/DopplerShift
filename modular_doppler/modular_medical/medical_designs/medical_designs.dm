@@ -1,16 +1,3 @@
-/datum/design/hospital_gown
-	name = "Hospital Gown"
-	id = "hospital_gown"
-	build_type = PROTOLATHE
-	materials = list(
-		/datum/material/plastic = SHEET_MATERIAL_AMOUNT,
-	)
-	build_path = /obj/item/clothing/suit/toggle/labcoat/hospitalgown
-	category = list(
-		RND_CATEGORY_EQUIPMENT + RND_SUBCATEGORY_EQUIPMENT_MEDICAL,
-	)
-	departmental_flags = DEPARTMENT_BITFLAG_MEDICAL | DEPARTMENT_BITFLAG_SCIENCE
-
 /datum/design/cyberimp_botany
 	name = "Hydroponics Toolset Implant"
 	desc = "Everything a botanist needs in an arm implant, designed to be installed on a subject's arm."
@@ -23,7 +10,7 @@
 		/datum/material/plastic = SHEET_MATERIAL_AMOUNT,
 	)
 	construction_time = 20 SECONDS
-	build_path = /obj/item/organ/cyberimp/arm/botany
+	build_path = /obj/item/organ/cyberimp/arm/toolkit/botany
 	category = list(
 		RND_CATEGORY_CYBERNETICS + RND_SUBCATEGORY_CYBERNETICS_IMPLANTS_TOOLS,
 	)
@@ -40,7 +27,7 @@
 		/datum/material/silver = HALF_SHEET_MATERIAL_AMOUNT,
 	)
 	construction_time = 20 SECONDS
-	build_path = /obj/item/organ/cyberimp/arm/janitor
+	build_path = /obj/item/organ/cyberimp/arm/toolkit/janitor
 	category = list(
 		RND_CATEGORY_CYBERNETICS + RND_SUBCATEGORY_CYBERNETICS_IMPLANTS_TOOLS,
 	)
@@ -57,7 +44,7 @@
 		/datum/material/silver = HALF_SHEET_MATERIAL_AMOUNT,
 	)
 	construction_time = 20 SECONDS
-	build_path = /obj/item/organ/cyberimp/arm/mining_drill
+	build_path = /obj/item/organ/cyberimp/arm/toolkit/mining_drill
 	category = list(
 		RND_CATEGORY_CYBERNETICS + RND_SUBCATEGORY_CYBERNETICS_IMPLANTS_TOOLS,
 	)
@@ -74,16 +61,14 @@
 		/datum/material/diamond = SHEET_MATERIAL_AMOUNT,
 	)
 	construction_time = 30 SECONDS
-	build_path = /obj/item/organ/cyberimp/arm/mining_drill/diamond
+	build_path = /obj/item/organ/cyberimp/arm/toolkit/mining_drill/diamond
 	category = list(
 		RND_CATEGORY_TOOLS + RND_SUBCATEGORY_TOOLS_MINING
 	)
 	departmental_flags = DEPARTMENT_BITFLAG_MEDICAL | DEPARTMENT_BITFLAG_CARGO
 
 /datum/techweb_node/mining_adv/New() //Here for the integrated drill augments.
-	design_ids = list(
-		"ci-drill-diamond"
-	)
+	design_ids += "ci-drill-diamond"
 	return ..()
 
 /datum/design/cyberimp_claws
@@ -97,7 +82,7 @@
 		/datum/material/silver = HALF_SHEET_MATERIAL_AMOUNT,
 	)
 	construction_time = 20 SECONDS
-	build_path = /obj/item/organ/cyberimp/arm/razor_claws
+	build_path = /obj/item/organ/cyberimp/arm/toolkit/razor_claws
 	category = list(
 		RND_CATEGORY_CYBERNETICS + RND_SUBCATEGORY_CYBERNETICS_IMPLANTS_TOOLS,
 	)

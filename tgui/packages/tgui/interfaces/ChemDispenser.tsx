@@ -7,12 +7,12 @@ import {
   ProgressBar,
   Section,
 } from 'tgui-core/components';
-import { BooleanLike } from 'tgui-core/react';
+import type { BooleanLike } from 'tgui-core/react';
 import { toTitleCase } from 'tgui-core/string';
 
 import { useBackend } from '../backend';
 import { Window } from '../layouts';
-import { Beaker, BeakerDisplay } from './common/BeakerDisplay';
+import { type Beaker, BeakerDisplay } from './common/BeakerDisplay';
 
 type DispensableReagent = {
   title: string;
@@ -190,13 +190,12 @@ export const ChemDispenser = (props) => {
                 textColor={showPhCol ? chemical.pHCol : chemical.color}
                 width="129.5px"
                 lineHeight={1.75}
-                tooltip={'pH: ' + chemical.pH}
+                tooltip={`pH: ${chemical.pH}`}
+                style={{
+                  textShadow: '1px 1px 0 black',
+                }}
                 backgroundColor={
-                  recipeReagents.includes(chemical.id)
-                    ? showPhCol
-                      ? 'black'
-                      : 'green'
-                    : 'default'
+                  recipeReagents.includes(chemical.id) ? 'green' : 'default'
                 }
                 onClick={() =>
                   act('dispense', {
@@ -204,7 +203,14 @@ export const ChemDispenser = (props) => {
                   })
                 }
               >
-                <span style={{ color: 'white' }}>{chemical.title}</span>
+                <span
+                  style={{
+                    color: 'white',
+                    textShadow: 'none',
+                  }}
+                >
+                  {chemical.title}
+                </span>
               </Button>
             ))}
           </Box>

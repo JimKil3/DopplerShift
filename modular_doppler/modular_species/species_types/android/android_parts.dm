@@ -29,6 +29,8 @@
 		new_bodypart.name = name
 		new_bodypart.desc = desc
 		qdel(src)
+		if(new_bodypart.loc == user)
+			user.put_in_hands(new_bodypart)
 		return ITEM_INTERACT_SUCCESS
 
 ///
@@ -36,11 +38,17 @@
 ///
 // head
 /obj/item/bodypart/head/robot/android
+	burn_modifier = 0.8
+	brute_modifier = 0.8
 	biological_state = (BIO_ROBOTIC|BIO_BLOODED)
 	// var for monitor heads and their emissive states
 	var/monitor_state
 
-/obj/item/bodypart/head/robot/android/get_limb_icon(dropped)
+/obj/item/bodypart/head/robot/android/Initialize(mapload)
+	. = ..()
+	name = "[GLOB.frame_type_names[limb_id]] [parse_zone(body_zone)]"
+
+/obj/item/bodypart/head/robot/android/get_limb_icon(dropped, mob/living/carbon/update_on)
 	. = ..()
 	// emissive handling
 	if(!monitor_state || monitor_state == "none")
@@ -63,7 +71,13 @@
 
 // chest
 /obj/item/bodypart/chest/robot/android
+	burn_modifier = 0.8
+	brute_modifier = 0.8
 	biological_state = (BIO_ROBOTIC|BIO_BLOODED)
+
+/obj/item/bodypart/chest/robot/android/Initialize(mapload)
+	. = ..()
+	name = "[GLOB.frame_type_names[limb_id]] [parse_zone(body_zone)]"
 
 /obj/item/bodypart/chest/robot/android/welder_act_secondary(mob/living/user, obj/item/tool)
 	. = ..()
@@ -78,7 +92,13 @@
 
 // right arm
 /obj/item/bodypart/arm/right/robot/android
+	burn_modifier = 0.8
+	brute_modifier = 0.8
 	biological_state = (BIO_ROBOTIC|BIO_BLOODED)
+
+/obj/item/bodypart/arm/right/robot/android/Initialize(mapload)
+	. = ..()
+	name = "[GLOB.frame_type_names[limb_id]] [parse_zone(body_zone)]"
 
 /obj/item/bodypart/arm/right/robot/android/welder_act_secondary(mob/living/user, obj/item/tool)
 	. = ..()
@@ -90,7 +110,13 @@
 
 // left arm
 /obj/item/bodypart/arm/left/robot/android
+	burn_modifier = 0.8
+	brute_modifier = 0.8
 	biological_state = (BIO_ROBOTIC|BIO_BLOODED)
+
+/obj/item/bodypart/arm/left/robot/android/Initialize(mapload)
+	. = ..()
+	name = "[GLOB.frame_type_names[limb_id]] [parse_zone(body_zone)]"
 
 /obj/item/bodypart/arm/left/robot/android/welder_act_secondary(mob/living/user, obj/item/tool)
 	. = ..()
@@ -102,7 +128,13 @@
 
 // right leg
 /obj/item/bodypart/leg/right/robot/android
+	burn_modifier = 0.8
+	brute_modifier = 0.8
 	biological_state = (BIO_ROBOTIC|BIO_BLOODED)
+
+/obj/item/bodypart/leg/right/robot/android/Initialize(mapload)
+	. = ..()
+	name = "[GLOB.frame_type_names[limb_id]] [parse_zone(body_zone)]"
 
 /obj/item/bodypart/leg/right/robot/android/welder_act_secondary(mob/living/user, obj/item/tool)
 	. = ..()
@@ -114,7 +146,13 @@
 
 // left leg
 /obj/item/bodypart/leg/left/robot/android
+	burn_modifier = 0.8
+	brute_modifier = 0.8
 	biological_state = (BIO_ROBOTIC|BIO_BLOODED)
+
+/obj/item/bodypart/leg/left/robot/android/Initialize(mapload)
+	. = ..()
+	name = "[GLOB.frame_type_names[limb_id]] [parse_zone(body_zone)]"
 
 /obj/item/bodypart/leg/left/robot/android/welder_act_secondary(mob/living/user, obj/item/tool)
 	. = ..()
@@ -827,6 +865,8 @@
 	icon_state = "synth_lizard_r_leg"
 	limb_id = "synth_lizard"
 
+	footstep_type = FOOTSTEP_MOB_CLAW
+
 /obj/item/bodypart/leg/left/robot/android/synth_lizard
 	bodypart_traits = list(TRAIT_HARD_SOLES)
 	bodyshape = BODYSHAPE_HUMANOID | BODYSHAPE_DIGITIGRADE
@@ -836,6 +876,8 @@
 	icon_greyscale = ANDROID_BODYPARTS_DMI
 	icon_state = "synth_lizard_r_leg"
 	limb_id = "synth_lizard"
+
+	footstep_type = FOOTSTEP_MOB_CLAW
 
 ///
 // Human-Like
@@ -882,6 +924,8 @@
 	icon_state = "human_like_r_leg"
 	limb_id = "human_like"
 
+	footstep_type = FOOTSTEP_MOB_BAREFOOT
+
 /obj/item/bodypart/leg/left/robot/android/human_like
 	should_draw_greyscale = TRUE
 	icon_static = ANDROID_BODYPARTS_DMI
@@ -889,6 +933,107 @@
 	icon_greyscale = ANDROID_BODYPARTS_DMI
 	icon_state = "human_like_r_leg"
 	limb_id = "human_like"
+
+	footstep_type = FOOTSTEP_MOB_BAREFOOT
+
+///
+// zhenkov-light
+///
+/obj/item/bodypart/leg/right/robot/android/zhenkov
+	should_draw_greyscale = FALSE
+	icon_static = ANDROID_BODYPARTS_DMI
+	icon = ANDROID_BODYPARTS_DMI
+	icon_greyscale = ANDROID_BODYPARTS_DMI
+	icon_state = "zhenkov_r_leg"
+	limb_id = "zhenkov"
+
+/obj/item/bodypart/leg/left/robot/android/zhenkov
+	should_draw_greyscale = FALSE
+	icon_static = ANDROID_BODYPARTS_DMI
+	icon = ANDROID_BODYPARTS_DMI
+	icon_greyscale = ANDROID_BODYPARTS_DMI
+	icon_state = "zhenkov_r_leg"
+	limb_id = "zhenkov"
+
+///
+// zhenkov-dark
+///
+/obj/item/bodypart/leg/right/robot/android/zhenkovdark
+	should_draw_greyscale = FALSE
+	icon_static = ANDROID_BODYPARTS_DMI
+	icon = ANDROID_BODYPARTS_DMI
+	icon_greyscale = ANDROID_BODYPARTS_DMI
+	icon_state = "zhenkovdark_r_leg"
+	limb_id = "zhenkovdark"
+
+/obj/item/bodypart/leg/left/robot/android/zhenkovdark
+	should_draw_greyscale = FALSE
+	icon_static = ANDROID_BODYPARTS_DMI
+	icon = ANDROID_BODYPARTS_DMI
+	icon_greyscale = ANDROID_BODYPARTS_DMI
+	icon_state = "zhenkovdark_r_leg"
+	limb_id = "zhenkovdark"
+
+///
+// shard alpha raptor legs
+///
+/obj/item/bodypart/leg/right/robot/android/shard_alpha
+	should_draw_greyscale = FALSE
+	icon_static = ANDROID_BODYPARTS_DMI
+	icon = ANDROID_BODYPARTS_DMI
+	icon_greyscale = ANDROID_BODYPARTS_DMI
+	icon_state = "shard_alpha_r_leg"
+	limb_id = "shard_alpha"
+	footstep_type = FOOTSTEP_MOB_CLAW
+	footprint_sprite = FOOTPRINT_SPRITE_CLAWS
+	bodyshape = BODYSHAPE_HUMANOID | BODYSHAPE_DIGITIGRADE
+
+/obj/item/bodypart/leg/left/robot/android/shard_alpha
+	should_draw_greyscale = FALSE
+	icon_static = ANDROID_BODYPARTS_DMI
+	icon = ANDROID_BODYPARTS_DMI
+	icon_greyscale = ANDROID_BODYPARTS_DMI
+	icon_state = "shard_alpha_r_leg"
+	limb_id = "shard_alpha"
+	footstep_type = FOOTSTEP_MOB_CLAW
+	footprint_sprite = FOOTPRINT_SPRITE_CLAWS
+	bodyshape = BODYSHAPE_HUMANOID | BODYSHAPE_DIGITIGRADE
+
+/obj/item/bodypart/head/robot/android/polytronic
+	icon_static = ANDROID_BODYPARTS_DMI
+	icon = ANDROID_BODYPARTS_DMI
+	icon_state = "polytronic_head"
+	limb_id = "polytronic"
+
+/obj/item/bodypart/chest/robot/android/polytronic
+	icon_static = ANDROID_BODYPARTS_DMI
+	icon = ANDROID_BODYPARTS_DMI
+	icon_state = "polytronic_chest"
+	limb_id = "polytronic"
+
+/obj/item/bodypart/arm/right/robot/android/polytronic
+	icon_static = ANDROID_BODYPARTS_DMI
+	icon = ANDROID_BODYPARTS_DMI
+	icon_state = "polytronic_r_arm"
+	limb_id = "polytronic"
+
+/obj/item/bodypart/arm/left/robot/android/polytronic
+	icon_static = ANDROID_BODYPARTS_DMI
+	icon = ANDROID_BODYPARTS_DMI
+	icon_state = "polytronic_l_arm"
+	limb_id = "polytronic"
+
+/obj/item/bodypart/leg/right/robot/android/polytronic
+	icon_static = ANDROID_BODYPARTS_DMI
+	icon = ANDROID_BODYPARTS_DMI
+	icon_state = "polytronic_r_leg"
+	limb_id = "polytronic"
+
+/obj/item/bodypart/leg/left/robot/android/polytronic
+	icon_static = ANDROID_BODYPARTS_DMI
+	icon = ANDROID_BODYPARTS_DMI
+	icon_state = "polytronic_r_leg"
+	limb_id = "polytronic"
 
 #undef HEAD_MONITOR_FACE
 #undef ANDROID_BODYPARTS_DMI
@@ -976,3 +1121,14 @@
 	category = list(
 		RND_CATEGORY_CYBERNETICS + RND_SUBCATEGORY_CYBERNETICS_ADVANCED_LIMBS
 	)
+
+
+///
+// sound overwrites
+///
+
+/obj/item/bodypart/leg/right/robot
+	footstep_type = FOOTSTEP_MOB_SHOE //stop making meat noises. consider custom sounds for this later
+
+/obj/item/bodypart/leg/left/robot
+	footstep_type = FOOTSTEP_MOB_SHOE

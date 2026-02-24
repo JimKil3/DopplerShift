@@ -76,7 +76,7 @@ GLOBAL_VAR_INIT(hhMysteryRoomNumber, rand(1, 999999))
 		to_chat(target, span_warning("You aren't able to activate \the [src] anymore!"))
 
 	// Has the user thrown it away or otherwise disposed of it such that it's no longer in their hands or in some storage connected to them?
-	if(!(get_atom_on_turf(src, /mob) == user))
+	if(get_atom_on_turf(src, /mob) != user)
 		if(user == target)
 			to_chat(user, span_warning("\The [src] is no longer in your possession!"))
 		else
@@ -378,7 +378,7 @@ GLOBAL_VAR_INIT(hhMysteryRoomNumber, rand(1, 999999))
 	desc = "Stop looking through the bluespace peephole."
 	button_icon_state = "cancel_peephole"
 
-/datum/action/peephole_cancel/Trigger(trigger_flags)
+/datum/action/peephole_cancel/Trigger(mob/clicker, trigger_flags)
 	. = ..()
 	to_chat(owner, span_warning("You move away from the peephole."))
 	owner.reset_perspective()
@@ -392,7 +392,7 @@ GLOBAL_VAR_INIT(hhMysteryRoomNumber, rand(1, 999999))
 	icon = 'icons/area/areas_ruins.dmi'
 	icon_state = "hilbertshotel"
 	requires_power = FALSE
-	has_gravity = TRUE
+	default_gravity = STANDARD_GRAVITY
 	area_flags = NOTELEPORT | HIDDEN_AREA
 	static_lighting = TRUE
 	ambientsounds = list('sound/ambience/ruin/servicebell.ogg')
@@ -483,7 +483,7 @@ GLOBAL_VAR_INIT(hhMysteryRoomNumber, rand(1, 999999))
 	icon_state = "hilbertshotel"
 	requires_power = FALSE
 	area_flags = HIDDEN_AREA | NOTELEPORT | UNIQUE_AREA
-	has_gravity = TRUE
+	default_gravity = STANDARD_GRAVITY
 
 /obj/item/abstracthotelstorage
 	anchored = TRUE
@@ -525,25 +525,25 @@ GLOBAL_VAR_INIT(hhMysteryRoomNumber, rand(1, 999999))
 	worn_icon_state = "analyzer"
 
 /obj/item/analyzer/hilbertsanalyzer/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
-	if(istype(interacting_with, /obj/item/hilbertshotel))
-		if(!Adjacent(interacting_with))
-			to_chat(user, span_warning("It's to far away to scan!"))
-			return ITEM_INTERACT_BLOCKING
-		var/obj/item/hilbertshotel/sphere = interacting_with
-		if(sphere.activeRooms.len)
-			to_chat(user, "Currently Occupied Rooms:")
-			for(var/roomnumber in sphere.activeRooms)
-				to_chat(user, roomnumber)
-		else
-			to_chat(user, "No currenty occupied rooms.")
-		if(sphere.storedRooms.len)
-			to_chat(user, "Vacated Rooms:")
-			for(var/roomnumber in sphere.storedRooms)
-				to_chat(user, roomnumber)
-		else
-			to_chat(user, "No vacated rooms.")
-		return ITEM_INTERACT_SUCCESS
-	return ..()
+	if(!istype(interacting_with, /obj/item/hilbertshotel))
+		return ..()
+	if(!user.CanReach(interacting_with))
+		to_chat(user, span_warning("It's to far away to scan!"))
+		return ITEM_INTERACT_BLOCKING
+	var/obj/item/hilbertshotel/sphere = interacting_with
+	if(sphere.activeRooms.len)
+		to_chat(user, "Currently Occupied Rooms:")
+		for(var/roomnumber in sphere.activeRooms)
+			to_chat(user, roomnumber)
+	else
+		to_chat(user, "No currenty occupied rooms.")
+	if(sphere.storedRooms.len)
+		to_chat(user, "Vacated Rooms:")
+		for(var/roomnumber in sphere.storedRooms)
+			to_chat(user, roomnumber)
+	else
+		to_chat(user, "No vacated rooms.")
+	return ITEM_INTERACT_SUCCESS
 
 /obj/effect/landmark/transport/transport_id/hilbert
 	specific_transport_id = HILBERT_LINE_1

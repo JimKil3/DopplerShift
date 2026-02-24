@@ -1,12 +1,13 @@
 /mob/living/simple_animal/hostile/megafauna
 	name = "boss of this gym"
 	desc = "Attack the weak point for massive damage."
+	abstract_type = /mob/living/simple_animal/hostile/megafauna
 	health = 1000
 	maxHealth = 1000
 	combat_mode = TRUE
 	sentience_type = SENTIENCE_BOSS
 	environment_smash = ENVIRONMENT_SMASH_RWALLS
-	mob_biotypes = MOB_ORGANIC|MOB_SPECIAL
+	mob_biotypes = MOB_ORGANIC|MOB_SPECIAL|MOB_MINING
 	obj_damage = 400
 	light_range = 3
 	faction = list(FACTION_MINING, FACTION_BOSS)
@@ -56,9 +57,18 @@
 	var/list/attack_action_types = list()
 	/// Summoning line, said when summoned via megafauna vents.
 	var/summon_line = "I'll kick your ass!"
+	///any delay before we start attacking something near us
+	var/attack_delay = 0.25 SECONDS
 
 /mob/living/simple_animal/hostile/megafauna/Initialize(mapload)
 	. = ..()
+
+	AddComponent(\
+		/datum/component/basic_mob_attack_telegraph,\
+		display_telegraph_overlay = FALSE,\
+		telegraph_duration = attack_delay,\
+	)
+
 	AddComponent(/datum/component/seethrough_mob)
 	AddElement(/datum/element/simple_flying)
 	if(gps_name && true_spawn)
@@ -122,7 +132,7 @@
 	if(recovery_time >= world.time)
 		return
 	. = ..()
-	if(!.)
+	if(target && !CanAttack(target))
 		LoseTarget()
 		return
 	if(!isliving(target))
@@ -158,8 +168,6 @@
 		span_danger("[src] disembowels [L]!"),
 		span_userdanger("You feast on [L]'s organs, restoring your health!"))
 
-
-
 /mob/living/simple_animal/hostile/megafauna/CanAttack(atom/the_target)
 	. = ..()
 	if (!.)
@@ -168,7 +176,6 @@
 		return TRUE
 	var/mob/living/living_target = the_target
 	return !living_target.has_status_effect(/datum/status_effect/gutted)
-
 
 /mob/living/simple_animal/hostile/megafauna/ex_act(severity, target)
 	switch (severity)

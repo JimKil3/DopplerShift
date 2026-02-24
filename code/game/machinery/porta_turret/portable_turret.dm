@@ -324,55 +324,61 @@ DEFINE_BITFIELD(turret_flags, list(
 	balloon_alert(user, "saved to multitool buffer")
 	return ITEM_INTERACT_SUCCESS
 
-/obj/machinery/porta_turret/attackby(obj/item/I, mob/user, params)
-	if(machine_stat & BROKEN)
-		if(I.tool_behaviour == TOOL_CROWBAR)
-			//If the turret is destroyed, you can remove it with a crowbar to
-			//try and salvage its components
-			to_chat(user, span_notice("You begin prying the metal coverings off..."))
-			if(I.use_tool(src, user, 20))
-				if(prob(70))
-					if(stored_gun)
-						stored_gun.forceMove(loc)
-						stored_gun = null
-					to_chat(user, span_notice("You remove the turret and salvage some components."))
-					if(prob(50))
-						new /obj/item/stack/sheet/iron(loc, rand(1,4))
-					if(prob(50))
-						new /obj/item/assembly/prox_sensor(loc)
-				else
-					to_chat(user, span_notice("You remove the turret but did not manage to salvage anything."))
-				qdel(src)
+/obj/machinery/porta_turret/crowbar_act(mob/living/user, obj/item/tool)
+	if(!(machine_stat & BROKEN))
+		return NONE
 
-	else if((I.tool_behaviour == TOOL_WRENCH) && (!on))
-		if(raised)
-			return
-
-		//This code handles moving the turret around. After all, it's a portable turret!
-		if(!anchored && !isinspace())
-			set_anchored(TRUE)
-			RemoveInvisibility(id=type)
-			update_appearance()
-			to_chat(user, span_notice("You secure the exterior bolts on the turret."))
-			if(has_cover)
-				cover = new /obj/machinery/porta_turret_cover(loc) //create a new turret. While this is handled in process(), this is to workaround a bug where the turret becomes invisible for a split second
-				cover.parent_turret = src //make the cover's parent src
-		else if(anchored)
-			set_anchored(FALSE)
-			to_chat(user, span_notice("You unsecure the exterior bolts on the turret."))
-			power_change()
-			SetInvisibility(INVISIBILITY_NONE, id=type)
-			qdel(cover) //deletes the cover, and the turret instance itself becomes its own cover.
-
-	else if(I.GetID())
-		//Behavior lock/unlock mangement
-		if(allowed(user))
-			locked = !locked
-			to_chat(user, span_notice("Controls are now [locked ? "locked" : "unlocked"]."))
-		else
-			to_chat(user, span_alert("Access denied."))
+	//If the turret is destroyed, you can remove it with a crowbar to
+	//try and salvage its components
+	to_chat(user, span_notice("You begin prying the metal coverings off..."))
+	if(!tool.use_tool(src, user, 20))
+		return ITEM_INTERACT_BLOCKING
+	if(prob(70))
+		if(stored_gun)
+			stored_gun.forceMove(loc)
+			stored_gun = null
+		to_chat(user, span_notice("You remove the turret and salvage some components."))
+		if(prob(50))
+			new /obj/item/stack/sheet/iron(loc, rand(1,4))
+		if(prob(50))
+			new /obj/item/assembly/prox_sensor(loc)
 	else
-		return ..()
+		to_chat(user, span_notice("You remove the turret but did not manage to salvage anything."))
+	qdel(src)
+	return ITEM_INTERACT_SUCCESS
+
+/obj/machinery/porta_turret/wrench_act(mob/living/user, obj/item/tool)
+	if(on || raised)
+		return NONE
+
+	//This code handles moving the turret around. After all, it's a portable turret!
+	if(!anchored && !isinspace())
+		set_anchored(TRUE)
+		RemoveInvisibility(id=type)
+		update_appearance()
+		to_chat(user, span_notice("You secure the exterior bolts on the turret."))
+		if(has_cover)
+			cover = new /obj/machinery/porta_turret_cover(loc) //create a new turret. While this is handled in process(), this is to workaround a bug where the turret becomes invisible for a split second
+			cover.parent_turret = src //make the cover's parent src
+	else if(anchored)
+		set_anchored(FALSE)
+		to_chat(user, span_notice("You unsecure the exterior bolts on the turret."))
+		power_change()
+		SetInvisibility(INVISIBILITY_NONE, id=type)
+		qdel(cover) //deletes the cover, and the turret instance itself becomes its own cover.
+	return ITEM_INTERACT_SUCCESS
+
+/obj/machinery/porta_turret/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+	if(!tool.GetID())
+		return NONE
+
+	//Behavior lock/unlock mangement
+	if(!allowed(user))
+		to_chat(user, span_alert("Access denied."))
+		return ITEM_INTERACT_BLOCKING
+	locked = !locked
+	to_chat(user, span_notice("Controls are now [locked ? "locked" : "unlocked"]."))
+	return ITEM_INTERACT_SUCCESS
 
 /obj/machinery/porta_turret/emag_act(mob/user, obj/item/card/emag/emag_card)
 	if(obj_flags & EMAGGED)
@@ -483,13 +489,17 @@ DEFINE_BITFIELD(turret_flags, list(
 
 		else if(iscarbon(A))
 			var/mob/living/carbon/C = A
-			//If not emagged, only target carbons that can use items
-			if(mode != TURRET_LETHAL && (C.stat || C.handcuffed || !(C.mobility_flags & MOBILITY_USE)))
-				continue
-
-			//If emagged, target all but dead carbons
-			if(mode == TURRET_LETHAL && C.stat == DEAD)
-				continue
+			switch(mode)
+				//If not emagged, only target carbons that can use items
+				if(TURRET_STUN)
+					if(!(C.mobility_flags & MOBILITY_USE))
+						continue
+					if(HAS_TRAIT(C, TRAIT_INCAPACITATED))
+						continue
+				//If emagged, target all but dead carbons
+				if(TURRET_LETHAL)
+					if(C.stat == DEAD)
+						continue
 
 			//if the target is a human and not in our faction, analyze threat level
 			if(ishuman(C) && !in_faction(C))
@@ -655,7 +665,7 @@ DEFINE_BITFIELD(turret_flags, list(
 
 
 	//Shooting Code:
-	A.preparePixelProjectile(target, T)
+	A.aim_projectile(target, T)
 	A.firer = src
 	A.fired_from = src
 	if(ignore_faction)
@@ -677,7 +687,7 @@ DEFINE_BITFIELD(turret_flags, list(
 	button_icon = 'icons/mob/actions/actions_mecha.dmi'
 	button_icon_state = "mech_cycle_equip_off"
 
-/datum/action/turret_toggle/Trigger(trigger_flags)
+/datum/action/turret_toggle/Trigger(mob/clicker, trigger_flags)
 	var/obj/machinery/porta_turret/P = target
 	if(!istype(P))
 		return
@@ -688,7 +698,7 @@ DEFINE_BITFIELD(turret_flags, list(
 	button_icon = 'icons/mob/actions/actions_mecha.dmi'
 	button_icon_state = "mech_eject"
 
-/datum/action/turret_quit/Trigger(trigger_flags)
+/datum/action/turret_quit/Trigger(mob/clicker, trigger_flags)
 	var/obj/machinery/porta_turret/P = target
 	if(!istype(P))
 		return
@@ -726,13 +736,13 @@ DEFINE_BITFIELD(turret_flags, list(
 	remote_controller = null
 	return TRUE
 
-/obj/machinery/porta_turret/proc/InterceptClickOn(mob/living/caller, params, atom/A)
+/obj/machinery/porta_turret/proc/InterceptClickOn(mob/living/clicker, params, atom/A)
 	if(!manual_control)
 		return FALSE
-	if(!can_interact(caller))
+	if(!can_interact(clicker))
 		remove_control()
 		return FALSE
-	log_combat(caller,A,"fired with manual turret control at")
+	log_combat(clicker, A, "fired with manual turret control at")
 	target(A)
 	return TRUE
 
@@ -758,6 +768,7 @@ DEFINE_BITFIELD(turret_flags, list(
 /obj/machinery/porta_turret/syndicate/Initialize(mapload)
 	. = ..()
 	AddElement(/datum/element/empprotection, EMP_PROTECT_SELF | EMP_PROTECT_WIRES)
+	AddElement(/datum/element/nav_computer_icon, 'icons/effects/nav_computer_indicators.dmi', "turret", FALSE)
 
 /obj/machinery/porta_turret/syndicate/setup()
 	return
@@ -774,6 +785,11 @@ DEFINE_BITFIELD(turret_flags, list(
 	lethal_projectile_sound = 'sound/items/weapons/laser.ogg'
 	desc = "An energy blaster auto-turret."
 	armor_type = /datum/armor/syndicate_turret
+
+/obj/machinery/porta_turret/syndicate/energy/ruin/assess_perp(mob/living/carbon/human/perp)
+	if (!check_access(perp.wear_id?.GetID()))
+		return 10
+	return 0
 
 /datum/armor/syndicate_turret
 	melee = 40
@@ -840,6 +856,7 @@ DEFINE_BITFIELD(turret_flags, list(
 		return TRUE
 
 /obj/machinery/porta_turret/ai
+	scan_range = /obj/projectile/energy/electrode/ai_turrets::range + 1
 	turret_flags = TURRET_FLAG_SHOOT_CRIMINALS | TURRET_FLAG_SHOOT_ANOMALOUS | TURRET_FLAG_SHOOT_HEADS
 
 /obj/machinery/porta_turret/ai/assess_perp(mob/living/carbon/human/perp)
@@ -985,7 +1002,7 @@ DEFINE_BITFIELD(turret_flags, list(
 		to_chat(user, span_notice("You link \the [multi_tool.buffer] with \the [src]."))
 		return ITEM_INTERACT_SUCCESS
 
-/obj/machinery/turretid/attackby(obj/item/attacking_item, mob/user, params)
+/obj/machinery/turretid/attackby(obj/item/attacking_item, mob/user, list/modifiers, list/attack_modifiers)
 	if(machine_stat & BROKEN)
 		return
 

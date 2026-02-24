@@ -7,9 +7,21 @@
 
 /datum/loadout_item/neck
 	abstract_type = /datum/loadout_item/neck
-
+/* DOPPLER EDIT START: ORIGINAL:
 /datum/loadout_item/neck/insert_path_into_outfit(datum/outfit/outfit, mob/living/carbon/human/equipper, visuals_only = FALSE)
 	outfit.neck = item_path
+*/
+
+/datum/loadout_item/neck/insert_path_into_outfit(datum/outfit/outfit, mob/living/carbon/human/equipper, visuals_only = FALSE, override_items = LOADOUT_OVERRIDE_BACKPACK)
+	if(override_items == LOADOUT_OVERRIDE_BACKPACK && !visuals_only)
+		if(outfit.neck)
+			LAZYADD(outfit.backpack_contents, outfit.neck)
+		outfit.neck = item_path
+	else
+		outfit.neck = item_path
+// DOPPLER EDIT END
+
+/* // DOPPLER EDIT REMOVAL START - Custom Loadout Organization
 
 /datum/loadout_item/neck/scarf_greyscale
 	name = "Scarf (Colorable)"
@@ -34,3 +46,9 @@
 /datum/loadout_item/neck/necktie_loose
 	name = "Necktie (Loose)"
 	item_path = /obj/item/clothing/neck/tie/detective
+
+/datum/loadout_item/neck/bowtie
+	name = "Bowtie"
+	item_path = /obj/item/clothing/neck/bowtie
+
+*/ // DOPPLER EDIT REMOVAL END

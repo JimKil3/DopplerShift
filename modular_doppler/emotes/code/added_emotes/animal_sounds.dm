@@ -52,6 +52,15 @@
 	else
 		return 'sound/mobs/non-humanoids/insect/chitter.ogg'
 
+/datum/emote/living/moth_chitter
+	key = "mchitter"
+	key_third_person = "chitters"
+	message = "chitters!"
+	emote_type = EMOTE_AUDIBLE
+	mob_type_allowed_typecache = list(/mob/living/carbon, /mob/living/silicon/pai)
+	vary = TRUE
+	sound = 'modular_doppler/emotes/sound/mothchitter.ogg'
+
 /datum/emote/living/flutter
 	key = "flutter"
 	key_third_person = "rapidly flutters their wings!"
@@ -295,3 +304,20 @@
 	cant_muffle = TRUE
 	vary = TRUE
 	sound = 'sound/effects/glass/glassbash.ogg'
+
+/datum/emote/living/click
+	key = "click"
+	key_third_person = "clicks"
+	message = "clicks."
+	emote_type = EMOTE_AUDIBLE
+	cant_muffle = TRUE
+	vary = TRUE
+	sound = 'sound/mobs/non-humanoids/crab/claw_click.ogg'
+
+/datum/emote/living/vines
+	key = "vine"
+	message = "writhes!"
+	emote_type = EMOTE_AUDIBLE
+	cant_muffle = TRUE
+	vary = TRUE
+	sound = 'sound/mobs/non-humanoids/venus_trap/venus_trap_death.ogg'

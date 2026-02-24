@@ -135,6 +135,18 @@
 ///Checks if the targeted portal was created by us, then causes it to expire, removing it
 /obj/item/hand_tele/proc/try_dispel_portal(atom/target, mob/user)
 	if(is_parent_of_portal(target))
+		// DOPPLER EDIT START - delay to the hand-tele
+		if(DOING_INTERACTION_WITH_TARGET(user, src))
+			balloon_alert(user, "busy!")
+			return
+		balloon_alert_to_viewers("closing portal")
+		playsound(src, 'sound/machines/gateway/gateway_calibrated.ogg', 10)
+		if(!do_after(user, 2 SECONDS, target, interaction_key = src))
+			return
+		if(QDELETED(target))
+			return FALSE
+		playsound(src, 'sound/machines/gateway/gateway_close.ogg', 10)
+		// DOPPLER EDIT END
 		to_chat(user, span_notice("You dispel [target] with [src]!"))
 		var/obj/effect/portal/portal = target
 		portal.expire()
@@ -176,10 +188,19 @@
 		if(!target)
 			computer.target_ref = null
 			continue
-		var/area/computer_area = get_area(target)
-		if(!computer_area || (computer_area.area_flags & NOTELEPORT))
+		if(!check_teleport_valid(user, get_turf(computer), TELEPORT_CHANNEL_BLUESPACE))
 			continue
-		if(computer.power_station?.teleporter_hub && computer.power_station.engaged)
+
+		if(!computer.power_station || !computer.power_station.teleporter_hub)
+			continue
+
+		if((computer.power_station.machine_stat & (NOPOWER|BROKEN|MAINT)) || computer.power_station.panel_open)
+			continue
+
+		if((computer.power_station.teleporter_hub.machine_stat & (NOPOWER|BROKEN|MAINT)) || computer.power_station.teleporter_hub.panel_open)
+			continue
+
+		if(computer.power_station.engaged)
 			locations["[get_area(target)] (Active)"] = computer
 		else
 			locations["[get_area(target)] (Inactive)"] = computer
@@ -216,6 +237,17 @@
 		user.show_message(span_notice("[src] is recharging!"))
 		return
 
+	// DOPPLER EDIT START - delay to the hand-tele
+	if(DOING_INTERACTION_WITH_TARGET(user, src))
+		balloon_alert(user, "busy!")
+		return
+	balloon_alert_to_viewers("opening portal")
+	playsound(src, 'sound/machines/gateway/gateway_calibrating.ogg', 10)
+	if(!do_after(user, 2 SECONDS, interaction_key = src))
+		return
+	playsound(src, 'sound/machines/gateway/gateway_open.ogg', 10)
+	// DOPPLER EDIT END
+
 	var/atom/teleport_target
 
 	if (teleport_location == PORTAL_LOCATION_DANGEROUS)
@@ -225,8 +257,7 @@
 				continue //putting them at the edge is dumb
 			if(dangerous_turf.y > world.maxy - PORTAL_DANGEROUS_EDGE_LIMIT || dangerous_turf.y < PORTAL_DANGEROUS_EDGE_LIMIT)
 				continue
-			var/area/dangerous_area = dangerous_turf.loc
-			if(dangerous_area.area_flags & NOTELEPORT)
+			if(!check_teleport_valid(src, dangerous_turf))
 				continue
 			dangerous_turfs += dangerous_turf
 
@@ -242,8 +273,7 @@
 		to_chat(user, span_notice("[src] vibrates, then stops. Maybe you should try something else."))
 		return
 
-	var/area/teleport_area = get_area(teleport_target)
-	if (teleport_area.area_flags & NOTELEPORT)
+	if(!check_teleport_valid(src, teleport_target))
 		to_chat(user, span_notice("[src] is malfunctioning."))
 		return
 
@@ -278,8 +308,7 @@
 ///Is, for some reason, separate from the teleport target's check in try_create_portal_to()
 /obj/item/hand_tele/proc/can_teleport_notifies(mob/user)
 	var/turf/current_location = get_turf(user)
-	var/area/current_area = current_location.loc
-	if (!current_location || (current_area.area_flags & NOTELEPORT) || is_away_level(current_location.z) || !isturf(user.loc))
+	if (!current_location || !check_teleport_valid(src, current_location) || is_away_level(current_location.z) || !isturf(user.loc))
 		to_chat(user, span_notice("[src] is malfunctioning."))
 		return FALSE
 
@@ -445,10 +474,9 @@
 		playsound(destination, SFX_PORTAL_ENTER, 50, 1, SHORT_RANGE_SOUND_EXTRARANGE)
 
 /obj/item/syndicate_teleporter/proc/malfunctioning(mob/guy_teleporting, turf/current_location)
-	var/area/current_area = get_area(current_location)
 	if(!current_location)
 		return TRUE
-	if(current_area.area_flags & NOTELEPORT)
+	if(!check_teleport_valid(src, current_location))
 		return TRUE
 	if(is_away_level(current_location.z))
 		return TRUE
@@ -514,7 +542,7 @@
 
 ///Bleed and make blood splatters at tele start and end points
 /obj/item/syndicate_teleporter/proc/make_bloods(turf/old_location, turf/new_location, mob/living/user)
-	if(HAS_TRAIT(user, TRAIT_NOBLOOD))
+	if(!user.can_bleed(BLOOD_COVER_TURFS) != BLEED_SPLATTER)
 		return FALSE
 	user.add_splatter_floor(old_location)
 	user.add_splatter_floor(new_location)
@@ -565,13 +593,6 @@
 		<br>
 		Final word of caution: the technology involved is experimental in nature. Although many years of research have allowed us to prevent leaving your organs behind, it simply cannot account for all of the liquid in your body.
 		"}
-
-/obj/item/storage/box/syndie_kit/syndicate_teleporter
-	name = "syndicate teleporter kit"
-
-/obj/item/storage/box/syndie_kit/syndicate_teleporter/PopulateContents()
-	new /obj/item/syndicate_teleporter(src)
-	new /obj/item/paper/syndicate_teleporter(src)
 
 /obj/effect/temp_visual/teleport_abductor/syndi_teleporter
 	duration = 5

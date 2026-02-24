@@ -6,6 +6,7 @@ export type Channel =
   | 'Whis'
   | 'LOOC'
   | 'Do'
+  | 'IRC'
   // DOPPLER EDIT ADDITION END
   | 'OOC'
   | 'Admin';
@@ -26,6 +27,7 @@ export class ChannelIterator {
     'Whis',
     'LOOC',
     'Do',
+    'IRC',
     // DOPPLER EDIT ADDITION
     'OOC',
     'Admin',
@@ -39,7 +41,7 @@ export class ChannelIterator {
     }
 
     for (let index = 1; index <= this.channels.length; index++) {
-      let nextIndex = (this.index + index) % this.channels.length;
+      const nextIndex = (this.index + index) % this.channels.length;
       if (!this.blacklist.includes(this.channels[nextIndex])) {
         this.index = nextIndex;
         break;
