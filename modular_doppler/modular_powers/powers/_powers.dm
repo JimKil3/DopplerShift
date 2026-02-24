@@ -1,6 +1,32 @@
 /mob/living
 	var/list/all_powers = list()
 
+ADMIN_VERB(give_resonant_ability, R_FUN, "Grant Resonant Ability", ADMIN_VERB_NO_DESCRIPTION, ADMIN_CATEGORY_HIDDEN, mob/living/resonant_recipient)
+	var/which = tgui_alert(user, "Chose by name or by type path?", "Chose option", list("Name", "Typepath"))
+	if(!which)
+		return
+	if(QDELETED(resonant_recipient))
+		to_chat(user, span_warning("The intended ability recipient no longer exists."))
+		return
+
+	var/list/power_list = list()
+	for(var/datum/power/to_add as anything in subtypesof(/datum/power))
+		var/power_name = initial(to_add.name)
+
+		if(which == "Name")
+			power_list[power_name] = to_add
+		else
+			power_list += to_add
+
+	var/chosen_power = tgui_input_list(user, "Choose the ability to give to [resonant_recipient]", "ABRAKADABRA", sort_list(power_list))
+
+	if(resonant_recipient.has_powerz(chosen_power))
+		to_chat(user, span_warning("The recipient already has this power!"))
+		return
+
+	var/datum/power/granted_power = new chosen_power()
+	granted_power.apply_to_human(resonant_recipient)
+
 /**
  * Power Handler
  *

@@ -1350,6 +1350,7 @@
 	VV_DROPDOWN_OPTION(VV_HK_REMOVE_SPELL, "Remove Spell")
 	VV_DROPDOWN_OPTION(VV_HK_GIVE_SPELL, "Give Spell")
 	VV_DROPDOWN_OPTION(VV_HK_REMOVE_SPELL, "Remove Spell")
+	VV_DROPDOWN_OPTION(VV_HK_GIVE_RESONANT, "Give Resonant Ability") // Doppler edit
 	VV_DROPDOWN_OPTION(VV_HK_GIVE_MOB_ACTION, "Give Mob Ability")
 	VV_DROPDOWN_OPTION(VV_HK_REMOVE_MOB_ACTION, "Remove Mob Ability")
 	VV_DROPDOWN_OPTION(VV_HK_GIVE_DISEASE, "Give Disease")
@@ -1403,6 +1404,9 @@
 
 	if(href_list[VV_HK_REMOVE_SPELL])
 		return SSadmin_verbs.dynamic_invoke_verb(usr, /datum/admin_verb/remove_spell, src)
+
+	if(href_list[VV_HK_GIVE_RESONANT]) // Doppler edit
+		return SSadmin_verbs.dynamic_invoke_verb(usr, /datum/admin_verb/give_resonant_ability, src) // Doppler edit
 
 	if(href_list[VV_HK_GIVE_DISEASE])
 		return SSadmin_verbs.dynamic_invoke_verb(usr, /datum/admin_verb/give_disease, src)

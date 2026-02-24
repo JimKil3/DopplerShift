@@ -34,7 +34,7 @@
 				to_chat(owner, span_warning("You try to call forth arcane fire without somatic components, but fail."))
 				return
 
-			owner.visible_message(span_notice("[owner]'[owner.p_s()] fingers ignite with arcane fire."))
+			owner.visible_message(span_notice("[owner] snaps [owner.p_their()] fingers, arcane fire sparking to life over [owner.p_their()] hand."), span_notice("You snap your fingers and summon arcane fire to your hand."))
 
 		if("Cleansing Wave")
 			var/obj/item/to_clean = owner.get_active_held_item() || owner.get_inactive_held_item()
@@ -58,7 +58,7 @@
 				to_chat(owner, span_warning("You try to call forth arcane fire without somatic components, but fail."))
 				return
 
-			owner.visible_message(span_notice("[owner]'[owner.p_s()] fingers ignite with arcane fire."))
+			owner.visible_message(span_notice("[owner] snaps [owner.p_their()] fingers, arcane fire sparking to life over [owner.p_their()] hand."), span_notice("You snap your fingers and summon arcane fire to your hand."))
 
 /obj/item/arcane_fire
 	name = "Arcane Fire"
@@ -70,16 +70,21 @@
 	light_power = 1.3
 	light_color = LIGHT_COLOR_PURPLE
 
-/obj/item/arcane_fire/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
-	if(interacting_with.loc == user || user.Adjacent(interacting_with))
-		return ITEM_INTERACT_SUCCESS
-	else
-		var/obj/effect/particle_effect/sparks/spark = new /obj/effect/particle_effect/sparks
-		GLOB.move_manager.move_towards(spark, interacting_with, timeout = 5)
+/obj/item/arcane_fire/dropped(mob/user, silent)
+	if(!silent)
+		user.visible_message(span_notice("[user]'[user.p_s()] arcane flame gutters out."), span_notice("You cut the flow of Resonance to the flame."))
+	return ..()
+
+/obj/item/arcane_fire/ranged_interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	var/obj/effect/particle_effect/sparks/spark = new /obj/effect/particle_effect/sparks(user.loc)
+	GLOB.move_manager.move_towards(spark, interacting_with, timeout = 5)
+	user.visible_message(span_warning("[user] waves [user.p_their()] hand, arcane flame leaping out in a wave of sparks!"))
+	qdel(src)
+	return ITEM_INTERACT_SUCCESS
 
 
 /obj/item/arcane_fire/ignition_effect(atom/A, mob/user)
-	return "[user]'[user.p_s()] conjured flame flares up as [user.p_they()] bring[user.p_s()] it close to [A], igniting it."
+	return span_notice("[user]'[user.p_s()] conjured flame flares up as [user.p_they()] bring[user.p_s()] it close to [A], igniting it.")
 
 // Resonant
 
