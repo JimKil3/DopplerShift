@@ -19,12 +19,13 @@ ADMIN_VERB(give_resonant_ability, R_FUN, "Grant Resonant Ability", ADMIN_VERB_NO
 			power_list += to_add
 
 	var/chosen_power = tgui_input_list(user, "Choose the ability to give to [resonant_recipient]", "ABRAKADABRA", sort_list(power_list))
+	var/chosen_path = which == "Typepath" ? chosen_power : power_list[chosen_power]
 
-	if(resonant_recipient.has_powerz(chosen_power))
+	if(resonant_recipient.has_powerz(chosen_path))
 		to_chat(user, span_warning("The recipient already has this power!"))
 		return
 
-	var/datum/power/granted_power = new chosen_power()
+	var/datum/power/granted_power = new chosen_path()
 	granted_power.apply_to_human(resonant_recipient)
 
 /**
@@ -193,3 +194,10 @@ GLOBAL_DATUM_INIT(power_handler, /datum/power_handler, new)
 		to_chat(target, chat_string)
 
 	where_items_spawned = null
+
+/datum/status_effect/anchored
+	id = "anchor"
+	duration = 4 SECONDS
+	tick_interval = STATUS_EFFECT_NO_TICK //Placeholder; this will be how ontological anchors harm abberants
+	status_type = STATUS_EFFECT_REFRESH
+	alert_type = null //Placeholder. This should 100% have feedback

@@ -17,14 +17,19 @@
 
 	//todo: icon
 
-	cooldown_time = 5 SECONDS
+	cooldown_time = 10 SECONDS
 
 /datum/action/cooldown/prestidigitation/Activate()
 	. = ..()
+
+	if(owner.has_status_effect(/datum/status_effect/anchored))
+		to_chat(owner, span_warning("Something is preventing you from manipulating Resonance!"))
+		return
+
 	var/choices = list(
-		"Arcane Fire" = image(icon = 'icons/hud/radial.dmi', icon_state = "radial_attack"),
+		"Arcane Fire" = image(icon = 'icons/hud/radial.dmi', icon_state = "radial_charge"),
 		"Cleansing Wave" = image(icon = 'icons/obj/watercloset.dmi', icon_state = "soap"),
-		"Disrupt Light" = image(icon = 'icons/obj/lighting.dmi', icon_state = "lbulb")
+		"Disrupt Lights" = image(icon = 'icons/obj/lighting.dmi', icon_state = "lbulb")
 	)
 	var/selection = show_radial_menu(owner, owner, choices)
 	switch(selection)
@@ -51,14 +56,16 @@
 			to_clean.wash(CLEAN_WASH)
 			owner.visible_message(span_notice("Grime flakes off of [to_clean] as [owner] channels cleaning energy through it."), span_notice("You channel cleansing energy into [to_clean]."))
 
-		if("Disrupt Light")
-			//placeholder
-			var/obj/item/arcane_fire/fire = new /obj/item/arcane_fire
-			if(!owner.put_in_hands(fire, TRUE))
-				to_chat(owner, span_warning("You try to call forth arcane fire without somatic components, but fail."))
+		if("Disrupt Lights")
+			if(!do_after(owner, 4 SECONDS))
+				to_chat(owner, span_warning("You lose focus on the disruptive incantation."))
 				return
 
-			owner.visible_message(span_notice("[owner] snaps [owner.p_their()] fingers, arcane fire sparking to life over [owner.p_their()] hand."), span_notice("You snap your fingers and summon arcane fire to your hand."))
+			owner.visible_message(span_warning("[owner] claps their hands together, the noise echoing strangely!"), span_notice("You charge your hands with Resonant energies and clap."))
+
+			for(var/obj/machinery/light/light in view(3, owner))
+				light.flicker()
+
 
 /obj/item/arcane_fire
 	name = "Arcane Fire"
@@ -89,34 +96,68 @@
 // Resonant
 
 /datum/power/meditate
-	name = "Meditate"
-	desc = "ooughhh im meditating"
+	name = "Meditation"
+	desc = "A mental exercise commonly used by Resonant individuals to center themselves and clear both their bodies and minds."
 	is_accessible = FALSE
-	power_type = TRAIT_PATH_SUBTYPE_PSYKER
+	power_type = TRAIT_PATH_RESONANT
 
 /datum/power/meditate/add(mob/living/carbon/human/target)
-	var/datum/action/new_action = new /datum/action/cooldown/spell/meditate(target.mind || target)
+	var/datum/action/new_action = new /datum/action/cooldown/meditate(target.mind || target)
 	new_action.Grant(target)
 
-/datum/action/cooldown/spell/meditate
+/datum/action/cooldown/meditate
 	name = "Meditate"
-	desc = "This state of internal focus allows them to replenish any reserves they have and purge any impurities dredged up by abusing Nature's law."
-	button_icon_state = "nose"
+	desc = "Enter a meditative state, clearing your mind and purging any impurities dredged up by your Resonant nature."
 
-	school = SCHOOL_CONJURATION
-	cooldown_time = 12 SECONDS
-	cooldown_reduction_per_rank = 2.5 SECONDS
-	spell_requirements = NONE
+	//todo: icon
 
-	invocation_type = INVOCATION_EMOTE
+	cooldown_time = 30 SECONDS
 
-	invocation = "Someone starts meditating."
-	invocation_self_message = "You start meditating"
+/datum/action/cooldown/meditate/Activate()
+	. = ..()
+
+	owner.visible_message(span_notice("[owner] sits down and closes [owner.p_their()] eyes."), span_notice("You sit and turn your attention inwards."))
+
+	while(TRUE)
+		var/mob/living/living_owner = owner
+		if(!istype(living_owner)) //I don't think this can happen but whatever
+			return
+
+		if(owner.has_status_effect(/datum/status_effect/anchored))
+			to_chat(owner, span_warning("You cannot meditate under these oppressive conditions!"))
+			living_owner.cure_blind(MEDITATION)
+			break
+
+		if(!do_after(owner, 6 SECONDS, owner))
+			to_chat(owner, span_warning("You lose focus and break out of the meditative state."))
+			living_owner.cure_blind(MEDITATION)
+			break
+
+		if(!living_owner.is_blind_from(MEDITATION))
+			living_owner.become_blind(MEDITATION)
+
+		//esper / cultivator code goes here
+
+		var/negative_event_categories = list()
+		for(var/category in living_owner.mob_mood.mood_events)
+			var/datum/mood_event/event = living_owner.mob_mood.mood_events[category]
+			if(event.mood_change < 0)
+				negative_event_categories += category
+
+		if(length(negative_event_categories))
+			var/to_remove = pick(negative_event_categories)
+			to_chat(owner, span_nicegreen("Your mind feels lighter."))
+			living_owner.mob_mood.clear_mood_event(to_remove)
 
 // Mortal
 
 /datum/power/tenacious
 	name = "Tenacious"
-	desc = "Try to remember some of the basics of CQC."
+	desc = "Without the crutch of Resonance, mundane individuals are forced to persevere."
 	is_accessible = FALSE
+	power_type = TRAIT_PATH_MORTAL
 	power_traits = list(TRAIT_POWER_TENACIOUS)
+
+/datum/movespeed_modifier/tenacious_carbon_softcrit
+	multiplicative_slowdown = 1.5
+	flags = IGNORE_NOSLOW

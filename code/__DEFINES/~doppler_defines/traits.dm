@@ -79,6 +79,10 @@
 // Powers
 ////
 
+// Resonance-related trait sources
+#define MEDITATION "meditation"
+
+// Generic / roots
 #define TRAIT_POWER "power_trait"
 
 #define TRAIT_PATH_SORCEROUS "path_sorcerous"

@@ -2863,11 +2863,17 @@
 
 /datum/reagent/determination/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
 	. = ..()
+
+	// Doppler edit - Tenacious ability
+	if(HAS_TRAIT(affected_mob, TRAIT_POWER_TENACIOUS))
+		metabolization_rate = 0.1
+	// End doppler edit
+
 	if(!significant && volume >= WOUND_DETERMINATION_SEVERE)
 		significant = TRUE
 		affected_mob.apply_status_effect(/datum/status_effect/determined) // in addition to the slight healing, limping cooldowns are divided by 4 during the combat high
 
-	volume = min(volume, WOUND_DETERMINATION_MAX)
+	volume = min(volume, WOUND_DETERMINATION_MAX * (HAS_TRAIT(affected_mob, TRAIT_POWER_TENACIOUS) ? 1.5 : 1)) // doppler edit
 
 	for(var/thing in affected_mob.all_wounds)
 		var/datum/wound/W = thing
